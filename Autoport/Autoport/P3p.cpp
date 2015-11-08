@@ -43,26 +43,22 @@
  *                  -1 if world points aligned
  */
 
-#include "P3p.h"
-
+#include "stdafx.h"
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <math.h>
 #include <complex>
-//#include <TooN/SVD.h>
-//#include <TooN/determinant.h>
 #include <Eigen/Eigen/Dense>
 #include <Eigen/Eigen/Geometry>
+
+#include "P3p.h"
 
 using Eigen::Matrix3d;
 using Eigen::Vector3d;
 
-P3p::P3p() {
-}
-
-P3p::~P3p() {
-}
+P3p::P3p() {}
+P3p::~P3p() {}
 
 int P3p::computePoses( Matrix3d featureVectors, Matrix3d worldPoints, Eigen::Matrix<double,3,16> &solutions )
 {
