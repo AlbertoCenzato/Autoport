@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Autoport", "Autoport\Autoport.vcxproj", "{50FC90E6-AC92-4247-A804-694376BBFBBF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{50FC90E6-AC92-4247-A804-694376BBFBBF}.Debug|x64.ActiveCfg = Debug|x64
+		{50FC90E6-AC92-4247-A804-694376BBFBBF}.Debug|x64.Build.0 = Debug|x64
+		{50FC90E6-AC92-4247-A804-694376BBFBBF}.Debug|x86.ActiveCfg = Debug|Win32
+		{50FC90E6-AC92-4247-A804-694376BBFBBF}.Debug|x86.Build.0 = Debug|Win32
+		{50FC90E6-AC92-4247-A804-694376BBFBBF}.Release|x64.ActiveCfg = Release|x64
+		{50FC90E6-AC92-4247-A804-694376BBFBBF}.Release|x64.Build.0 = Release|x64
+		{50FC90E6-AC92-4247-A804-694376BBFBBF}.Release|x86.ActiveCfg = Release|Win32
+		{50FC90E6-AC92-4247-A804-694376BBFBBF}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 2
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://albertocenzato.visualstudio.com/defaultcollection
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = Autoport\\Autoport.vcxproj
+		SccProjectName1 = Autoport
+		SccLocalPath1 = Autoport
+	EndGlobalSection
+EndGlobal
