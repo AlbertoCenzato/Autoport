@@ -104,24 +104,24 @@ int P3p::computePoses( Matrix3d featureVectors, Matrix3d worldPoints, Eigen::Mat
 	//What is this??
 	if( f3[2] > 0 )
 	{
-		f1 = featureVectors.T()[1];
-		f2 = featureVectors.T()[0];
-		f3 = featureVectors.T()[2];
+		f1 = featureVectors.col(1);
+		f2 = featureVectors.col(0);
+		f3 = featureVectors.col(2);
 
 		tx = f1;
-		tz = f1 ^ f2;
-		tz = tz / TooN::norm(tz);
-		ty = tz ^ tx;
+		tz = f1.cross(f2);
+		tz = tz / tz.norm();
+		ty = tz.cross(tx);
 
-		T[0] = tx;
-		T[1] = ty;
-		T[2] = tz;
+		T.col(0) = tx;
+		T.col(1) = ty;
+		T.col(2) = tz;
 
 		f3 = T*f3;
 
-		P1 = worldPoints.T()[1];
-		P2 = worldPoints.T()[0];
-		P3 = worldPoints.T()[2];
+		P1 = worldPoints.col(1);
+		P2 = worldPoints.col(0);
+		P3 = worldPoints.col(2);
 	}
 
 	// Creation of intermediate world frame
