@@ -5,6 +5,8 @@ VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Autoport", "Autoport\Autoport.vcxproj", "{50FC90E6-AC92-4247-A804-694376BBFBBF}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Eigen", "Eigen\Eigen.vcxproj", "{3E2DB1D3-2AFF-4331-BDEB-5AF9749A05A3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,17 +23,28 @@ Global
 		{50FC90E6-AC92-4247-A804-694376BBFBBF}.Release|x64.Build.0 = Release|x64
 		{50FC90E6-AC92-4247-A804-694376BBFBBF}.Release|x86.ActiveCfg = Release|Win32
 		{50FC90E6-AC92-4247-A804-694376BBFBBF}.Release|x86.Build.0 = Release|Win32
+		{3E2DB1D3-2AFF-4331-BDEB-5AF9749A05A3}.Debug|x64.ActiveCfg = Debug|x64
+		{3E2DB1D3-2AFF-4331-BDEB-5AF9749A05A3}.Debug|x64.Build.0 = Debug|x64
+		{3E2DB1D3-2AFF-4331-BDEB-5AF9749A05A3}.Debug|x86.ActiveCfg = Debug|Win32
+		{3E2DB1D3-2AFF-4331-BDEB-5AF9749A05A3}.Debug|x86.Build.0 = Debug|Win32
+		{3E2DB1D3-2AFF-4331-BDEB-5AF9749A05A3}.Release|x64.ActiveCfg = Release|x64
+		{3E2DB1D3-2AFF-4331-BDEB-5AF9749A05A3}.Release|x64.Build.0 = Release|x64
+		{3E2DB1D3-2AFF-4331-BDEB-5AF9749A05A3}.Release|x86.ActiveCfg = Release|Win32
+		{3E2DB1D3-2AFF-4331-BDEB-5AF9749A05A3}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 2
+		SccNumberOfProjects = 3
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://albertocenzato.visualstudio.com/defaultcollection
 		SccLocalPath0 = .
 		SccProjectUniqueName1 = Autoport\\Autoport.vcxproj
 		SccProjectName1 = Autoport
 		SccLocalPath1 = Autoport
+		SccProjectUniqueName2 = Eigen\\Eigen.vcxproj
+		SccProjectName2 = Eigen
+		SccLocalPath2 = Eigen
 	EndGlobalSection
 EndGlobal

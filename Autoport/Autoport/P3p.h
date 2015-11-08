@@ -46,8 +46,7 @@
 #ifndef P3P_H_
 #define P3P_H_
 
-//#include <TooN/TooN.h>
-#include <Eigen/Eigen/Dense>
+#include "../Eigen/Eigen/Dense"
 
 class P3p {
 public:

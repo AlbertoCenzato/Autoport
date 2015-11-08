@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 #include <stdio.h>
-#include <Eigen/Eigen/Dense>
+#include "..\Eigen\Eigen\Dense"
 #include "P3p.h"
 
 int main()
