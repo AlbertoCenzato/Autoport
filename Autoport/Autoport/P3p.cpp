@@ -85,7 +85,7 @@ int P3p::computePoses( Matrix3d featureVectors, Matrix3d worldPoints, Eigen::Mat
 
 	Vector3d tx = f1;
 	Vector3d tz = f1.cross(f2);
-	tz = tz / tz.norm();
+	tz.normalize();
 	Vector3d ty = tz.cross(tx);
 
 	Matrix3d T;
@@ -96,7 +96,6 @@ int P3p::computePoses( Matrix3d featureVectors, Matrix3d worldPoints, Eigen::Mat
 	f3 = T*f3;
 
 	// Reinforce that f3[2] > 0 for having theta in [0;pi]
-
 	//What is this??
 	if( f3[2] > 0 )
 	{
@@ -123,9 +122,9 @@ int P3p::computePoses( Matrix3d featureVectors, Matrix3d worldPoints, Eigen::Mat
 	// Creation of intermediate world frame
 
 	Vector3d n1 = P2-P1;
-	n1 = n1 / n1.norm();
+	n1.normalize();
 	Vector3d n3 = n1.cross(P3-P1);
-	n3 = n3 / n3.norm();
+	n3.normalize();
 	Vector3d n2 = n3.cross(n1);
 
 	Matrix3d N;
@@ -142,7 +141,6 @@ int P3p::computePoses( Matrix3d featureVectors, Matrix3d worldPoints, Eigen::Mat
 	double phi2 = f3[1]/f3[2];
 	double p1 = P3[0];
 	double p2 = P3[1];
-
 	double cos_beta = f1.dot(f2);
 	double b = 1/(1-pow(cos_beta,2)) - 1;
 
