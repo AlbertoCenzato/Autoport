@@ -101,6 +101,7 @@ int P3p::computePoses( Matrix3d featureVectors, Matrix3d worldPoints, Eigen::Mat
 
 	// Reinforce that f3[2] > 0 for having theta in [0;pi]
 
+	//What is this??
 	if( f3[2] > 0 )
 	{
 		f1 = featureVectors.T()[1];
@@ -126,27 +127,27 @@ int P3p::computePoses( Matrix3d featureVectors, Matrix3d worldPoints, Eigen::Mat
 	// Creation of intermediate world frame
 
 	Vector3d n1 = P2-P1;
-	n1 = n1 / TooN::norm(n1);
-	Vector3d n3 = n1 ^ (P3-P1);
-	n3 = n3 / TooN::norm(n3);
-	Vector3d n2 = n3 ^ n1;
+	n1 = n1 / n1.norm();
+	Vector3d n3 = n1.cross(P3-P1);
+	n3 = n3 / n3.norm();
+	Vector3d n2 = n3.cross(n1);
 
 	Matrix3d N;
-	N[0] = n1;
-	N[1] = n2;
-	N[2] = n3;
+	N.row(0) = n1.transpose();
+	N.row(1) = n2.transpose();
+	N.row(2) = n3.transpose();
 
 	// Extraction of known parameters
 
 	P3 = N*(P3-P1);
 
-	double d_12 = TooN::norm(P2-P1);
-	double f_1 = f3[0]/f3[2];
-	double f_2 = f3[1]/f3[2];
-	double p_1 = P3[0];
-	double p_2 = P3[1];
+	double d_12 = (P2-P1).norm();
+	double phi1 = f3[0]/f3[2];
+	double phi2 = f3[1]/f3[2];
+	double p1 = P3[0];
+	double p2 = P3[1];
 
-	double cos_beta = f1 * f2;
+	double cos_beta = f1.dot(f2);
 	double b = 1/(1-pow(cos_beta,2)) - 1;
 
 	if (cos_beta < 0)
@@ -156,35 +157,35 @@ int P3p::computePoses( Matrix3d featureVectors, Matrix3d worldPoints, Eigen::Mat
 
 	// Definition of temporary variables for avoiding multiple computation
 
-	double f_1_pw2 = pow(f_1,2);
-	double f_2_pw2 = pow(f_2,2);
-	double p_1_pw2 = pow(p_1,2);
-	double p_1_pw3 = p_1_pw2 * p_1;
-	double p_1_pw4 = p_1_pw3 * p_1;
-	double p_2_pw2 = pow(p_2,2);
-	double p_2_pw3 = p_2_pw2 * p_2;
-	double p_2_pw4 = p_2_pw3 * p_2;
+	double phi1_pw2 = pow(phi1,2);
+	double phi2_pw2 = pow(phi2,2);
+	double p1_pw2   = pow(p1,2);
+	double p1_pw3   = p1_pw2 * p1;
+	double p1_pw4   = p1_pw3 * p1;
+	double p2_pw2   = pow(p2,2);
+	double p2_pw3   = p2_pw2 * p2;
+	double p2_pw4   = p2_pw3 * p2;
 	double d_12_pw2 = pow(d_12,2);
-	double b_pw2 = pow(b,2);
+	double b_pw2	= pow(b,2);
 
 	// Computation of factors of 4th degree polynomial
 
-	Matrix<double,5,1> factors;
+	Eigen::Matrix<double,5,1> factors;
 
-	factors[0] = -f_2_pw2*p_2_pw4 - p_2_pw4*f_1_pw2 - p_2_pw4;
+	factors[0] = p2_pw4*(-phi2_pw2 - phi1_pw2 - 1);	//ok, rearranged to do less computations
 
-	factors[1] = 2*p_2_pw3*d_12*b + 2*f_2_pw2*p_2_pw3*d_12*b - 2*f_2*p_2_pw3*f_1*d_12;
+	factors[1] = 2*p2_pw3*d_12*(b + phi2_pw2*b - phi1*phi2);	//ok, rearranged to do less computations
 
-	factors[2] = -f_2_pw2*p_2_pw2*p_1_pw2      - f_2_pw2*p_2_pw2*d_12_pw2*b_pw2 - f_2_pw2*p_2_pw2*d_12_pw2
-				 +f_2_pw2*p_2_pw4		       + p_2_pw4*f_1_pw2				+ 2*p_1*p_2_pw2*d_12
-				 +2*f_1*f_2*p_1*p_2_pw2*d_12*b - p_2_pw2*p_1_pw2*f_1_pw2        + 2*p_1*p_2_pw2*f_2_pw2*d_12
-				 -p_2_pw2*d_12_pw2*b_pw2       - 2*p_1_pw2*p_2_pw2;
+	factors[2] = - phi2_pw2*p1_pw2*p2_pw2 - phi2_pw2*p2_pw2*d_12_pw2*b_pw2 - phi2_pw2*p2_pw2*d_12_pw2	  + phi2_pw2*p2_pw4	//ok
+		         + phi1_pw2*p2_pw4		  + 2*p1*p2_pw2*d_12			   + 2*phi1*phi2*p1*p2_pw2*d_12*b						//ok
+				 - phi1_pw2*p1_pw2*p2_pw2 + 2*phi2_pw2*p1*p2_pw2*d_12      - p2_pw2*d_12_pw2*b_pw2        - 2*p1_pw2*p2_pw2;	//ok
 
-	factors[3] = 2*p_1_pw2*p_2*d_12*b + 2*f_2*p_2_pw3*f_1*d_12 - 2*f_2_pw2*p_2_pw3*d_12*b - 2*p_1*p_2*d_12_pw2*b;
+	factors[3] =   2*p1_pw2*p2*d_12*b + 2*phi1*phi2*p2_pw3*d_12   //ok
+				 - 2*phi2_pw2*p2_pw3*d_12*b - 2*p1*p2*d_12_pw2*b; //ok
 
-	factors[4] = -2*f_2*p_2_pw2*f_1*p_1*d_12*b + f_2_pw2*p_2_pw2*d_12_pw2  + 2*p_1_pw3*d_12 
-				 - p_1_pw2*d_12_pw2			   +f_2_pw2*p_2_pw2*p_1_pw2	   - p_1_pw4						 
-				 - 2*f_2_pw2*p_2_pw2*p_1*d_12  +p_2_pw2*f_1_pw2*p_1_pw2    + f_2_pw2*p_2_pw2*d_12_pw2*b_pw2;
+	factors[4] = - 2*phi1*phi2*p1*p2_pw2*d_12*b + phi2_pw2*p2_pw2*d_12_pw2 + 2*p1_pw3*d_12								//ok	
+				 - p1_pw2*d_12_pw2			    + phi2_pw2*p1_pw2*p2_pw2   - p1_pw4		   - 2*phi2_pw2*p1*p2_pw2*d_12	//ok
+				 + phi1_pw2*p1_pw2*p2_pw2       + phi2_pw2*p2_pw2*d_12_pw2*b_pw2;										//ok
 
 	// Computation of roots
 
@@ -196,34 +197,36 @@ int P3p::computePoses( Matrix3d featureVectors, Matrix3d worldPoints, Eigen::Mat
 
 	for(int i=0; i<4; i++)
 	{
-		double cot_alpha = (-f_1*p_1/f_2 - realRoots[i]*p_2 + d_12*b)/(-f_1*realRoots[i]*p_2/f_2 + p_1 - d_12);
+		double cotAlpha = (-phi1*p1/phi2 - realRoots[i]*p2 + d_12*b)/(-phi1*realRoots[i]*p2/phi2 + p1 - d_12);
 
-		double cos_theta = realRoots[i];
-		double sin_theta = sqrt(1 - pow(realRoots[i],2));
-		double sin_alpha = sqrt(1/(pow(cot_alpha,2) + 1));
-		double cos_alpha = sqrt(1 - pow(sin_alpha,2));
+		double cosTheta = realRoots[i];
+		double sinTheta = sqrt(1 - pow(realRoots[i],2));
+		double sinAlpha = sqrt(1/(pow(cotAlpha,2) + 1));
+		double cosAlpha = sqrt(1 - pow(sinAlpha,2));
 
-		if (cot_alpha < 0)
-			cos_alpha = -cos_alpha;
+		if (cotAlpha < 0)
+			cosAlpha = -cosAlpha;
 
-		Vector3d C = TooN::makeVector(
-				d_12*cos_alpha*(sin_alpha*b+cos_alpha),
-				cos_theta*d_12*sin_alpha*(sin_alpha*b+cos_alpha),
-				sin_theta*d_12*sin_alpha*(sin_alpha*b+cos_alpha));
+		double bSinCos = sinAlpha*b + cosAlpha;
 
-		C = P1 + N.T()*C;
+		Vector3d C; 
+		C <<	d_12*cosAlpha*bSinCos,
+				cosTheta*d_12*sinAlpha*bSinCos,
+				sinTheta*d_12*sinAlpha*bSinCos;
 
-		Matrix3d R;
-		R[0] = TooN::makeVector(	-cos_alpha,		-sin_alpha*cos_theta,	-sin_alpha*sin_theta );
-		R[1] = TooN::makeVector(	sin_alpha,		-cos_alpha*cos_theta,	-cos_alpha*sin_theta );
-		R[2] = TooN::makeVector(	0,				-sin_theta,				cos_theta );
+		C = P1 + N.transpose()*C;
 
-		R = N.T()*R.T()*T;
+		Matrix3d Q;
+		Q.row(0) << -cosAlpha, -sinAlpha*cosTheta, -sinAlpha*sinTheta;
+		Q.row(1) <<  sinAlpha, -cosAlpha*cosTheta, -cosAlpha*sinTheta;
+		Q.row(2) <<  0,		   -sinTheta,		    cosTheta;
 
-		solutions.T()[i*4] = C;
-		solutions.T()[i*4+1] = R.T()[0];
-		solutions.T()[i*4+2] = R.T()[1];
-		solutions.T()[i*4+3] = R.T()[2];
+		Matrix3d R = N.transpose()*Q.transpose()*T;
+
+		solutions.col(i*4)   = C;
+		solutions.col(i*4+1) = R.col(0);
+		solutions.col(i*4+2) = R.col(1);
+		solutions.col(i*4+3) = R.col(2);
 	}
 
 	return 0;
