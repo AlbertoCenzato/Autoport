@@ -69,14 +69,14 @@ void SimulazioneCompleta() {
 	fd_0.col(3) = f4d_0;
 
 	//TODO define p3p_solver_new
-	[T_0, R_0] = p3p_solver_new(P, fd_0);	//T_0 is a 3x4 matrix, for R see matlab file "p3p_solver_new.m" (should be 3x3)
+	[T_0, R_0] = p3p_solver_new(P, fd_0);	//T_0 is a 3x1 vector, for R see matlab file "p3p_solver_new.m" (should be 3x3)
 
 	//TODO define dcm_to_ypr
 	double ypr[3];
 	ypr = dcm_to_ypr(R_0);	//ypr = vector containing yaw, pitch, roll
 	//[Yaw_0, Pitch_0, Roll_0] = dcm_to_ypr(R_0);	original line of code
 
-	Eigen::Matrix<double,3,4> T_s = T_0;
+	double[3] T_s = T_0;
 	double Yaw_s = yaw0 * PI / 180;
 	double Pitch_s = pitch0 *PI / 180;
 	double Roll_s = roll0 *PI / 180;
@@ -107,21 +107,24 @@ void SimulazioneCompleta() {
 		Pitch_nt[iter] = 0;					 // rad
 		Roll_nt[iter]  = ypr[2] * PI / 180 + (2 * PI / 180)*cos(w*t); // rad
 
-		T_nt(:, iter) = T_0;
+		Eigen::Matrix<double, 3, 1001> T_nt;
+		T_nt.col(iter) = T_0;
 
-		R_nt11 = cos(Yaw_nt(iter))*cos(Pitch_nt(iter));
-		R_nt12 = sin(Yaw_nt(iter))*cos(Pitch_nt(iter));
-		R_nt13 = -sin(Pitch_nt(iter));
-		R_nt21 = cos(Yaw_nt(iter))*sin(Pitch_nt(iter))*sin(Roll_nt(iter)) - sin(Yaw_nt(iter))*cos(Roll_nt(iter));
-		R_nt22 = sin(Yaw_nt(iter))*sin(Pitch_nt(iter))*sin(Roll_nt(iter)) + cos(Yaw_nt(iter))*cos(Roll_nt(iter));
-		R_nt23 = cos(Pitch_nt(iter))*sin(Roll_nt(iter));
-		R_nt31 = cos(Yaw_nt(iter))*sin(Pitch_nt(iter))*cos(Roll_nt(iter)) + sin(Yaw_nt(iter))*sin(Roll_nt(iter));
-		R_nt32 = sin(Yaw_nt(iter))*sin(Pitch_nt(iter))*cos(Roll_nt(iter)) - cos(Yaw_nt(iter))*sin(Roll_nt(iter));
-		R_nt33 = cos(Pitch_nt(iter))*cos(Roll_nt(iter));
+		double R_nt11 = cos(Yaw_nt[iter])*cos(Pitch_nt[iter]);
+		double R_nt12 = sin(Yaw_nt[iter])*cos(Pitch_nt[iter]);
+		double R_nt13 = -sin(Pitch_nt[iter]);
+		double R_nt21 = cos(Yaw_nt[iter])*sin(Pitch_nt[iter])*sin(Roll_nt[iter]) - sin(Yaw_nt[iter])*cos(Roll_nt[iter]);
+		double R_nt22 = sin(Yaw_nt[iter])*sin(Pitch_nt[iter])*sin(Roll_nt[iter]) + cos(Yaw_nt[iter])*cos(Roll_nt[iter]);
+		double R_nt23 = cos(Pitch_nt[iter])*sin(Roll_nt[iter]);
+		double R_nt31 = cos(Yaw_nt[iter])*sin(Pitch_nt[iter])*cos(Roll_nt[iter]) + sin(Yaw_nt[iter])*sin(Roll_nt[iter]);
+		double R_nt32 = sin(Yaw_nt[iter])*sin(Pitch_nt[iter])*cos(Roll_nt[iter]) - cos(Yaw_nt[iter])*sin(Roll_nt[iter]);
+		double R_nt33 = cos(Pitch_nt[iter])*cos(Roll_nt[iter]);
+
+		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 		R_nt = [R_nt11 R_nt12 R_nt13; R_nt21 R_nt22 R_nt23; R_nt31 R_nt32 R_nt33];
 
-		% Parametri:
+		// Parametri:
 
 		focal = 3.46031;
 		d_pxl = 1.4e-3;
