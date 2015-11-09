@@ -6,6 +6,25 @@
 #include "..\Eigen\Eigen\Dense"
 #include "P3p.h"
 
+
+/*
+This function finds the angles (in RADIANS) of the yaw - pitch - roll sequence
+R1(gamma)*R2(beta)*R3(alpha) from the direction cosine matrix
+Q - direction cosine matrix
+yaw - yaw angle(rad)
+pitch - pitch angle(rad)
+roll - roll angle(rad)
+*/
+
+inline double* dcm_to_ypr(Eigen::Matrix3d &R) {
+	double ypr[3];
+	ypr[0] = atan(R(0, 1) / R(0, 0));
+	ypr[1] = asin(-R(0, 2));
+	ypr[2] = atan(R(1, 2) / R(2, 2));
+	return ypr;
+}
+
+
 int main()
 {
 	printf("Test program for modified P3p.cpp");
@@ -39,6 +58,15 @@ int main()
 			printf("%f\n", solutions(i, j));
 	}
 	getchar();
+
+	printf("-------------------------------------------------------\n");
+	printf("\nTEST PROGRAM FOR dcm_to_ypr.cpp");
+	Eigen::Matrix3d R;
+	R << 0.7922, 0.0357, 0.6787, 0.9595, 0.8491, 0.7577, 0.6557, 0.9340, 0.7431;
+	double *ypr = dcm_to_ypr(R);
+	printf("\n\nYaw: %f\nPitch: %f\nRoll: %f", ypr[0], ypr[1], ypr[2]);
+	getchar();
     return 0;
 }
+
 
