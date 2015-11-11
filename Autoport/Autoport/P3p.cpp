@@ -60,7 +60,7 @@ using Eigen::Vector3d;
 P3p::P3p() {}
 P3p::~P3p() {}
 
-int P3p::computePoses( Matrix3d featureVectors, Matrix3d worldPoints, Eigen::Matrix<double,3,16> &solutions )
+Eigen::Matrix<double, 3, 16> P3p::computePoses(Matrix3d featureVectors, Matrix3d worldPoints)
 {
 	// Extraction of world points
 	//(Vector3d is a column vector of double of length 3)
@@ -223,7 +223,7 @@ int P3p::computePoses( Matrix3d featureVectors, Matrix3d worldPoints, Eigen::Mat
 		solutions.col(i*4+3) = R.col(2);
 	}
 
-	return 0;
+	return solutions;
 }
 
 int P3p::solveQuartic(Eigen::Matrix<double, 5, 1> factors, Eigen::Vector4d &realRoots)
