@@ -7,6 +7,9 @@
 #include "P3p.h"
 
 using Eigen::Vector3d;
+using Eigen::Matrix3d;
+
+
 
 /*
 This function finds the angles (in RADIANS) of the yaw - pitch - roll sequence
@@ -54,25 +57,43 @@ Eigen::Matrix<double, 3, 4> p3p_solver(Eigen::Matrix<double, 3, 4> &P, Eigen::Ma
 	//Primo calcolo
 	//Input al codice di Kneip:
 	Eigen::Matrix3d wP;
-	wP << P1, P2, P4; //CHECK IF WORKS LIKE THIS
+	wP.col(0) = P1
+	wP.col(1) = P2
+	wP.col(2) = P4; //CHECK IF WORKS LIKE THIS
 	Eigen::Matrix3d iV;
-	iV << f1, f2, f4; //SAME HERE
+	iV.col(0) = f1
+	iV.col(1) = f2
+	iV.col(2) = f4; //SAME HERE
 
-					  //risoluzione del p3p
+	//risoluzione del p3p
 	P3p p3p;
-	Eigen::Matrix<double, 3, 16> poses;	//set n and m dimension
-	p3p.computePoses(iV, wP, poses);
+	Eigen::Matrix<double, 3, 16> poses = p3p.computePoses(iV, wP);	//set n and m dimension
 	Vector3d C1 = poses.col(0);
 	Vector3d C2 = poses.col(4);
 	Vector3d C3 = poses.col(8);
 	Vector3d C4 = poses.col(12);
-	Eigen::Matrix3d R1 = poses.block(0, 1, 3, 3);
-	Eigen::Matrix3d R2 = poses.block(0, 5, 3, 3);
-	Eigen::Matrix3d R3 = poses.block(0, 9, 3, 3);
-	Eigen::Matrix3d R4 = poses.block(0, 13, 3, 3);
+	Matrix3d R1;
+	R1.col(0) = poses.col(1);
+	R1.col(1) = poses.col(2);
+	R1.col(2) = poses.col(3);
+	Matrix3d R2;
+	R2.col(0) = poses.col(5);
+	R2.col(1) = poses.col(6);
+	R2.col(2) = poses.col(7);
+	Matrix3d R3;
+	R3.col(0) = poses.col(9);
+	R3.col(1) = poses.col(10);
+	R3.col(2) = poses.col(11);
+	Matrix3d R4;
+	R4.col(0) = poses.col(13);
+	R4.col(1) = poses.col(14);
+	R4.col(2) = poses.col(15);
 	Eigen::Matrix<double, 3, 4> C;
+	C.col(0) = C1;
+	C.col(1) = C2;
+	C.col(2) = C3;
+	C.col(3) = C4;
 	Eigen::Matrix<double, 3, 12> R;
-	C << C1, C2, C3, C4;
 	R << R1, R2, R3, R4;
 
 	//Discriminazione della soluzione esatta
@@ -100,10 +121,16 @@ Eigen::Matrix<double, 3, 4> p3p_solver(Eigen::Matrix<double, 3, 4> &P, Eigen::Ma
 	}
 
 	Vector3d c = C.col(index);
-	Eigen::Matrix3d r = R.block(0, 3 * index, 3, 3);
+	Matrix3d r;
+	r.col(0) = R.col(3 * index);
+	r.col(1) = R.col(3 * index + 1);
+	r.col(2) = R.col(3 * index + 2);
 
 	Eigen::Matrix<double, 3, 4> solution;
-	solution << c, r;
+	solution.col(0) = c;
+	solution.col(1) = r.col(0);
+	solution.col(2) = r.col(1);
+	solution.col(3) = r.col(2);
 
 	//CHECK IF RETURNS BY VALUE OR BY REFERENCE!
 	return solution;
