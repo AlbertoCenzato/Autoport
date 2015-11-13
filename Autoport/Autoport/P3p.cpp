@@ -72,9 +72,10 @@ Eigen::Matrix<double, 3, 16> P3p::computePoses(Matrix3d featureVectors, Matrix3d
 	//TODO: probably useless check!
 	Vector3d temp1 = P2 - P1;
 	Vector3d temp2 = P3 - P1;
-
-	if((temp1.cross(temp2)).norm() == 0)
-		return -1;
+	if ((temp1.cross(temp2)).norm() == 0) {
+		Eigen::Matrix<double, 3, 16> zero;
+		return zero;
+	}
 
 	// Extraction of feature vectors
 	Vector3d f1 = featureVectors.col(0);
@@ -121,9 +122,9 @@ Eigen::Matrix<double, 3, 16> P3p::computePoses(Matrix3d featureVectors, Matrix3d
 
 	// Creation of intermediate world frame
 
-	Vector3d n1 = P2-P1;
+	Vector3d n1 = P2 - P1;
 	n1.normalize();
-	Vector3d n3 = n1.cross(P3-P1);
+	Vector3d n3 = n1.cross(P3 - P1);
 	n3.normalize();
 	Vector3d n2 = n3.cross(n1);
 
@@ -133,16 +134,15 @@ Eigen::Matrix<double, 3, 16> P3p::computePoses(Matrix3d featureVectors, Matrix3d
 	N.row(2) = n3.transpose();
 
 	// Extraction of known parameters
+	P3 = N*(P3 - P1);
 
-	P3 = N*(P3-P1);
-
-	double d_12 = (P2-P1).norm();
+	double d_12 = (P2 - P1).norm();
 	double phi1 = f3[0]/f3[2];
 	double phi2 = f3[1]/f3[2];
 	double p1 = P3[0];
 	double p2 = P3[1];
 	double cos_beta = f1.dot(f2);
-	double b = 1/(1-pow(cos_beta,2)) - 1;
+	double b = 1/(1 - pow(cos_beta,2)) - 1;
 
 	if (cos_beta < 0)
 		b = -sqrt(b);
@@ -188,7 +188,7 @@ Eigen::Matrix<double, 3, 16> P3p::computePoses(Matrix3d featureVectors, Matrix3d
 	this->solveQuartic( factors, realRoots );
 
 	// Backsubstitution of each solution
-
+	Eigen::Matrix<double, 3, 16> solutions;
 	for(int i=0; i<4; i++)
 	{
 		double cotAlpha = (-phi1*p1/phi2 - realRoots[i]*p2 + d_12*b)/(-phi1*realRoots[i]*p2/phi2 + p1 - d_12);

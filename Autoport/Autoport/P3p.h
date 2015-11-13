@@ -53,7 +53,7 @@ public:
 	P3p();
 	virtual ~P3p();
 
-	int computePoses(Eigen::Matrix3d featureVectors, Eigen::Matrix3d worldPoints, Eigen::Matrix<double, 3, 16> &solutions);
+	Eigen::Matrix<double,3,16> computePoses(Eigen::Matrix3d featureVectors, Eigen::Matrix3d worldPoints);
 	int solveQuartic(Eigen::Matrix<double,5,1>, Eigen::Vector4d &realRoots);
 };
 

@@ -57,12 +57,12 @@ Eigen::Matrix<double, 3, 4> p3p_solver(Eigen::Matrix<double, 3, 4> &P, Eigen::Ma
 	//Primo calcolo
 	//Input al codice di Kneip:
 	Eigen::Matrix3d wP;
-	wP.col(0) = P1
-	wP.col(1) = P2
+	wP.col(0) = P1;
+	wP.col(1) = P2;
 	wP.col(2) = P4; //CHECK IF WORKS LIKE THIS
 	Eigen::Matrix3d iV;
-	iV.col(0) = f1
-	iV.col(1) = f2
+	iV.col(0) = f1;
+	iV.col(1) = f2;
 	iV.col(2) = f4; //SAME HERE
 
 	//risoluzione del p3p
@@ -159,10 +159,9 @@ int main()
 	worldPoints.col(1) << -50,  50, 0;
 	worldPoints.col(2) << -50, -50, 0;
 
-	Eigen::Matrix<double, 3, 16> solutions = Eigen::MatrixXd::Zero(3,16);
-	
+	Eigen::Matrix<double, 3, 16> solutions;
 	P3p p3p;
-	p3p.computePoses(featureVectors, worldPoints, solutions);
+	solutions = p3p.computePoses(featureVectors, worldPoints);
 	for (int i = 0; i < 3; i++) {
 		printf("\n");
 		for (int j = 0; j < 16; j++)
