@@ -75,6 +75,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\alber\Documents\Visual Studio 2015\Projects\Autoport\Eigen;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -157,9 +158,7 @@
   <ItemGroup>
     <ClCompile Include="Autoport.cpp" />
     <ClCompile Include="Functions.cpp" />
-    <ClCompile Include="pinHoleFSolve.cpp" />
     <ClCompile Include="P3p.cpp" />
-    <ClCompile Include="p3p_solver.cpp" />
     <ClCompile Include="SimulazioneCompleta.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

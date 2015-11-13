@@ -1,10 +1,14 @@
 #include "stdafx.h"
 #include <stdio.h>
-#include "..\Eigen\Eigen\Dense"
+#include <Eigen\Dense>
+#include "..\Eigen\unsupported\Eigen\NonLinearOptimization"
+#include "..\Eigen\unsupported\Eigen\NumericalDiff"
 #include "P3p.h"
+#include "Functions.h"
 
 using Eigen::Matrix3d;
 using Eigen::Vector3d;
+using Eigen::Vector2d;
 
 /* This function finds the angles (in RADIANS) of the yaw - pitch - roll sequence
 R1(gamma)*R2(beta)*R3(alpha) from the direction cosine matrix
@@ -104,7 +108,7 @@ Eigen::Matrix<double, 3, 4> p3p_solver(Eigen::Matrix<double, 3, 4> &P, Eigen::Ma
 	dF = dF.cwiseAbs();
 
 	//find a better algorithm for min finding
-	int min = dF(0);
+	double min = dF(0);
 	int index = 0;
 	for (int i = 1; i < 4; i++) {
 		if (dF(i) < min) {
@@ -127,4 +131,129 @@ Eigen::Matrix<double, 3, 4> p3p_solver(Eigen::Matrix<double, 3, 4> &P, Eigen::Ma
 
 	//CHECK IF RETURNS BY VALUE OR BY REFERENCE!
 	return solution;
+}
+
+
+// Generic functor
+template<typename _Scalar, int NX = Eigen::Dynamic, int NY = Eigen::Dynamic>
+struct Functor
+{
+	typedef _Scalar Scalar;
+	enum {
+		InputsAtCompileTime = NX,
+		ValuesAtCompileTime = NY
+	};
+	typedef Eigen::Matrix<Scalar, InputsAtCompileTime, 1> InputType;
+	typedef Eigen::Matrix<Scalar, ValuesAtCompileTime, 1> ValueType;
+	typedef Eigen::Matrix<Scalar, ValuesAtCompileTime, InputsAtCompileTime> JacobianType;
+
+	int m_inputs, m_values;
+
+	Functor() : m_inputs(InputsAtCompileTime), m_values(ValuesAtCompileTime) {}
+	Functor(int inputs, int values) : m_inputs(inputs), m_values(values) {}
+
+	int inputs() const { return m_inputs; }
+	int values() const { return m_values; }
+};
+
+
+struct PinHoleEquations : Functor<double> /*TODO: inputs and values missing! Add them!*/{
+	PinHoleEquations(double* q_d, double* v, double* PXL1, double* PXL2, double* PXL3, double* PXL4, double* P1_T, double* P2_T, double* P3_T, double* P4_T, double focal, double d_pxl)
+		: q_d(q_d), v(v), PXL1(PXL1), PXL2(PXL2), PXL3(PXL3), PXL4(PXL4), P1_T(P1_T), P2_T(P2_T), P3_T(P3_T), P4_T(P4_T) {}
+
+	int operator()(Eigen::VectorXd &variables, Eigen::VectorXd &fvec) const {
+
+		double x = variables(0);
+		double Y = variables(1);
+		double Z = variables(2);
+		double Yaw = variables(3);
+		double Pitch = variables(4);
+		double Roll = variables(5);
+
+		double cosYaw = cos(Yaw);
+		double sinYaw = sin(Yaw);
+		double cosPitch = cos(Pitch);
+		double sinPitch = sin(Pitch);
+		double cosRoll = cos(Roll);
+		double sinRoll = sin(Roll);
+
+		//#define aaa(a,b)  (cos(a)*sin(b)+a*a)
+
+		double x_pxl_1 = PXL1[0];
+		double x_pxl_2 = PXL2[0];
+		double x_pxl_3 = PXL3[0];
+		double x_pxl_4 = PXL4[0];
+						 	 
+		double y_pxl_1 = PXL1[1];
+		double y_pxl_2 = PXL2[1];
+		double y_pxl_3 = PXL3[1];
+		double y_pxl_4 = PXL4[1];
+
+		double Px_1 = P1_T[0];
+		double Px_2 = P2_T[0];
+		double Px_3 = P3_T[0];
+		double Px_4 = P4_T[0];
+					  	  
+		double Py_1 = P1_T[1];
+		double Py_2 = P2_T[1];
+		double Py_3 = P3_T[1];
+		double Py_4 = P4_T[1];
+					  	  
+		double Pz_1 = P1_T[2];
+		double Pz_2 = P2_T[2];
+		double Pz_3 = P3_T[2];
+		double Pz_4 = P4_T[2];
+
+		double vx = v[0];
+		double vy = v[1];
+		double vz = v[2];
+					
+		double qx = q_d[0];
+		double qy = q_d[1];
+		double qz = q_d[2];
+
+		fvec(0) = x_pxl_1 - (focal*(cosPitch*cosYaw*(Px_1 - x) - sinPitch*(Pz_1 - Z) + cosPitch*sinYaw*(Py_1 - Y))) / (d_pxl*((Px_1 - x)*(sinRoll*sinYaw + cosRoll*cosYaw*sinPitch) - (Py_1 - Y)*(cosYaw*sinRoll - cosRoll*sinPitch*sinYaw) + cosPitch*cosRoll*(Pz_1 - Z)));
+		fvec(2) = x_pxl_2 - (focal*(cosPitch*cosYaw*(Px_2 - x) - sinPitch*(Pz_2 - Z) + cosPitch*sinYaw*(Py_2 - Y))) / (d_pxl*((Px_2 - x)*(sinRoll*sinYaw + cosRoll*cosYaw*sinPitch) - (Py_2 - Y)*(cosYaw*sinRoll - cosRoll*sinPitch*sinYaw) + cosPitch*cosRoll*(Pz_2 - Z)));
+		fvec(4) = x_pxl_3 - (focal*(cosPitch*cosYaw*(Px_3 - x) - sinPitch*(Pz_3 - Z) + cosPitch*sinYaw*(Py_3 - Y))) / (d_pxl*((Px_3 - x)*(sinRoll*sinYaw + cosRoll*cosYaw*sinPitch) - (Py_3 - Y)*(cosYaw*sinRoll - cosRoll*sinPitch*sinYaw) + cosPitch*cosRoll*(Pz_3 - Z)));
+		fvec(6) = x_pxl_4 - (focal*(cosPitch*cosYaw*(Px_4 - x) - sinPitch*(Pz_4 - Z) + cosPitch*sinYaw*(Py_4 - Y))) / (d_pxl*((Px_4 - x)*(sinRoll*sinYaw + cosRoll*cosYaw*sinPitch) - (Py_4 - Y)*(cosYaw*sinRoll - cosRoll*sinPitch*sinYaw) + cosPitch*cosRoll*(Pz_4 - Z)));
+
+		fvec(1) = y_pxl_1 - (focal*((Py_1 - Y)*(cosRoll*cosYaw + sinPitch*sinRoll*sinYaw) - (Px_1 - x)*(cosRoll*sinYaw - cosYaw*sinPitch*sinRoll) + cosPitch*sinRoll*(Pz_1 - Z))) / (d_pxl*((Px_1 - x)*(sinRoll*sinYaw + cosRoll*cosYaw*sinPitch) - (Py_1 - Y)*(cosYaw*sinRoll - cosRoll*sinPitch*sinYaw) + cosPitch*cosRoll*(Pz_1 - Z)));
+		fvec(3) = y_pxl_2 - (focal*((Py_2 - Y)*(cosRoll*cosYaw + sinPitch*sinRoll*sinYaw) - (Px_2 - x)*(cosRoll*sinYaw - cosYaw*sinPitch*sinRoll) + cosPitch*sinRoll*(Pz_2 - Z))) / (d_pxl*((Px_2 - x)*(sinRoll*sinYaw + cosRoll*cosYaw*sinPitch) - (Py_2 - Y)*(cosYaw*sinRoll - cosRoll*sinPitch*sinYaw) + cosPitch*cosRoll*(Pz_2 - Z)));
+		fvec(5) = y_pxl_3 - (focal*((Py_3 - Y)*(cosRoll*cosYaw + sinPitch*sinRoll*sinYaw) - (Px_3 - x)*(cosRoll*sinYaw - cosYaw*sinPitch*sinRoll) + cosPitch*sinRoll*(Pz_3 - Z))) / (d_pxl*((Px_3 - x)*(sinRoll*sinYaw + cosRoll*cosYaw*sinPitch) - (Py_3 - Y)*(cosYaw*sinRoll - cosRoll*sinPitch*sinYaw) + cosPitch*cosRoll*(Pz_3 - Z)));
+		fvec(7) = y_pxl_4 - (focal*((Py_4 - Y)*(cosRoll*cosYaw + sinPitch*sinRoll*sinYaw) - (Px_4 - x)*(cosRoll*sinYaw - cosYaw*sinPitch*sinRoll) + cosPitch*sinRoll*(Pz_4 - Z))) / (d_pxl*((Px_4 - x)*(sinRoll*sinYaw + cosRoll*cosYaw*sinPitch) - (Py_4 - Y)*(cosYaw*sinRoll - cosRoll*sinPitch*sinYaw) + cosPitch*cosRoll*(Pz_4 - Z)));
+
+		//TODO: change variable name, it sucks
+		double denominator = sqrt(pow(abs(qx - Z*sinPitch + x*cosPitch*cosYaw + Y*cosPitch*sinYaw), 2) + pow(abs(qz + x*(sinRoll*sinYaw + cosRoll*cosYaw*sinPitch) - Y*(cosYaw*sinRoll - cosRoll*sinPitch*sinYaw) + Z*cosPitch*cosRoll), 2) + pow(abs(qy - x*(cosRoll*sinYaw - cosYaw*sinPitch*sinRoll) + Y*(cosRoll*cosYaw + sinPitch*sinRoll*sinYaw) + Z*cosPitch*sinRoll), 2));
+
+		fvec(8) = vx + (qx - Z*sinPitch + x*cosPitch*cosYaw + Y*cosPitch*sinYaw) / denominator;
+		fvec(9) = vy + (qy - x*(cosRoll*sinYaw - cosYaw*sinPitch*sinRoll) + Y*(cosRoll*cosYaw + sinPitch*sinRoll*sinYaw) + Z*cosPitch*sinRoll) / denominator;
+		fvec(10) = vz + (qz + x*(sinRoll*sinYaw + cosRoll*cosYaw*sinPitch) - Y*(cosYaw*sinRoll - cosRoll*sinPitch*sinYaw) + Z*cosPitch*cosRoll) / denominator;
+
+		return 1;
+	}
+
+	double *q_d;
+	double *v;
+	double *PXL1;
+	double *PXL2;
+	double *PXL3;
+	double *PXL4;
+	double *P1_T;
+	double *P2_T;
+	double *P3_T;
+	double *P4_T;
+	double focal;
+	double d_pxl;
+};
+
+
+//TODO: fix the size of VectorXd variables
+int pinHoleFSolve(Eigen::VectorXd &variables, Eigen::VectorXd &fvec, double* q_d, double* v, double* PXL1, double* PXL2, double* PXL3, double* PXL4, double* P1_T, double* P2_T, double* P3_T, double* P4_T, double focal, double d_pxl) {
+
+	PinHoleEquations pinHoleFunctor(q_d, v, PXL1, PXL2, PXL3, PXL4, P1_T, P2_T, P3_T, P4_T, focal, d_pxl);
+	Eigen::NumericalDiff<PinHoleEquations> numDiff(pinHoleFunctor);
+	Eigen::LevenbergMarquardt<Eigen::NumericalDiff<PinHoleEquations>, double> levMarq(numDiff);
+	//levMarq.parameters.maxfev = 2000;
+	//levMarq.parameters.xtol = 1.0e-10;
+	return levMarq.minimize(variables);
 }

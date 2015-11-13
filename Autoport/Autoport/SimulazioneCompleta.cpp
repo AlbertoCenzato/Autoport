@@ -6,16 +6,15 @@
 #include <math.h>
 #include <complex>
 #include "../Eigen/Eigen/Dense"
-#include "../Eigen/Eigen/Geometry"
 
 #include "P3p.h"
-//#include "dcm_to_ypr.cpp"
+#include "Functions.h"
 
 using Eigen::Vector3d;
 using Eigen::Matrix3d;
 
 void SimulazioneCompleta() {
-	Vector3d q_d(400, 0, 0);			//Coordinate del Quadrant Detector nel sistema drone
+	Vector3d q_d( 400, 0, 0 );			//Coordinate del Quadrant Detector nel sistema drone
 	Vector3d P1_T( 500, -500, 0);	//Coordinate del led 1 nel sistema target
 	Vector3d P2_T( 500,  500, 0);	//Coordinate del led 2 nel sistema target
 	Vector3d P3_T(   0,  500, 0);	//Coordinate del led 3 nel sistema target
@@ -70,7 +69,7 @@ void SimulazioneCompleta() {
 
 	//TODO define p3p_solver_new
 	Eigen::Matrix<double, 3, 4> sol = p3p_solver(P, fd_0);	//T_0 is a 3x1 vector, for R see matlab file "p3p_solver_new.m" (should be 3x3)
-	Vector3d T_0 = sol.col(0);
+	T_0 = sol.col(0);
 	Eigen::Matrix3d R0;
 	R0.col(0) = sol.col(1);
 	R0.col(1) = sol.col(2);
@@ -96,7 +95,7 @@ void SimulazioneCompleta() {
 	Eigen::Matrix<double, 1, 1001> Time_out;
 	int iter = 0;
 	for (int i = 0; i <= 1000; i++) {
-		float t = i / 0.01;
+		double t = i / 0.01;
 
 		//what can we do to replace these global variables?
 		/*
@@ -114,7 +113,7 @@ void SimulazioneCompleta() {
 
 		iter++;
 		int Periodo = 2; //secondi
-		int w = 2 * M_PI / Periodo;
+		double w = 2 * M_PI / Periodo;
 
 		//ypr is already in radians!! modify these lines
 		Yaw_nt[iter-1]   = ypr[0] * M_PI / 180; // rad
@@ -140,9 +139,9 @@ void SimulazioneCompleta() {
 		// Parametri:
 		double focal = 3.46031;
 		double d_pxl = 1.4e-3;
-		double qx = q_d(0); 
-		double qy = q_d(1); 
-		double qz = q_d(2);
+		double qx = q_d[0]; 
+		double qy = q_d[1]; 
+		double qz = q_d[2];
 
 		Vector3d v = -(R_nt*T_nt.col(iter - 1) + q_dn);
 		v.normalize();
@@ -189,14 +188,14 @@ void SimulazioneCompleta() {
 		double Pz_4 = P4_T(2);
 
 		//TODO write fsolve
-		Eigen::Matrix<double, 6, 1> X0;
+		Eigen::VectorXd X0;
+		Eigen::VectorXd Y0;
 		X0 << T_s(0), T_s(1), T_s(2), Yaw_s, Pitch_s, Roll_s;  // Condizioni iniziali PinHole;
-		Eigen::Matrix<double, 6, 1> X;
-		X = pinHoleFSolve(X0, q_d, v, PXL1, PXL2, PXL3, PXL4, P1_T, P2_T, P3_T, P4_T, focal, d_pxl);
-		T_s = X.block(0,0,2,0);
-		Yaw_s = X(3);
-		Pitch_s = X(4);
-		Roll_s = X(5);
+		pinHoleFSolve(X0, Y0, q_d.data(), v.data(), PXL1.data(), PXL2.data(), PXL3.data(), PXL4.data(), P1_T.data(), P2_T.data(), P3_T.data(), P4_T.data(), focal, d_pxl);
+		T_s = X0.block(0,0,2,0);
+		Yaw_s = X0(3);
+		Pitch_s = X0(4);
+		Roll_s = X0(5);
 
 		// Output:
 		T_out.col(iter-1) = T_s;

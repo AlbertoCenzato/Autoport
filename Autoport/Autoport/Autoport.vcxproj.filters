@@ -44,12 +44,6 @@
     <ClCompile Include="SimulazioneCompleta.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="p3p_solver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="pinHoleFSolve.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Functions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

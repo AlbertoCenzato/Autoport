@@ -69,7 +69,11 @@ int main()
 			printf("%f ", solution(i, j));
 	}
 	getchar();
-
+	/*
+	printf("---------------------------------------------------------\n");
+	printf("\nTEST PROGRAM FOR pinHoleFSolve");
+	Eigen::Matrix<double, 6, 1> variables = {};
+	*/
     return 0;
 }
 
