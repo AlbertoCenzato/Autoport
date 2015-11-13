@@ -11,10 +11,6 @@
 
 using Eigen::Vector3d;
 
-
-
-
-
 /*
 
 function[C R] = p3p_solver_new(P, f)

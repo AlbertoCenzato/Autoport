@@ -27,6 +27,9 @@
     <ClInclude Include="P3p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Functions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -45,6 +48,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pinHoleFSolve.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Functions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

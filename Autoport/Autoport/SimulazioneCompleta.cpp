@@ -69,7 +69,12 @@ void SimulazioneCompleta() {
 	fd_0.col(3) = f4d_0;
 
 	//TODO define p3p_solver_new
-	[T_0, R_0] = p3p_solver(P, fd_0);	//T_0 is a 3x1 vector, for R see matlab file "p3p_solver_new.m" (should be 3x3)
+	Eigen::Matrix<double, 3, 4> sol = p3p_solver(P, fd_0);	//T_0 is a 3x1 vector, for R see matlab file "p3p_solver_new.m" (should be 3x3)
+	Vector3d T_0 = sol.col(0);
+	Eigen::Matrix3d R0;
+	R0.col(0) = sol.col(1);
+	R0.col(1) = sol.col(2);
+	R0.col(2) = sol.col(3);
 
 	//Written like this is a bit confusing... Find a better way
 	double *ypr;	//array of length 3
@@ -94,6 +99,7 @@ void SimulazioneCompleta() {
 		float t = i / 0.01;
 
 		//what can we do to replace these global variables?
+		/*
 		global qx qy qz vx vy vz ...
 			x_pxl_1 y_pxl_1 ... // Coordinate dei led nei pixel della cam
 			x_pxl_2 y_pxl_2 ...
@@ -104,6 +110,7 @@ void SimulazioneCompleta() {
 			Px_3 Py_3 Pz_3 ...
 			Px_4 Py_4 Pz_4 ...
 			focal d_pxl // focale cam
+		*/
 
 		iter++;
 		int Periodo = 2; //secondi

@@ -20,7 +20,6 @@ double* pinHoleFSolve(Eigen::Matrix<double, 6, 1> variables, Vector3d q_d, Vecto
 	//levMarq.parameters.xtol = 1.0e-10;
 	int ret = levMarq.minimize(variables);
 
-
 }
 
 
@@ -88,7 +87,7 @@ struct PinHoleEquations {
 		k(5) = y_pxl_3 - (focal*((Py_3 - Y)*(cosRoll*cosYaw + sinPitch*sinRoll*sinYaw) - (Px_3 - x)*(cosRoll*sinYaw - cosYaw*sinPitch*sinRoll) + cosPitch*sinRoll*(Pz_3 - Z))) / (d_pxl*((Px_3 - x)*(sinRoll*sinYaw + cosRoll*cosYaw*sinPitch) - (Py_3 - Y)*(cosYaw*sinRoll - cosRoll*sinPitch*sinYaw) + cosPitch*cosRoll*(Pz_3 - Z)));
 		k(7) = y_pxl_4 - (focal*((Py_4 - Y)*(cosRoll*cosYaw + sinPitch*sinRoll*sinYaw) - (Px_4 - x)*(cosRoll*sinYaw - cosYaw*sinPitch*sinRoll) + cosPitch*sinRoll*(Pz_4 - Z))) / (d_pxl*((Px_4 - x)*(sinRoll*sinYaw + cosRoll*cosYaw*sinPitch) - (Py_4 - Y)*(cosYaw*sinRoll - cosRoll*sinPitch*sinYaw) + cosPitch*cosRoll*(Pz_4 - Z)));
 		
-		//change variable name, it sucks
+		//TODO: change variable name, it sucks
 		double denominator = sqrt(pow(abs(qx - Z*sinPitch + x*cosPitch*cosYaw + Y*cosPitch*sinYaw), 2) + pow(abs(qz + x*(sinRoll*sinYaw + cosRoll*cosYaw*sinPitch) - Y*(cosYaw*sinRoll - cosRoll*sinPitch*sinYaw) + Z*cosPitch*cosRoll), 2) + pow(abs(qy - x*(cosRoll*sinYaw - cosYaw*sinPitch*sinRoll) + Y*(cosRoll*cosYaw + sinPitch*sinRoll*sinYaw) + Z*cosPitch*sinRoll), 2));
 		
 		k(8)  = vx + (qx - Z*sinPitch + x*cosPitch*cosYaw + Y*cosPitch*sinYaw) / denominator;
