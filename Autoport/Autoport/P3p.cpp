@@ -52,6 +52,7 @@
 #include "../Eigen/Eigen/Dense"
 #include "../Eigen/Eigen/Geometry"
 
+#include "Functions.h"
 #include "P3p.h"
 
 using Eigen::Matrix3d;
@@ -150,7 +151,6 @@ Eigen::Matrix<double, 3, 16> P3p::computePoses(Matrix3d featureVectors, Matrix3d
 		b = sqrt(b);
 
 	// Definition of temporary variables for avoiding multiple computation
-
 	double phi1_pw2 = pow(phi1,2);
 	double phi2_pw2 = pow(phi2,2);
 	double p1_pw2   = pow(p1,2);
@@ -160,7 +160,7 @@ Eigen::Matrix<double, 3, 16> P3p::computePoses(Matrix3d featureVectors, Matrix3d
 	double p2_pw3   = p2_pw2 * p2;
 	double p2_pw4   = p2_pw3 * p2;
 	double d_12_pw2 = pow(d_12,2);
-	double b_pw2	= pow(b,2);
+	double b_pw2	= pow(b,2);	
 
 	// Computation of factors of 4th degree polynomial
 
@@ -169,10 +169,19 @@ Eigen::Matrix<double, 3, 16> P3p::computePoses(Matrix3d featureVectors, Matrix3d
 	factors[0] = p2_pw4*(-phi2_pw2 - phi1_pw2 - 1);	//ok, rearranged to do less computations
 
 	factors[1] = 2*p2_pw3*d_12*(b + phi2_pw2*b - phi1*phi2);	//ok, rearranged to do less computations
+	
+	factors[2] = - phi2_pw2*p2_pw2*p1_pw2 
+				 - phi2_pw2*p2_pw2*d_12_pw2*b_pw2 
+				 - phi2_pw2*p2_pw2*d_12_pw2	  
+		         + phi2_pw2*p2_pw4	//ok
 
-	factors[2] = - phi2_pw2*p1_pw2*p2_pw2 - phi2_pw2*p2_pw2*d_12_pw2*b_pw2 - phi2_pw2*p2_pw2*d_12_pw2	  + phi2_pw2*p2_pw4	//ok
-		         + phi1_pw2*p2_pw4		  + 2*p1*p2_pw2*d_12			   + 2*phi1*phi2*p1*p2_pw2*d_12*b						//ok
-				 - phi1_pw2*p1_pw2*p2_pw2 + 2*phi2_pw2*p1*p2_pw2*d_12      - p2_pw2*d_12_pw2*b_pw2        - 2*p1_pw2*p2_pw2;	//ok
+		         + phi1_pw2*p2_pw4		  
+				 + 2*p1*p2_pw2*d_12			   
+				 + 2*phi1*phi2*p1*p2_pw2*d_12*b						
+				 - phi1_pw2*p1_pw2*p2_pw2 
+				 + 2*phi2_pw2*p1*p2_pw2*d_12      
+				 - p2_pw2*d_12_pw2*b_pw2        
+				 - 2*p1_pw2*p2_pw2;	
 
 	factors[3] =   2*p1_pw2*p2*d_12*b + 2*phi1*phi2*p2_pw3*d_12   //ok
 				 - 2*phi2_pw2*p2_pw3*d_12*b - 2*p1*p2*d_12_pw2*b; //ok
@@ -186,6 +195,8 @@ Eigen::Matrix<double, 3, 16> P3p::computePoses(Matrix3d featureVectors, Matrix3d
 	Eigen::Vector4d realRoots;
 
 	this->solveQuartic( factors, realRoots );
+	//printf("\nRealRoots: ");
+	//printMatrix(realRoots, 4, 1);
 
 	// Backsubstitution of each solution
 	Eigen::Matrix<double, 3, 16> solutions;
@@ -193,10 +204,12 @@ Eigen::Matrix<double, 3, 16> P3p::computePoses(Matrix3d featureVectors, Matrix3d
 	{
 		double cotAlpha = (-phi1*p1/phi2 - realRoots[i]*p2 + d_12*b)/(-phi1*realRoots[i]*p2/phi2 + p1 - d_12);
 
-		double cosTheta = realRoots[i];
-		double sinTheta = sqrt(1 - pow(realRoots[i],2));
-		double sinAlpha = sqrt(1/(pow(cotAlpha,2) + 1));
-		double cosAlpha = sqrt(1 - pow(sinAlpha,2));
+		double cosTheta = realRoots[i];	
+		double sinTheta = 0;
+		if (realRoots[i] <= 1)
+			sinTheta = sqrt(1 - pow(realRoots[i], 2));
+		double sinAlpha = sqrt(1/(pow(cotAlpha,2) + 1));					
+		double cosAlpha = sqrt(1 - pow(sinAlpha,2));						
 
 		if (cotAlpha < 0)
 			cosAlpha = -cosAlpha;
@@ -209,6 +222,8 @@ Eigen::Matrix<double, 3, 16> P3p::computePoses(Matrix3d featureVectors, Matrix3d
 				sinTheta*d_12*sinAlpha*bSinCos;
 
 		C = P1 + N.transpose()*C;
+		//printf("\nC: %d",i);
+		//printMatrix(C, 3, 1);
 
 		Matrix3d Q;
 		Q.row(0) << -cosAlpha, -sinAlpha*cosTheta, -sinAlpha*sinTheta;
@@ -216,13 +231,14 @@ Eigen::Matrix<double, 3, 16> P3p::computePoses(Matrix3d featureVectors, Matrix3d
 		Q.row(2) <<  0,		   -sinTheta,		    cosTheta;
 
 		Matrix3d R = N.transpose()*Q.transpose()*T;
+		//printf("\nR %d: ",i);
+		//printMatrix(R, 3, 3);
 
 		solutions.col(i*4)   = C;
 		solutions.col(i*4+1) = R.col(0);
 		solutions.col(i*4+2) = R.col(1);
 		solutions.col(i*4+3) = R.col(2);
 	}
-
 	return solutions;
 }
 

@@ -41,9 +41,6 @@
     <ClCompile Include="P3p.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SimulazioneCompleta.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Functions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

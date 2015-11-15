@@ -12,6 +12,7 @@ using Eigen::Matrix3d;
 
 int main()
 {
+	/*
 	printf("Test program for modified P3p.cpp");
 
 	double focal = 3.46031; // Focale camera[mm]
@@ -36,13 +37,11 @@ int main()
 	Eigen::Matrix<double, 3, 16> solutions;
 	P3p p3p;
 	solutions = p3p.computePoses(featureVectors, worldPoints);
-	for (int i = 0; i < 3; i++) {
-		printf("\n");
-		for (int j = 0; j < 16; j++)
-			printf("%f\n", solutions(i, j));
-	}
+	printf("\nSolutions: ");
+	printMatrix(solutions, 3, 16);
 	getchar();
-
+	*/
+	/*
 	printf("-------------------------------------------------------\n");
 	printf("\nTEST PROGRAM FOR dcm_to_ypr.cpp");
 	Eigen::Matrix3d R;
@@ -50,30 +49,33 @@ int main()
 	double *ypr = dcm_to_ypr(R);
 	printf("\n\nYaw: %f\nPitch: %f\nRoll: %f", ypr[0], ypr[1], ypr[2]);
 	getchar();
-
-	printf("---------------------------------------------------------\n");
-	printf("\nTEST PROGRAM FOR p3p_solver.cpp");
-	Eigen::Matrix<double, 3, 4> P;
-	P << 0.1626 ,   0.9597 ,   0.2238  ,  0.5060,
-		0.1190  ,  0.3404  ,  0.7513   , 0.6991 ,
-		0.4984  ,  0.5853  ,  0.2551   , 0.8909;
-	Eigen::Matrix<double, 3, 4> f;
-	f << 0.3816, 0.1869, 0.6463, 0.2760,
-		0.7655, 0.4898, 0.7094, 0.6797,
-		0.7952, 0.4456, 0.7547, 0.6551;
-	Eigen::Matrix<double, 3, 4> solution = p3p_solver(P, f);
-	
-	for (int i = 0; i < 3; i++) {
-		printf("\n");
-		for (int j = 0; j < 4; j++)
-			printf("%f ", solution(i, j));
-	}
-	getchar();
+	*/
 	/*
+	printf("---------------------------------------------------------\n");
+	printf("\nTEST PROGRAM FOR simulazioneCompleta\n");
+	simulazioneCompleta();
+	*/
+	/*
+	printf("---------------------------------------------------------\n");
+	printf("\nTEST PROGRAM FOR p3p_solver.cpp\n");
+	Eigen::Matrix<double, 3, 4> P;
+	P << 500, 500,   0, -500,
+		-500, 500, 500,  500,
+		   0,   0,   0,    0;
+	Eigen::Matrix<double, 3, 4> f;
+	f << -0.235765117474178,0.236050371549753,0.241941876133016,0,
+		0.235765117474178,0.235437865595631,0.000970290259205868,- 0.235754658236770,
+		0.942777608328058,0.942788010920269,0.970290259206001,0;
+	Eigen::Matrix<double, 3, 4> solution = p3p_solver(P, f);
+	printf("\nsolution: ");
+	printMatrix(solution, 3, 4);
+	getchar();
+	*/
+	
 	printf("---------------------------------------------------------\n");
 	printf("\nTEST PROGRAM FOR pinHoleFSolve");
 	Eigen::Matrix<double, 6, 1> variables = {};
-	*/
+	
     return 0;
 }
 
