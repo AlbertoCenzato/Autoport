@@ -63,6 +63,7 @@ P3p::~P3p() {}
 
 Eigen::Matrix<double, 3, 16> P3p::computePoses(Matrix3d featureVectors, Matrix3d worldPoints)
 {
+	
 	// Extraction of world points
 	//(Vector3d is a column vector of double of length 3)
 	Vector3d P1 = worldPoints.col(0);

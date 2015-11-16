@@ -73,8 +73,9 @@ int main()
 	*/
 	
 	printf("---------------------------------------------------------\n");
-	printf("\nTEST PROGRAM FOR pinHoleFSolve");
-	Eigen::Matrix<double, 6, 1> variables = {};
+	printf("\nTEST PROGRAM FOR simulazioneCompleta");
+	simulazioneCompleta();
+	getchar();
 	
     return 0;
 }

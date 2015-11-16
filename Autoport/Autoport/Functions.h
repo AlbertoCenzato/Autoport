@@ -26,7 +26,7 @@ extern double* dcm_to_ypr(Eigen::Matrix3d &R);
 extern Eigen::Matrix<double, 3, 4> p3p_solver(Eigen::Matrix<double, 3, 4> &P, Eigen::Matrix<double, 3, 4> &f);
 
 
-extern int pinHoleFSolve(Eigen::VectorXd &variables, Eigen::VectorXd &fvec, double* q_d, double* v, double* PXL1, double* PXL2, double* PXL3, double* PXL4, double* P1_T, double* P2_T, double* P3_T, double* P4_T, double focal, double d_pxl);
+extern int pinHoleFSolve(Eigen::Matrix<double, 6, 1> &variables, Eigen::VectorXd &fvec, double* q_d, double* v, double* PXL1, double* PXL2, double* PXL3, double* PXL4, double* P1_T, double* P2_T, double* P3_T, double* P4_T, double focal, double d_pxl);
 
 extern void printMatrix(Eigen::MatrixXd mtrx, int n, int m);
 
