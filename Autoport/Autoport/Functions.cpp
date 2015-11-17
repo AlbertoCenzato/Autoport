@@ -43,27 +43,27 @@ Eigen::Matrix<double, 3, 4> p3p_solver(Eigen::Matrix<double, 3, 4> &P, Eigen::Ma
 	auto begin = std::chrono::high_resolution_clock::now();
 	
 	//Fixed points at the base station (in millimeters)
-	Vector3d P1 = P.col(0);
-	Vector3d P2 = P.col(1);
+	//Vector3d P1 = P.col(0);
+	//Vector3d P2 = P.col(1);
 	Vector3d P3 = P.col(2);
-	Vector3d P4 = P.col(3);
+	//Vector3d P4 = P.col(3);
 
 	//Versori normati nel riferimento della camera
-	Vector3d f1 = f.col(0);
-	Vector3d f2 = f.col(1);
+	//Vector3d f1 = f.col(0);
+	//Vector3d f2 = f.col(1);
 	Vector3d f3 = f.col(2);
-	Vector3d f4 = f.col(3);
+	//Vector3d f4 = f.col(3);
 	
 	//Primo calcolo
 	//Input al codice di Kneip:
 	Matrix3d wP;
-	wP.col(0) = P1;
-	wP.col(1) = P2;
-	wP.col(2) = P4; //CHECK IF WORKS LIKE THIS
+	wP.col(0) = P.col(0); //wP.col(0) = P1;
+	wP.col(1) = P.col(1); //wP.col(1) = P2;
+	wP.col(2) = P.col(3); //wP.col(2) = P4;
 	Matrix3d iV;
-	iV.col(0) = f1;
-	iV.col(1) = f2;
-	iV.col(2) = f4; //SAME HERE
+	iV.col(0) = f.col(0); //iV.col(0) = f1;
+	iV.col(1) = f.col(1); //iV.col(1) = f2;
+	iV.col(2) = f.col(3); //iV.col(2) = f4; 
 	/*
 	printf("\niV:");
 	printMatrix(iV, 3, 3);
@@ -77,10 +77,10 @@ Eigen::Matrix<double, 3, 4> p3p_solver(Eigen::Matrix<double, 3, 4> &P, Eigen::Ma
 	printf("poses: \n");
 	printMatrix(poses, 3, 16);
 	*/
-	Vector3d C1 = poses.col(0);
-	Vector3d C2 = poses.col(4);
-	Vector3d C3 = poses.col(8);
-	Vector3d C4 = poses.col(12);
+	//Vector3d C1 = poses.col(0);
+	//Vector3d C2 = poses.col(4);
+	//Vector3d C3 = poses.col(8);
+	//Vector3d C4 = poses.col(12);
 	Matrix3d R1;
 	R1.col(0) = poses.col(1);
 	R1.col(1) = poses.col(2);
@@ -109,11 +109,11 @@ Eigen::Matrix<double, 3, 4> p3p_solver(Eigen::Matrix<double, 3, 4> &P, Eigen::Ma
 	//printf("R4: ");
 	//printMatrix(R4, 3, 3);
 
-	Eigen::Matrix<double, 3, 4> C;
-	C.col(0) = C1;
-	C.col(1) = C2;
-	C.col(2) = C3;
-	C.col(3) = C4;
+	//Eigen::Matrix<double, 3, 4> C;
+	//C.col(0) = C1;
+	//C.col(1) = C2;
+	//C.col(2) = C3;
+	//C.col(3) = C4;
 	//printf("C: ");
 	//printMatrix(C, 3, 4);
 
@@ -123,10 +123,10 @@ Eigen::Matrix<double, 3, 4> p3p_solver(Eigen::Matrix<double, 3, 4> &P, Eigen::Ma
 	//printMatrix(R, 3, 12);
 
 	//Discriminazione della soluzione esatta
-	Vector3d F31 = (R1*(P3 - C1));
-	Vector3d F32 = (R2*(P3 - C2));
-	Vector3d F33 = (R3*(P3 - C3));
-	Vector3d F34 = (R4*(P3 - C4));
+	Vector3d F31 = (R1*(P3 - poses.col(0)));	//Vector3d F31 = (R1*(P3 - C1));
+	Vector3d F32 = (R2*(P3 - poses.col(4)));	//Vector3d F32 = (R2*(P3 - C2));
+	Vector3d F33 = (R3*(P3 - poses.col(8)));	//Vector3d F33 = (R3*(P3 - C3));
+	Vector3d F34 = (R4*(P3 - poses.col(12)));	//Vector3d F34 = (R4*(P3 - C4));
 	F31.normalize();
 	F32.normalize();
 	F33.normalize();
@@ -156,17 +156,17 @@ Eigen::Matrix<double, 3, 4> p3p_solver(Eigen::Matrix<double, 3, 4> &P, Eigen::Ma
 		}
 	}
 
-	Vector3d c = C.col(index);
-	Matrix3d r;
-	r.col(0) = R.col(3 * index);
-	r.col(1) = R.col(3 * index + 1);
-	r.col(2) = R.col(3 * index + 2);
+	//Vector3d c = poses.col(4*index); //Vector3d c = C.col(index);
+	//Matrix3d r;
+	//r.col(0) = R.col(3 * index);
+	//r.col(1) = R.col(3 * index + 1);
+	//r.col(2) = R.col(3 * index + 2);
 
 	Eigen::Matrix<double, 3, 4> solution;
-	solution.col(0) = c;
-	solution.col(1) = r.col(0);
-	solution.col(2) = r.col(1);
-	solution.col(3) = r.col(2);
+	solution.col(0) = poses.col(4 * index); //solution.col(0) = c;
+	solution.col(1) = R.col(3 * index);		//solution.col(1) = r.col(0);
+	solution.col(2) = R.col(3 * index + 1); //solution.col(2) = r.col(1);
+	solution.col(3) = R.col(3 * index + 2); //solution.col(3) = r.col(2);
 
 	auto end = std::chrono::high_resolution_clock::now();
 	long total = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();

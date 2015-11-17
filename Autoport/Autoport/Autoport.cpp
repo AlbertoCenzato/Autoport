@@ -14,7 +14,7 @@ using Eigen::Matrix3d;
 
 int main()
 {
-	
+	/*
 	printf("Test program for modified P3p.cpp");
 
 	double focal = 3.46031; // Focale camera[mm]
@@ -42,7 +42,7 @@ int main()
 	printf("\nSolutions: ");
 	printMatrix(solutions, 3, 16);
 	getchar();
-	
+	*/
 	/*
 	printf("-------------------------------------------------------\n");
 	printf("\nTEST PROGRAM FOR dcm_to_ypr.cpp");
@@ -57,7 +57,7 @@ int main()
 	printf("\nTEST PROGRAM FOR simulazioneCompleta\n");
 	simulazioneCompleta();
 	*/
-	/*
+	
 	printf("---------------------------------------------------------\n");
 	printf("\nTEST PROGRAM FOR p3p_solver.cpp\n");
 	Eigen::Matrix<double, 3, 4> P;
@@ -72,7 +72,7 @@ int main()
 	printf("\nsolution: ");
 	printMatrix(solution, 3, 4);
 	getchar();
-	*/
+	
 	
 	/*
 	printf("---------------------------------------------------------\n");
