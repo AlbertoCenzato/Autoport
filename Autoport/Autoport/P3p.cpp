@@ -65,7 +65,7 @@ P3p::~P3p() {}
 
 Eigen::Matrix<double, 3, 16> P3p::computePoses(Matrix3d featureVectors, Matrix3d worldPoints)
 {
-	auto begin = std::chrono::high_resolution_clock::now();
+	//auto begin = std::chrono::high_resolution_clock::now();
 	// Extraction of world points
 	//(Vector3d is a column vector of double of length 3)
 	Vector3d P1 = worldPoints.col(0);
@@ -261,10 +261,10 @@ Eigen::Matrix<double, 3, 16> P3p::computePoses(Matrix3d featureVectors, Matrix3d
 		solutions.col(i*4+2) = R.col(1);
 		solutions.col(i*4+3) = R.col(2);
 	}
-	auto end = std::chrono::high_resolution_clock::now();
-	long total = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
-	double timeInMillis = total / pow(10, 6);
-	printf("\nP3P: %f millisecondi", timeInMillis);
+	//auto end = std::chrono::high_resolution_clock::now();
+	//long total = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
+	//double timeInMillis = total / pow(10, 6);
+	//printf("\nP3P: %f millisecondi", timeInMillis);
 	return solutions;
 }
 

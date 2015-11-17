@@ -30,4 +30,4 @@ extern int pinHoleFSolve(Eigen::Matrix<double, 6, 1> &variables, Eigen::VectorXd
 
 extern void printMatrix(Eigen::MatrixXd mtrx, int n, int m);
 
-extern void simulazioneCompleta();
+extern long simulazioneCompleta();

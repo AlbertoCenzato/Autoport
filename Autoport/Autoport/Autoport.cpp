@@ -57,7 +57,7 @@ int main()
 	printf("\nTEST PROGRAM FOR simulazioneCompleta\n");
 	simulazioneCompleta();
 	*/
-	
+	/*
 	printf("---------------------------------------------------------\n");
 	printf("\nTEST PROGRAM FOR p3p_solver.cpp\n");
 	Eigen::Matrix<double, 3, 4> P;
@@ -72,19 +72,27 @@ int main()
 	printf("\nsolution: ");
 	printMatrix(solution, 3, 4);
 	getchar();
+	*/
 	
 	
-	/*
 	printf("---------------------------------------------------------\n");
 	printf("\nTEST PROGRAM FOR simulazioneCompleta");
-	auto begin = std::chrono::high_resolution_clock::now();
-	simulazioneCompleta();
-	auto end = std::chrono::high_resolution_clock::now();
-	long total = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
-	double timeInMillis = total / pow(10, 6);
-	printf("\nTempo totale: %f millisecondi", timeInMillis);
+	double totalTime = 0;
+	double fSolveTime = 0;
+	for (int i = 0; i < 50; i++) {
+		printf("\nIteration: %d", i);
+		auto begin = std::chrono::high_resolution_clock::now();
+		fSolveTime += simulazioneCompleta();
+		auto end = std::chrono::high_resolution_clock::now();
+		double total = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
+		totalTime += total;
+	}
+	double timeInMillis = totalTime/50*1.e-6;
+	double fSolveTimeInMillis = fSolveTime / 50 * 1.e-6;
+	printf("\nTempo medio simulazione completa: %f millisecondi", timeInMillis);
+	printf("\nTempo medio fSolve: %f millisecondi", fSolveTimeInMillis);
 	getchar();
-	*/
+	
     return 0;
 }
 

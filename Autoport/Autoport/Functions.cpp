@@ -40,7 +40,7 @@ void dcm_to_ypr(Matrix3d &R, double* ypr) {
 
 Eigen::Matrix<double, 3, 4> p3p_solver(Eigen::Matrix<double, 3, 4> &P, Eigen::Matrix<double, 3, 4> &f) {
 	
-	auto begin = std::chrono::high_resolution_clock::now();
+	//auto begin = std::chrono::high_resolution_clock::now();
 	
 	//Fixed points at the base station (in millimeters)
 	//Vector3d P1 = P.col(0);
@@ -168,10 +168,10 @@ Eigen::Matrix<double, 3, 4> p3p_solver(Eigen::Matrix<double, 3, 4> &P, Eigen::Ma
 	solution.col(2) = R.col(3 * index + 1); //solution.col(2) = r.col(1);
 	solution.col(3) = R.col(3 * index + 2); //solution.col(3) = r.col(2);
 
-	auto end = std::chrono::high_resolution_clock::now();
-	long total = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
-	double timeInMillis = total / pow(10, 6);
-	printf("\nP3P_solver: %f millisecondi", timeInMillis);
+	//auto end = std::chrono::high_resolution_clock::now();
+	//long total = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
+	//double timeInMillis = total / pow(10, 6);
+	//printf("\nP3P_solver: %f millisecondi", timeInMillis);
 
 	//CHECK IF RETURNS BY VALUE OR BY REFERENCE!
 	return solution;
@@ -257,22 +257,54 @@ struct PinHoleEquations : Functor<double> /*TODO: inputs and values missing! Add
 		double qy = q_d[1];			//printf("\nqy: %f",qy);
 		double qz = q_d[2];			//printf("\nqz: %f",qz);
 
-		fvec(0) = x_pxl_1 - (focal*(cosPitch*cosYaw*(Px_1 + x) - sinPitch*(Pz_1 + Z) + cosPitch*sinYaw*(Py_1 + Y))) / (d_pxl*((Px_1 + x)*(sinRoll*sinYaw + cosRoll*cosYaw*sinPitch) - (Py_1 + Y)*(cosYaw*sinRoll - cosRoll*sinPitch*sinYaw) + cosPitch*cosRoll*(Pz_1 + Z)));
-		fvec(2) = x_pxl_2 - (focal*(cosPitch*cosYaw*(Px_2 + x) - sinPitch*(Pz_2 + Z) + cosPitch*sinYaw*(Py_2 + Y))) / (d_pxl*((Px_2 + x)*(sinRoll*sinYaw + cosRoll*cosYaw*sinPitch) - (Py_2 + Y)*(cosYaw*sinRoll - cosRoll*sinPitch*sinYaw) + cosPitch*cosRoll*(Pz_2 + Z)));
-		fvec(4) = x_pxl_3 - (focal*(cosPitch*cosYaw*(Px_3 + x) - sinPitch*(Pz_3 + Z) + cosPitch*sinYaw*(Py_3 + Y))) / (d_pxl*((Px_3 + x)*(sinRoll*sinYaw + cosRoll*cosYaw*sinPitch) - (Py_3 + Y)*(cosYaw*sinRoll - cosRoll*sinPitch*sinYaw) + cosPitch*cosRoll*(Pz_3 + Z)));
-		fvec(6) = x_pxl_4 - (focal*(cosPitch*cosYaw*(Px_4 + x) - sinPitch*(Pz_4 + Z) + cosPitch*sinYaw*(Py_4 + Y))) / (d_pxl*((Px_4 + x)*(sinRoll*sinYaw + cosRoll*cosYaw*sinPitch) - (Py_4 + Y)*(cosYaw*sinRoll - cosRoll*sinPitch*sinYaw) + cosPitch*cosRoll*(Pz_4 + Z)));
-
-		fvec(1) = y_pxl_1 - (focal*((Py_1 + Y)*(cosRoll*cosYaw + sinPitch*sinRoll*sinYaw) - (Px_1 + x)*(cosRoll*sinYaw - cosYaw*sinPitch*sinRoll) + cosPitch*sinRoll*(Pz_1 + Z))) / (d_pxl*((Px_1 + x)*(sinRoll*sinYaw + cosRoll*cosYaw*sinPitch) - (Py_1 + Y)*(cosYaw*sinRoll - cosRoll*sinPitch*sinYaw) + cosPitch*cosRoll*(Pz_1 + Z)));
-		fvec(3) = y_pxl_2 - (focal*((Py_2 + Y)*(cosRoll*cosYaw + sinPitch*sinRoll*sinYaw) - (Px_2 + x)*(cosRoll*sinYaw - cosYaw*sinPitch*sinRoll) + cosPitch*sinRoll*(Pz_2 + Z))) / (d_pxl*((Px_2 + x)*(sinRoll*sinYaw + cosRoll*cosYaw*sinPitch) - (Py_2 + Y)*(cosYaw*sinRoll - cosRoll*sinPitch*sinYaw) + cosPitch*cosRoll*(Pz_2 + Z)));
-		fvec(5) = y_pxl_3 - (focal*((Py_3 + Y)*(cosRoll*cosYaw + sinPitch*sinRoll*sinYaw) - (Px_3 + x)*(cosRoll*sinYaw - cosYaw*sinPitch*sinRoll) + cosPitch*sinRoll*(Pz_3 + Z))) / (d_pxl*((Px_3 + x)*(sinRoll*sinYaw + cosRoll*cosYaw*sinPitch) - (Py_3 + Y)*(cosYaw*sinRoll - cosRoll*sinPitch*sinYaw) + cosPitch*cosRoll*(Pz_3 + Z)));
-		fvec(7) = y_pxl_4 - (focal*((Py_4 + Y)*(cosRoll*cosYaw + sinPitch*sinRoll*sinYaw) - (Px_4 + x)*(cosRoll*sinYaw - cosYaw*sinPitch*sinRoll) + cosPitch*sinRoll*(Pz_4 + Z))) / (d_pxl*((Px_4 + x)*(sinRoll*sinYaw + cosRoll*cosYaw*sinPitch) - (Py_4 + Y)*(cosYaw*sinRoll - cosRoll*sinPitch*sinYaw) + cosPitch*cosRoll*(Pz_4 + Z)));
-
+		double cosPcosY     = cosPitch*cosYaw;
+		double cosPsinY     = cosPitch*sinYaw;
+		double sinRsinY     = sinRoll*sinYaw;
+		double cosRcosYsinP = cosRoll*cosYaw*sinPitch;
+		double cosYsinR		= cosYaw*sinRoll;
+		double cosRsinPsinY = cosRoll*sinPitch*sinYaw;
+		double cosPcosR     = cosPitch*cosRoll;
+		double cosRcosY		= cosRoll*cosYaw;
+		double sinPsinRsinY = sinPitch*sinRoll*sinYaw;
+		double cosRsinY		= cosRoll*sinYaw;
+		double cosYsinPsinR = cosYaw*sinPitch*sinRoll;
+		double cosPsinR		= cosPitch*sinRoll;
+		/*
+#define fx(xPXL,pX,pY,pZ)  xPXL - (focal*(cosPcosY*(pX + x) - sinPitch*(pZ + Z) + cosPsinY*(pY + Y)));
+#define fy(yPXL,pX,pY,pZ)  yPXL - (focal*((pY + Y)*(cosRcosY + sinPsinRsinY) - (pX + x)*(cosRsinY - cosYsinPsinR) + cosPsinR*(pZ + Z)));
+#define den(pX,pY,pZ)  (d_pxl*((pX + x)*(sinRsinY + cosRcosYsinP) - (pY + Y)*(cosYsinR - cosRsinPsinY) + cosPcosR*(pZ + Z)));
+*/
+		fvec(0) = x_pxl_1 - (focal*(cosPcosY*(Px_1 + x) - sinPitch*(Pz_1 + Z) + cosPsinY*(Py_1 + Y))) / (d_pxl*((Px_1 + x)*(sinRsinY + cosRcosYsinP) - (Py_1 + Y)*(cosYsinR - cosRsinPsinY) + cosPcosR*(Pz_1 + Z)));
+		fvec(2) = x_pxl_2 - (focal*(cosPcosY*(Px_2 + x) - sinPitch*(Pz_2 + Z) + cosPsinY*(Py_2 + Y))) / (d_pxl*((Px_2 + x)*(sinRsinY + cosRcosYsinP) - (Py_2 + Y)*(cosYsinR - cosRsinPsinY) + cosPcosR*(Pz_2 + Z)));
+		fvec(4) = x_pxl_3 - (focal*(cosPcosY*(Px_3 + x) - sinPitch*(Pz_3 + Z) + cosPsinY*(Py_3 + Y))) / (d_pxl*((Px_3 + x)*(sinRsinY + cosRcosYsinP) - (Py_3 + Y)*(cosYsinR - cosRsinPsinY) + cosPcosR*(Pz_3 + Z)));
+		fvec(6) = x_pxl_4 - (focal*(cosPcosY*(Px_4 + x) - sinPitch*(Pz_4 + Z) + cosPsinY*(Py_4 + Y))) / (d_pxl*((Px_4 + x)*(sinRsinY + cosRcosYsinP) - (Py_4 + Y)*(cosYsinR - cosRsinPsinY) + cosPcosR*(Pz_4 + Z)));
+		/*
+		double den1 = den(Px_1, Py_1, Pz_1);
+		double den2 = den(Px_2, Py_2, Pz_2);
+		double den3 = den(Px_3, Py_3, Pz_3);
+		double den4 = den(Px_4, Py_4, Pz_4);
+		
+		fvec(0) = fx(x_pxl_1,Px_1,Py_1,Pz_1) / den1;
+		fvec(2) = fx(x_pxl_2,Px_2,Py_2,Pz_2) / den2;
+		fvec(4) = fx(x_pxl_3,Px_3,Py_3,Pz_3) / den3;
+		fvec(6) = fx(x_pxl_4,Px_4,Py_4,Pz_4) / den4;
+		*/
+		fvec(1) = y_pxl_1 - (focal*((Py_1 + Y)*(cosRcosY + sinPsinRsinY) - (Px_1 + x)*(cosRsinY - cosYsinPsinR) + cosPsinR*(Pz_1 + Z))) / (d_pxl*((Px_1 + x)*(sinRsinY + cosRcosYsinP) - (Py_1 + Y)*(cosYsinR - cosRsinPsinY) + cosPcosR*(Pz_1 + Z)));
+		fvec(3) = y_pxl_2 - (focal*((Py_2 + Y)*(cosRcosY + sinPsinRsinY) - (Px_2 + x)*(cosRsinY - cosYsinPsinR) + cosPsinR*(Pz_2 + Z))) / (d_pxl*((Px_2 + x)*(sinRsinY + cosRcosYsinP) - (Py_2 + Y)*(cosYsinR - cosRsinPsinY) + cosPcosR*(Pz_2 + Z)));
+		fvec(5) = y_pxl_3 - (focal*((Py_3 + Y)*(cosRcosY + sinPsinRsinY) - (Px_3 + x)*(cosRsinY - cosYsinPsinR) + cosPsinR*(Pz_3 + Z))) / (d_pxl*((Px_3 + x)*(sinRsinY + cosRcosYsinP) - (Py_3 + Y)*(cosYsinR - cosRsinPsinY) + cosPcosR*(Pz_3 + Z)));
+		fvec(7) = y_pxl_4 - (focal*((Py_4 + Y)*(cosRcosY + sinPsinRsinY) - (Px_4 + x)*(cosRsinY - cosYsinPsinR) + cosPsinR*(Pz_4 + Z))) / (d_pxl*((Px_4 + x)*(sinRsinY + cosRcosYsinP) - (Py_4 + Y)*(cosYsinR - cosRsinPsinY) + cosPcosR*(Pz_4 + Z)));
+		/*
+		fvec(1) = fy(y_pxl_1,Px_1,Py_1,Pz_1) / den1;
+		fvec(3) = fy(y_pxl_2,Px_2,Py_2,Pz_2) / den2;
+		fvec(5) = fy(y_pxl_3,Px_3,Py_3,Pz_3) / den3;
+		fvec(7) = fy(y_pxl_4,Px_4,Py_4,Pz_4) / den4;
+		*/
 		//TODO: change variable name, it sucks
 		double denominator = sqrt(pow(abs(qx - Z*sinPitch + x*cosPitch*cosYaw + Y*cosPitch*sinYaw), 2) + pow(abs(qz + x*(sinRoll*sinYaw + cosRoll*cosYaw*sinPitch) - Y*(cosYaw*sinRoll - cosRoll*sinPitch*sinYaw) + Z*cosPitch*cosRoll), 2) + pow(abs(qy - x*(cosRoll*sinYaw - cosYaw*sinPitch*sinRoll) + Y*(cosRoll*cosYaw + sinPitch*sinRoll*sinYaw) + Z*cosPitch*sinRoll), 2));
 
-		fvec(8) = vx + (qx - Z*sinPitch + x*cosPitch*cosYaw + Y*cosPitch*sinYaw) / denominator;
-		fvec(9) = vy + (qy - x*(cosRoll*sinYaw - cosYaw*sinPitch*sinRoll) + Y*(cosRoll*cosYaw + sinPitch*sinRoll*sinYaw) + Z*cosPitch*sinRoll) / denominator;
-		fvec(10) = vz + (qz + x*(sinRoll*sinYaw + cosRoll*cosYaw*sinPitch) - Y*(cosYaw*sinRoll - cosRoll*sinPitch*sinYaw) + Z*cosPitch*cosRoll) / denominator;
+		fvec(8) = vx + (qx - Z*sinPitch + x*cosPcosY + Y*cosPsinY) / denominator;
+		fvec(9) = vy + (qy - x*(cosRsinY - cosYsinPsinR) + Y*(cosRcosY + sinPsinRsinY) + Z*cosPsinR) / denominator;
+		fvec(10) = vz + (qz + x*(sinRsinY + cosRcosYsinP) - Y*(cosYsinR - cosRsinPsinY) + Z*cosPcosR) / denominator;
 		//printf("\nfvec:");
 		//printMatrix(fvec, 11, 1);
 		return 1;
@@ -294,8 +326,7 @@ struct PinHoleEquations : Functor<double> /*TODO: inputs and values missing! Add
 };
 
 
-//TODO: fix the size of VectorXd variables
-int pinHoleFSolve(Eigen::Matrix<double,6,1> &variables, double* q_d, double* v, double* PXL1, double* PXL2, double* PXL3, double* PXL4, double* P1_T, double* P2_T, double* P3_T, double* P4_T, double focal, double d_pxl) {
+long pinHoleFSolve(Eigen::Matrix<double,6,1> &variables, double* q_d, double* v, double* PXL1, double* PXL2, double* PXL3, double* PXL4, double* P1_T, double* P2_T, double* P3_T, double* P4_T, double focal, double d_pxl) {
 	
 	auto begin = std::chrono::high_resolution_clock::now();
 
@@ -318,10 +349,10 @@ int pinHoleFSolve(Eigen::Matrix<double,6,1> &variables, double* q_d, double* v, 
 
 	auto end = std::chrono::high_resolution_clock::now();
 	long total = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
-	double timeInMillis = total / pow(10, 6);
-	printf("\nFsolve: %f millisecondi", timeInMillis);
+	//double timeInMillis = total / pow(10, 6);
+	//printf("\nFsolve: %f millisecondi", timeInMillis);
 
-	return ret;
+	return total;
 }
 
 
@@ -336,8 +367,7 @@ void printMatrix(Eigen::MatrixXd mtrx, int n, int m) {
 }
 
 
-
-void simulazioneCompleta() {
+long simulazioneCompleta() {
 	Vector3d q_d(400, 0, 0);			//Coordinate del Quadrant Detector nel sistema drone
 	Vector3d P1_T(500, -500, 0);	//Coordinate del led 1 nel sistema target
 	Vector3d P2_T(500, 500, 0);	//Coordinate del led 2 nel sistema target
@@ -410,7 +440,7 @@ void simulazioneCompleta() {
 	*/
 
 	Eigen::Matrix<double, 3, 4> sol = p3p_solver(P, fd_0);	
-	T_0 = sol.col(0);
+	//T_0 = sol.col(0);
 	R0.col(0) = sol.col(1);
 	R0.col(1) = sol.col(2);
 	R0.col(2) = sol.col(3);
@@ -428,7 +458,7 @@ void simulazioneCompleta() {
 	printf("\nroll: %f", (double)ypr[2]);
 	*/
 
-	Vector3d T_s = T_0;
+	Vector3d T_s = sol.col(0); //Vector3d T_s = T_0;
 	double Yaw_s = yaw0;
 	double Pitch_s = pitch0;
 	double Roll_s = roll0;
@@ -443,6 +473,7 @@ void simulazioneCompleta() {
 	Eigen::Matrix<double, 1, 1001> Roll_out;
 	Eigen::Matrix<double, 1, 1001> Time_out;
 	//int iter = 0;
+	long totalTime = 0;
 	for (int i = 0; i <= 1000; i++) {
 
 		double t = i / 0.01;
@@ -579,7 +610,8 @@ void simulazioneCompleta() {
 			printMatrix(X0, 6, 1);
 		}
 		*/
-		pinHoleFSolve(X0, q_d.data(), v.data(), PXL1.data(), PXL2.data(), PXL3.data(), PXL4.data(), P1_T.data(), P2_T.data(), P3_T.data(), P4_T.data(), focal, d_pxl);
+		long time = pinHoleFSolve(X0, q_d.data(), v.data(), PXL1.data(), PXL2.data(), PXL3.data(), PXL4.data(), P1_T.data(), P2_T.data(), P3_T.data(), P4_T.data(), focal, d_pxl);
+		totalTime += time;
 		/*
 		if (i == 0) {
 			printf("\nX0 output:");
@@ -598,6 +630,6 @@ void simulazioneCompleta() {
 		Roll_out(i) = Roll_s;
 		Time_out(i) = t;
 	}
-
-	//plots missing!
+	long meanTime = totalTime / 1001;
+	return meanTime;//plots missing!
 }
