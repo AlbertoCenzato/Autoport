@@ -54,6 +54,8 @@
 
 #include "Functions.h"
 #include "P3p.h"
+#include <chrono>
+
 
 using Eigen::Matrix3d;
 using Eigen::Vector3d;
@@ -63,7 +65,7 @@ P3p::~P3p() {}
 
 Eigen::Matrix<double, 3, 16> P3p::computePoses(Matrix3d featureVectors, Matrix3d worldPoints)
 {
-	
+	auto begin = std::chrono::high_resolution_clock::now();
 	// Extraction of world points
 	//(Vector3d is a column vector of double of length 3)
 	Vector3d P1 = worldPoints.col(0);
@@ -72,12 +74,14 @@ Eigen::Matrix<double, 3, 16> P3p::computePoses(Matrix3d featureVectors, Matrix3d
 
 	// Verification that world points are not colinear
 	//TODO: probably useless check!
+	/*
 	Vector3d temp1 = P2 - P1;
 	Vector3d temp2 = P3 - P1;
 	if ((temp1.cross(temp2)).norm() == 0) {
 		Eigen::Matrix<double, 3, 16> zero;
 		return zero;
 	}
+	*/
 
 	// Extraction of feature vectors
 	Vector3d f1 = featureVectors.col(0);
@@ -86,14 +90,14 @@ Eigen::Matrix<double, 3, 16> P3p::computePoses(Matrix3d featureVectors, Matrix3d
 
 	// Creation of intermediate camera frame
 
-	Vector3d tx = f1;
+	//Vector3d tx = f1;
 	Vector3d tz = f1.cross(f2);
 	tz.normalize();
-	Vector3d ty = tz.cross(tx);
+	//Vector3d ty = tz.cross(f1); //Vector3d ty = tz.cross(tx);
 
 	Matrix3d T;
-	T.row(0) = tx.transpose();
-	T.row(1) = ty.transpose();
+	T.row(0) = f1.transpose(); //T.row(0) = tx.transpose();
+	T.row(1) = tz.cross(f1).transpose(); //T.row(1) = ty.transpose();
 	T.row(2) = tz.transpose();
 
 	f3 = T*f3;
@@ -106,13 +110,13 @@ Eigen::Matrix<double, 3, 16> P3p::computePoses(Matrix3d featureVectors, Matrix3d
 		f2 = featureVectors.col(0);
 		f3 = featureVectors.col(2);
 
-		tx = f1;
+		//tx = f1;
 		tz = f1.cross(f2);
 		tz = tz / tz.norm();
-		ty = tz.cross(tx);
+		//ty = tz.cross(f1);
 
-		T.col(0) = tx;
-		T.col(1) = ty;
+		T.col(0) = f1; //T.col(0) = tx;
+		T.col(1) = tz.cross(f1);//T.col(1) = ty;
 		T.col(2) = tz;
 
 		f3 = T*f3;
@@ -125,20 +129,21 @@ Eigen::Matrix<double, 3, 16> P3p::computePoses(Matrix3d featureVectors, Matrix3d
 	// Creation of intermediate world frame
 
 	Vector3d n1 = P2 - P1;
-	n1.normalize();
+	double d_12 = n1.norm();
+	n1 = n1/d_12;
 	Vector3d n3 = n1.cross(P3 - P1);
 	n3.normalize();
-	Vector3d n2 = n3.cross(n1);
+	//Vector3d n2 = n3.cross(n1);
 
 	Matrix3d N;
 	N.row(0) = n1.transpose();
-	N.row(1) = n2.transpose();
+	N.row(1) = n3.cross(n1).transpose();	//N.row(1) = n2.transpose();
 	N.row(2) = n3.transpose();
 
 	// Extraction of known parameters
 	P3 = N*(P3 - P1);
 
-	double d_12 = (P2 - P1).norm();
+	//double d_12 = (P2 - P1).norm();
 	double phi1 = f3[0]/f3[2];
 	double phi2 = f3[1]/f3[2];
 	double p1 = P3[0];
@@ -166,33 +171,48 @@ Eigen::Matrix<double, 3, 16> P3p::computePoses(Matrix3d featureVectors, Matrix3d
 	// Computation of factors of 4th degree polynomial
 
 	Eigen::Matrix<double,5,1> factors;
-
-	factors[0] = p2_pw4*(-phi2_pw2 - phi1_pw2 - 1);	//ok, rearranged to do less computations
-
-	factors[1] = 2*p2_pw3*d_12*(b + phi2_pw2*b - phi1*phi2);	//ok, rearranged to do less computations
 	
-	factors[2] = - phi2_pw2*p2_pw2*p1_pw2 
-				 - phi2_pw2*p2_pw2*d_12_pw2*b_pw2 
-				 - phi2_pw2*p2_pw2*d_12_pw2	  
-		         + phi2_pw2*p2_pw4	//ok
+	factors[0] = -phi2_pw2*p2_pw4
+		- p2_pw4*phi1_pw2
+		- p2_pw4;
+	
+	factors[1] = 2 * p2_pw3*d_12*b 
+		+ 2 * phi2_pw2*p2_pw3*d_12*b 
+		- 2 * phi2*p2_pw3*phi1*d_12;
+	
+	factors[2] = -phi2_pw2*p2_pw2*p1_pw2
+		- phi2_pw2*p2_pw2*d_12_pw2*b_pw2 
+		- phi2_pw2*p2_pw2*d_12_pw2 
+		+ phi2_pw2*p2_pw4 
+		+ p2_pw4*phi1_pw2 
+		+ 2 * p1*p2_pw2*d_12 
+		+ 2 * phi1*phi2*p1*p2_pw2*d_12*b 
+		- p2_pw2*p1_pw2*phi1_pw2 
+		+ 2 * p1*p2_pw2*phi2_pw2*d_12 
+		- p2_pw2*d_12_pw2*b_pw2 
+		- 2 * p1_pw2*p2_pw2;
+	
+	factors[3] = 2 * p1_pw2*p2*d_12*b 
+		+ 2 * phi2*p2_pw3*phi1*d_12 
+		- 2 * phi2_pw2*p2_pw3*d_12*b
+		- 2 * p1*p2*d_12_pw2*b;
+	
+	factors[4] = -2 * phi2*p2_pw2*phi1*p1*d_12*b 
+		+ phi2_pw2*p2_pw2*d_12_pw2 
+		+ 2 * p1_pw3*d_12 
+		- p1_pw2*d_12_pw2 
+		+ phi2_pw2*p2_pw2*p1_pw2 
+		- p1_pw4 
+		- 2 * phi2_pw2*p2_pw2*p1*d_12 
+		+ p2_pw2*phi1_pw2*p1_pw2 
+		+ phi2_pw2*p2_pw2*d_12_pw2*b_pw2;
 
-		         + phi1_pw2*p2_pw4		  
-				 + 2*p1*p2_pw2*d_12			   
-				 + 2*phi1*phi2*p1*p2_pw2*d_12*b						
-				 - phi1_pw2*p1_pw2*p2_pw2 
-				 + 2*phi2_pw2*p1*p2_pw2*d_12      
-				 - p2_pw2*d_12_pw2*b_pw2        
-				 - 2*p1_pw2*p2_pw2;	
-
-	factors[3] =   2*p1_pw2*p2*d_12*b + 2*phi1*phi2*p2_pw3*d_12   //ok
-				 - 2*phi2_pw2*p2_pw3*d_12*b - 2*p1*p2*d_12_pw2*b; //ok
-
-	factors[4] = - 2*phi1*phi2*p1*p2_pw2*d_12*b + phi2_pw2*p2_pw2*d_12_pw2 + 2*p1_pw3*d_12								//ok	
-				 - p1_pw2*d_12_pw2			    + phi2_pw2*p1_pw2*p2_pw2   - p1_pw4		   - 2*phi2_pw2*p1*p2_pw2*d_12	//ok
-				 + phi1_pw2*p1_pw2*p2_pw2       + phi2_pw2*p2_pw2*d_12_pw2*b_pw2;										//ok
+	/*
+	printf("\nfactors:");
+	printMatrix(factors, 5, 1);
+	*/
 
 	// Computation of roots
-
 	Eigen::Vector4d realRoots;
 
 	this->solveQuartic( factors, realRoots );
@@ -203,12 +223,13 @@ Eigen::Matrix<double, 3, 16> P3p::computePoses(Matrix3d featureVectors, Matrix3d
 	Eigen::Matrix<double, 3, 16> solutions;
 	for(int i=0; i<4; i++)
 	{
-		double cotAlpha = (-phi1*p1/phi2 - realRoots[i]*p2 + d_12*b)/(-phi1*realRoots[i]*p2/phi2 + p1 - d_12);
+		double realRoot = realRoots[i];
+		double cotAlpha = (-phi1*p1/phi2 - realRoot*p2 + d_12*b)/(-phi1*realRoot*p2/phi2 + p1 - d_12);
 
-		double cosTheta = realRoots[i];	
+		//double cosTheta = realRoot;	
 		double sinTheta = 0;
-		if (realRoots[i] <= 1)
-			sinTheta = sqrt(1 - pow(realRoots[i], 2));
+		if (realRoot <= 1)
+			sinTheta = sqrt(1 - pow(realRoot, 2));
 		double sinAlpha = sqrt(1/(pow(cotAlpha,2) + 1));					
 		double cosAlpha = sqrt(1 - pow(sinAlpha,2));						
 
@@ -219,7 +240,7 @@ Eigen::Matrix<double, 3, 16> P3p::computePoses(Matrix3d featureVectors, Matrix3d
 
 		Vector3d C; 
 		C <<	d_12*cosAlpha*bSinCos,
-				cosTheta*d_12*sinAlpha*bSinCos,
+				realRoot*d_12*sinAlpha*bSinCos,		//cosTheta*d_12*sinAlpha*bSinCos,
 				sinTheta*d_12*sinAlpha*bSinCos;
 
 		C = P1 + N.transpose()*C;
@@ -227,9 +248,9 @@ Eigen::Matrix<double, 3, 16> P3p::computePoses(Matrix3d featureVectors, Matrix3d
 		//printMatrix(C, 3, 1);
 
 		Matrix3d Q;
-		Q.row(0) << -cosAlpha, -sinAlpha*cosTheta, -sinAlpha*sinTheta;
-		Q.row(1) <<  sinAlpha, -cosAlpha*cosTheta, -cosAlpha*sinTheta;
-		Q.row(2) <<  0,		   -sinTheta,		    cosTheta;
+		Q.row(0) << -cosAlpha, -sinAlpha*realRoot, -sinAlpha*sinTheta;	//Q.row(0) << -cosAlpha, -sinAlpha*cosTheta, -sinAlpha*sinTheta;
+		Q.row(1) <<  sinAlpha, -cosAlpha*realRoot, -cosAlpha*sinTheta;	//Q.row(1) <<  sinAlpha, -cosAlpha*cosTheta, -cosAlpha*sinTheta;
+		Q.row(2) <<  0,		   -sinTheta,		    realRoot;			//Q.row(2) <<  0,		   -sinTheta,		    cosTheta;		
 
 		Matrix3d R = N.transpose()*Q.transpose()*T;
 		//printf("\nR %d: ",i);
@@ -240,6 +261,10 @@ Eigen::Matrix<double, 3, 16> P3p::computePoses(Matrix3d featureVectors, Matrix3d
 		solutions.col(i*4+2) = R.col(1);
 		solutions.col(i*4+3) = R.col(2);
 	}
+	auto end = std::chrono::high_resolution_clock::now();
+	long total = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
+	double timeInMillis = total / pow(10, 6);
+	printf("\nP3P: %f millisecondi", timeInMillis);
 	return solutions;
 }
 
@@ -249,24 +274,24 @@ int P3p::solveQuartic(Eigen::Matrix<double, 5, 1> factors, Eigen::Vector4d &real
 	double B = factors[1];
 	double C = factors[2];
 	double D = factors[3];
-	double E = factors[4];
+	//double E = factors[4];
 
 	double A_pw2 = A*A;
 	double B_pw2 = B*B;
 	double A_pw3 = A_pw2*A;
 	double B_pw3 = B_pw2*B;
-	double A_pw4 = A_pw3*A;
-	double B_pw4 = B_pw3*B;
+	//double A_pw4 = A_pw3*A;
+	//double B_pw4 = B_pw3*B;
 
 	double alpha = -3*B_pw2/(8*A_pw2)+C/A;
 	double beta = B_pw3/(8*A_pw3)-B*C/(2*A_pw2)+D/A;
-	double gamma = -3*B_pw4/(256*A_pw4)+B_pw2*C/(16*A_pw3)-B*D/(4*A_pw2)+E/A;
+	double gamma = -3*B_pw3*B/(256*A_pw3*A)+B_pw2*C/(16*A_pw3)-B*D/(4*A_pw2)+factors[4]/A; //double gamma = -3*B_pw4/(256*A_pw4)+B_pw2*C/(16*A_pw3)-B*D/(4*A_pw2)+E/A;
 
 	double alpha_pw2 = alpha*alpha;
 	double alpha_pw3 = alpha_pw2*alpha;
 
 	std::complex<double> P (-alpha_pw2/12-gamma,0);
-	std::complex<double> Q (-alpha_pw3/108+alpha*gamma/3-pow(beta,2)/8,0);
+	std::complex<double> Q(-alpha_pw3 / 108 + alpha*gamma / 3 - pow(beta, 2) / 8, 0);
 	std::complex<double> R = -Q/2.0+sqrt(pow(Q,2.0)/4.0+pow(P,3.0)/27.0);
 
 	std::complex<double> U = pow(R,(1.0/3.0));

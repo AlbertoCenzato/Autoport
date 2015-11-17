@@ -6,13 +6,15 @@
 #include "..\Eigen\Eigen\Dense"
 #include "P3p.h"
 #include "Functions.h"
+#include <time.h>
+#include <chrono>
 
 using Eigen::Vector3d;
 using Eigen::Matrix3d;
 
 int main()
 {
-	/*
+	
 	printf("Test program for modified P3p.cpp");
 
 	double focal = 3.46031; // Focale camera[mm]
@@ -40,7 +42,7 @@ int main()
 	printf("\nSolutions: ");
 	printMatrix(solutions, 3, 16);
 	getchar();
-	*/
+	
 	/*
 	printf("-------------------------------------------------------\n");
 	printf("\nTEST PROGRAM FOR dcm_to_ypr.cpp");
@@ -72,11 +74,17 @@ int main()
 	getchar();
 	*/
 	
+	/*
 	printf("---------------------------------------------------------\n");
 	printf("\nTEST PROGRAM FOR simulazioneCompleta");
+	auto begin = std::chrono::high_resolution_clock::now();
 	simulazioneCompleta();
+	auto end = std::chrono::high_resolution_clock::now();
+	long total = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
+	double timeInMillis = total / pow(10, 6);
+	printf("\nTempo totale: %f millisecondi", timeInMillis);
 	getchar();
-	
+	*/
     return 0;
 }
 

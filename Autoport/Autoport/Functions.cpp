@@ -5,6 +5,8 @@
 #include "..\Eigen\unsupported\Eigen\NumericalDiff"
 #include "P3p.h"
 #include "Functions.h"
+#include <time.h>
+#include <chrono>
 
 using Eigen::Matrix3d;
 using Eigen::Vector3d;
@@ -37,6 +39,9 @@ void dcm_to_ypr(Matrix3d &R, double* ypr) {
 %   R - Matrice di rotazione dal sistema assoluto a quello camera */
 
 Eigen::Matrix<double, 3, 4> p3p_solver(Eigen::Matrix<double, 3, 4> &P, Eigen::Matrix<double, 3, 4> &f) {
+	
+	auto begin = std::chrono::high_resolution_clock::now();
+	
 	//Fixed points at the base station (in millimeters)
 	Vector3d P1 = P.col(0);
 	Vector3d P2 = P.col(1);
@@ -163,6 +168,11 @@ Eigen::Matrix<double, 3, 4> p3p_solver(Eigen::Matrix<double, 3, 4> &P, Eigen::Ma
 	solution.col(2) = r.col(1);
 	solution.col(3) = r.col(2);
 
+	auto end = std::chrono::high_resolution_clock::now();
+	long total = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
+	double timeInMillis = total / pow(10, 6);
+	printf("\nP3P_solver: %f millisecondi", timeInMillis);
+
 	//CHECK IF RETURNS BY VALUE OR BY REFERENCE!
 	return solution;
 }
@@ -286,6 +296,8 @@ struct PinHoleEquations : Functor<double> /*TODO: inputs and values missing! Add
 
 //TODO: fix the size of VectorXd variables
 int pinHoleFSolve(Eigen::Matrix<double,6,1> &variables, double* q_d, double* v, double* PXL1, double* PXL2, double* PXL3, double* PXL4, double* P1_T, double* P2_T, double* P3_T, double* P4_T, double focal, double d_pxl) {
+	
+	auto begin = std::chrono::high_resolution_clock::now();
 
 	PinHoleEquations pinHoleFunctor(q_d, v, PXL1, PXL2, PXL3, PXL4, P1_T, P2_T, P3_T, P4_T, focal, d_pxl);
 	Eigen::NumericalDiff<PinHoleEquations> numDiff(pinHoleFunctor);
@@ -303,6 +315,12 @@ int pinHoleFSolve(Eigen::Matrix<double,6,1> &variables, double* q_d, double* v, 
 	//walking inside the world of black magic...
 	int ret = levMarq.minimize(dynVar);
 	variables = dynVar;
+
+	auto end = std::chrono::high_resolution_clock::now();
+	long total = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
+	double timeInMillis = total / pow(10, 6);
+	printf("\nFsolve: %f millisecondi", timeInMillis);
+
 	return ret;
 }
 
@@ -334,33 +352,42 @@ void simulazioneCompleta() {
 
 	//Istante iniziale
 	Vector3d T_0(0, 0, 2000);
-	double yaw0 = 90 * M_PI / 180;
-	double pitch0 = 0 * M_PI / 180;
-	double roll0 = 180 * M_PI / 180;
+	double yaw0 = 90 * M_PI / 180;		//in RAD
+	double pitch0 = 0 * M_PI / 180;		//in RAD
+	double roll0 = 180 * M_PI / 180;	//in RAD
 
-	double R11_0 = cos(yaw0)*cos(pitch0);
-	double R12_0 = sin(yaw0)*cos(pitch0);
-	double R13_0 = -sin(pitch0);
-	double R21_0 = cos(yaw0)*sin(pitch0)*sin(roll0) - sin(yaw0)*cos(roll0);
-	double R22_0 = sin(yaw0)*sin(pitch0)*sin(roll0) + cos(yaw0)*cos(roll0);
-	double R23_0 = cos(pitch0)*sin(roll0);
-	double R31_0 = cos(yaw0)*sin(pitch0)*cos(roll0) + sin(yaw0)*sin(roll0);
-	double R32_0 = sin(yaw0)*sin(pitch0)*cos(roll0) - cos(yaw0)*sin(roll0);
-	double R33_0 = cos(pitch0)*cos(roll0);
+	//temporary variables for R_0 matrix computing
+	double cosYaw0 = cos(yaw0);
+	double sinYaw0 = sin(yaw0);
+	double cosPitch0 = cos(pitch0);
+	double sinPitch0 = sin(pitch0);
+	double cosRoll0 = cos(roll0);
+	double sinRoll0 = sin(roll0);
 
-	Matrix3d R_0;
-	R_0 << R11_0, R12_0, R13_0, R21_0, R22_0, R23_0, R31_0, R32_0, R33_0;
+	double R11_0 = cosYaw0*cosPitch0;
+	double R12_0 = sinYaw0*cosPitch0;
+	double R13_0 = -sinPitch0;
+	double R21_0 = cosYaw0*sinPitch0*sinRoll0 - sinYaw0*cosRoll0;
+	double R22_0 = sinYaw0*sinPitch0*sinRoll0 + cosYaw0*cosRoll0;
+	double R23_0 = cosPitch0*sinRoll0;
+	double R31_0 = cosYaw0*sinPitch0*cosRoll0 + sinYaw0*sinRoll0;
+	double R32_0 = sinYaw0*sinPitch0*cosRoll0 - cosYaw0*sinRoll0;
+	double R33_0 = cosPitch0*cosRoll0;
+
+	//TODO: rename R_0 to R0, it will be overwritten after calling p3p_solver but it doesn't matter
+	Matrix3d R0;
+	R0 << R11_0, R12_0, R13_0, R21_0, R22_0, R23_0, R31_0, R32_0, R33_0;
 	/*
 	printf("\nR_0:");
 	printMatrix(R_0, 3, 3);
 	*/
-	Vector3d f1d_0 = R_0*(P1_Tn - T_0); // Versori nel sistema camera
+	Vector3d f1d_0 = R0*(P1_Tn - T_0); // Versori nel sistema camera
 	f1d_0.normalize();
-	Vector3d f2d_0 = R_0*(P2_Tn - T_0);
+	Vector3d f2d_0 = R0*(P2_Tn - T_0);
 	f2d_0.normalize();
-	Vector3d f3d_0 = R_0*(P3_Tn - T_0);
+	Vector3d f3d_0 = R0*(P3_Tn - T_0);
 	f3d_0.normalize();
-	Vector3d f4d_0 = R_0*(P4_Tn - T_0);
+	Vector3d f4d_0 = R0*(P4_Tn - T_0);
 	f4d_0.normalize();
 
 	//Risoluzione del punto iniziale tramite p3p
@@ -375,36 +402,36 @@ void simulazioneCompleta() {
 	fd_0.col(1) = f2d_0;
 	fd_0.col(2) = f3d_0;
 	fd_0.col(3) = f4d_0;
-
+	/*
 	printf("\nP:");
 	printMatrix(P, 3, 4);
 	printf("\nfd_0:");
 	printMatrix(fd_0, 3, 4);
+	*/
 
-	//TODO define p3p_solver_new
-	Eigen::Matrix<double, 3, 4> sol = p3p_solver(P, fd_0);	//T_0 is a 3x1 vector, for R see matlab file "p3p_solver_new.m" (should be 3x3)
+	Eigen::Matrix<double, 3, 4> sol = p3p_solver(P, fd_0);	
 	T_0 = sol.col(0);
-	Eigen::Matrix3d R0;
 	R0.col(0) = sol.col(1);
 	R0.col(1) = sol.col(2);
 	R0.col(2) = sol.col(3);
+	/*
 	printf("\nT_0: ");
 	printMatrix(T_0, 3, 1);
 	printf("\nR0 :");
 	printMatrix(R0, 3, 3);
-
+	*/
 	double ypr[3];
-	dcm_to_ypr(R_0,ypr);	//ypr = vector containing yaw, pitch, roll in DEGREES!!!
-
+	dcm_to_ypr(R0,ypr);	//ypr = vector containing yaw, pitch, roll in DEGREES!!!
+	/*
 	printf("\nyaw: %f", (double)ypr[0]);
 	printf("\npitch: %f", (double)ypr[1]);
 	printf("\nroll: %f", (double)ypr[2]);
-
+	*/
 
 	Vector3d T_s = T_0;
-	double Yaw_s = yaw0 * M_PI /180;
-	double Pitch_s = pitch0 * M_PI / 180;
-	double Roll_s = roll0 * M_PI / 180;
+	double Yaw_s = yaw0;
+	double Pitch_s = pitch0;
+	double Roll_s = roll0;
 
 	//Moto
 	double Yaw_nt[1001];
@@ -417,32 +444,20 @@ void simulazioneCompleta() {
 	Eigen::Matrix<double, 1, 1001> Time_out;
 	//int iter = 0;
 	for (int i = 0; i <= 1000; i++) {
+
 		double t = i / 0.01;
-
-		//what can we do to replace these global variables?
-		/*
-		global qx qy qz vx vy vz ...
-		x_pxl_1 y_pxl_1 ... // Coordinate dei led nei pixel della cam
-		x_pxl_2 y_pxl_2 ...
-		x_pxl_3 y_pxl_3 ...
-		x_pxl_4 y_pxl_4 ...
-		Px_1 Py_1 Pz_1 ... // Coordinate del led nel sistema target
-		Px_2 Py_2 Pz_2 ...
-		Px_3 Py_3 Pz_3 ...
-		Px_4 Py_4 Pz_4 ...
-		focal d_pxl // focale cam
-		*/
-
-		//iter++;
 		int Periodo = 2; //secondi
 		double w = 2 * M_PI / Periodo;
 
 		double oscillation = (2 * M_PI / 180)*cos(w*t);
 
-		//ypr is already in radians!! modify these lines
-		Yaw_nt[i] = ypr[0] * M_PI / 180;
-		Pitch_nt[i] = 0 * M_PI / 180;					 // rad
-		Roll_nt[i] = ypr[2] * M_PI / 180 + oscillation;
+		double yaw = ypr[0] * M_PI / 180;
+		double pitch = 0 * M_PI / 180;
+		double roll = ypr[2] * M_PI / 180 + oscillation;
+
+		Yaw_nt[i] = yaw;				//in DEG
+		Pitch_nt[i] = pitch;					//in DEG 
+		Roll_nt[i] = roll;	//in DEG
 		/*
 		printf("\nyaw: %f", (double)Yaw_nt[iter-1]);
 		printf("\npitch: %f", (double)Pitch_nt[iter - 1]);
@@ -452,21 +467,28 @@ void simulazioneCompleta() {
 		Eigen::Matrix<double, 3, 1001> T_nt;
 		T_nt.col(i) = T_0;
 
-		double R_nt11 = cos(Yaw_nt[i])*cos(Pitch_nt[i]);
-		double R_nt12 = sin(Yaw_nt[i])*cos(Pitch_nt[i]);  
-		double R_nt13 = -sin(Pitch_nt[i]);						
-		double R_nt21 = cos(Yaw_nt[i])*sin(Pitch_nt[i])*sin(Roll_nt[i]) - sin(Yaw_nt[i])*cos(Roll_nt[i]);
-		double R_nt22 = sin(Yaw_nt[i])*sin(Pitch_nt[i])*sin(Roll_nt[i]) + cos(Yaw_nt[i])*cos(Roll_nt[i]);
-		double R_nt23 = cos(Pitch_nt[i])*sin(Roll_nt[i]);							 				 
-		double R_nt31 = cos(Yaw_nt[i])*sin(Pitch_nt[i])*cos(Roll_nt[i]) + sin(Yaw_nt[i])*sin(Roll_nt[i]); //ok?
-		double R_nt32 = sin(Yaw_nt[i])*sin(Pitch_nt[i])*cos(Roll_nt[i]) - cos(Yaw_nt[i])*sin(Roll_nt[i]);
-		double R_nt33 = cos(Pitch_nt[i])*cos(Roll_nt[i]);
+		double cosYaw = cos(yaw);
+		double sinYaw = sin(yaw);
+		double cosPitch = cos(pitch);
+		double sinPitch = sin(pitch);
+		double cosRoll = cos(roll);
+		double sinRoll = sin(roll);
+
+		double R_nt11 = cosYaw*cosPitch;
+		double R_nt12 = sinYaw*cosPitch;
+		double R_nt13 = -sinPitch;
+		double R_nt21 = cosYaw*sinPitch*sinRoll - sinYaw*cosRoll;
+		double R_nt22 = sinYaw*sinPitch*sinRoll + cosYaw*cosRoll;
+		double R_nt23 = cosPitch*sinRoll;
+		double R_nt31 = cosYaw*sinPitch*cosRoll + sinYaw*sinRoll;
+		double R_nt32 = sinYaw*sinPitch*cosRoll - cosYaw*sinRoll;
+		double R_nt33 = cosPitch*cosRoll;
 
 		Eigen::Matrix<double, 3, 3> R_nt;
 		R_nt << R_nt11, R_nt12, R_nt13, R_nt21, R_nt22, R_nt23, R_nt31, R_nt32, R_nt33;
 
-		printf("\R_nt:");
-		printMatrix(R_nt, 3, 3);
+		//printf("\R_nt:");
+		//printMatrix(R_nt, 3, 3);
 
 		// Parametri:
 		double focal = 3.46031;
@@ -486,7 +508,6 @@ void simulazioneCompleta() {
 
 		//printf("\nv:");
 		//printMatrix(v, 3, 1);
-		
 		/*
 		printf("\nT_nt.col:");
 		printMatrix(T_nt.col(i), 3, 1);
@@ -503,14 +524,14 @@ void simulazioneCompleta() {
 		double Z3 = z3(2);			  
 		Vector3d z4 = (R_nt*(T_nt.col(i) + P4_Tn)); // Riferimento drone
 		double Z4 = z4(2);
-
+		/*
 		if (i == 0) {
 			printf("\nZ1: %f",Z1);
 			printf("\nZ2: %f",Z2);
 			printf("\nZ3: %f",Z3);
 			printf("\nZ4: %f",Z4);
 		}
-
+		*/
 		Eigen::Matrix<double, 2, 3> sparseFocal;
 		sparseFocal << focal, 0, 0, 0, focal, 0;
 		Eigen::Vector2d PXL1 = (1 / (Z1*d_pxl)) * sparseFocal * (R_nt*(T_nt.col(i) + P1_Tn));
@@ -518,7 +539,7 @@ void simulazioneCompleta() {
 		Eigen::Vector2d PXL3 = (1 / (Z3*d_pxl)) * sparseFocal * (R_nt*(T_nt.col(i) + P3_Tn));
 		Eigen::Vector2d PXL4 = (1 / (Z4*d_pxl)) * sparseFocal * (R_nt*(T_nt.col(i) + P4_Tn));
 
-		
+		/*
 		printf("\nPXL1:");
 		printMatrix(PXL1, 2, 1);
 		printf("\nPXL2:");
@@ -527,7 +548,7 @@ void simulazioneCompleta() {
 		printMatrix(PXL3, 2, 1);
 		printf("\nPXL4:");
 		printMatrix(PXL4, 2, 1);
-		
+		*/
 		double x_pxl_1 = PXL1(0);
 		double y_pxl_1 = PXL1(1);
 		double x_pxl_2 = PXL2(0);
@@ -550,19 +571,21 @@ void simulazioneCompleta() {
 		double Pz_3 = P3_T(2);
 		double Pz_4 = P4_T(2);
 
-		//TODO write fsolve
 		Eigen::Matrix<double,6,1> X0;
-		//Eigen::VectorXd Y0;
 		X0 << T_s(0), T_s(1), T_s(2), Yaw_s, Pitch_s, Roll_s;  // Condizioni iniziali PinHole;
+		/*
 		if (i == 0) {
 			printf("\nX0 input:");
 			printMatrix(X0, 6, 1);
 		}
+		*/
 		pinHoleFSolve(X0, q_d.data(), v.data(), PXL1.data(), PXL2.data(), PXL3.data(), PXL4.data(), P1_T.data(), P2_T.data(), P3_T.data(), P4_T.data(), focal, d_pxl);
+		/*
 		if (i == 0) {
 			printf("\nX0 output:");
 			printMatrix(X0, 6, 1);
 		}
+		*/
 		T_s << X0(0),X0(1),X0(2);
 		Yaw_s = X0(3);
 		Pitch_s = X0(4);
