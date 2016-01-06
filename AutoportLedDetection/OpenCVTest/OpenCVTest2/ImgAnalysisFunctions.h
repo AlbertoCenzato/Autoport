@@ -5,4 +5,4 @@
 extern std::vector<cv::KeyPoint> imgLedDetection(std::string &);
 extern std::vector<cv::KeyPoint> vidLedDetection(std::string &);
 
-extern std::vector<POINT> pattern1(std::vector<cv::KeyPoint> &);
+extern std::vector<Point2f> pattern1(std::vector<cv::KeyPoint> &);

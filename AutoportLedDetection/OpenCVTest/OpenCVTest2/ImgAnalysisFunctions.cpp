@@ -119,7 +119,7 @@ vector<KeyPoint> vidLedDetection(string vidName)
 	VideoCapture videoCapture = VideoCapture(vidName);
 
 	if (!videoCapture.isOpened())
-		return -1;
+		return vector<KeyPoint>();
 
 	Mat imgOriginal;
 	videoCapture.read(imgOriginal);
@@ -164,6 +164,7 @@ vector<KeyPoint> vidLedDetection(string vidName)
 	Mat imgThresholded;
 	Mat imgHSV;
 
+	vector<KeyPoint> keypoints;
 	bool done = false;
 	while (!done) {
 
@@ -183,7 +184,6 @@ vector<KeyPoint> vidLedDetection(string vidName)
 		erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
 
 		Ptr<SimpleBlobDetector> featureDetector = SimpleBlobDetector::create(params);
-		std::vector<KeyPoint> keypoints;
 		featureDetector->detect(imgThresholded, keypoints);
 		// Draw detected blobs as red circles.
 		// DrawMatchesFlags::DRAW_RICH_KEYPOINTS flag ensures the size of the circle corresponds to the size of blob
@@ -205,13 +205,33 @@ vector<KeyPoint> vidLedDetection(string vidName)
 		//Sleep(100);
 		//videoCapture.set(CAP_PROP_FORMAT,)
 	}
-	return 0;
+	return keypoints;
 }
 
 //led recognition algorithm
-std::vector<POINT> pattern1(std::vector<cv::KeyPoint> &) {
+vector<Point2f> pattern1(vector<KeyPoint> &keyPoints) {
+	
+	//compute the distances between points
+	int size = keyPoints.size();
+	int numOfComb = size*(size - 1) / 2;
+	vector<float> dist = vector<float>(numOfComb,0);
+	int k = 0;
+	for (int i = 0; i < keyPoints.size(); i++) {
+		Point2f point1 = keyPoints[i].pt;			//pt returns by value probably...
+		for (int j = i + 1; j < size; j++) {
+			Point2f point2 = keyPoints[j].pt;
+			dist[k++] = distance(point1, point2);
+		}
+	}
 
-	return
+
+	return;
+}
+
+
+//---Private functions---
+float distance(Point2f &point1, Point2f &point2) {
+	return sqrt(pow(point1.x - point2.x, 2) + pow(point1.y - point2.y, 2));
 }
 
 
