@@ -13,7 +13,8 @@ using namespace std;
 struct Distance {
 	float dist = 0;
 	KeyPoint *keyPoint1;
-	KeyPoint *keyPoint2;
+	//KeyPoint *keyPoint2;
+	int keyPoint2;
 };
 
 struct lessDist : binary_function <Distance, Distance, bool> {
@@ -33,13 +34,13 @@ vector<KeyPoint> imgLedDetection(string &imgName)
 
 	//---Color filtering----
 
-	int iLowH = 0;
-	int iHighH = 20;
+	int iLowH = 150;
+	int iHighH = 180;
 
-	int iLowS = 180;
-	int iHighS = 255;
+	int iLowS = 100;
+	int iHighS = 200;
 
-	int iLowV = 0;
+	int iLowV = 100;
 	int iHighV = 255;
 
 	int64 start = getTickCount();
@@ -107,7 +108,7 @@ vector<KeyPoint> imgLedDetection(string &imgName)
 
 //image analysis on video, RETURNS ONLY THE KEYPOINTS DETECTED IN THE LAST FRAME (WELL...
 //IT SHOULD, BUT IT THROWS AN EXCEPTION REACHING THE EOF
-vector<KeyPoint> vidLedDetection(string vidName)
+vector<KeyPoint> vidLedDetection(string &vidName)
 {
 	int iLowH = 0;
 	int iHighH = 180;
@@ -228,18 +229,19 @@ vector<KeyPoint> vidLedDetection(string vidName)
 vector<KeyPoint> pattern1(vector<KeyPoint> &keyPoints) {
 	
 	//compute the distances between points
-	int size = keyPoints.size();
-	int numOfComb = size*(size - 1) / 2;
+	
 	set<Distance, lessDist> distances[12];
 	//set<Distance, lessDist>	distances;	//TODO: preallocate the exact vector size if possible...
 	Distance d;
 	int k = 0;
-	for (uint i = 0; i < keyPoints.size(); i++)	{		//pt returns by value probably...
-		for (int j = 0; j < size; j++) {
-			d.keyPoint1 = &keyPoints[i];
-			d.keyPoint2 = &keyPoints[j];
-			d.dist = myDistance(d.keyPoint1, d.keyPoint2);
-			if (i!=j) distances[i].insert(d);
+	for (uint i = 0; i < 12; i++)	{
+		for (int j = 0; j < 12; j++) {
+			if (i != j) {
+				d.keyPoint1 = &keyPoints[i];
+				d.keyPoint2 = j;
+				d.dist = myDistance(d.keyPoint1, &(keyPoints[j]));
+				distances[i].insert(d);
+			}
 		}
 	}
 
@@ -269,76 +271,81 @@ vector<KeyPoint> pattern1(vector<KeyPoint> &keyPoints) {
 	
 	set<Distance, lessDist> patternPoints[12];
 	
+	/*
 	KeyPoint *minKP1 = (*(distances[minIndx].begin())).keyPoint1;
 	KeyPoint *minKP2 = (*(distances[minIndx].begin())).keyPoint2;
 	KeyPoint *maxKP1 = (*(++(distances[maxIndx].rend()))).keyPoint1;
 	KeyPoint *maxKP2 = (*(++(distances[maxIndx].rend()))).keyPoint2;
+	*/
+	int minKP1 = minIndx;
+	int minKP2 = (*(distances[minIndx].begin())).keyPoint2;
+	int maxKP1 = maxIndx;
+	int maxKP2 = (*(++distances[maxIndx].rend())).keyPoint2;
 
 	if (minKP1 == maxKP1) {
 		patternPoints[11] = distances[minIndx];  //CHECK: retruns by value or by reference??
-		int i = 0;
-		for (i = 0; maxKP2 != (*(distances[i].rend()++)).keyPoint1; i++);
-		patternPoints[8] = distances[i];
-		for (i = 0; minKP2 != (*(distances[i].begin())).keyPoint1; i++);
-		patternPoints[10] = distances[i];
+		distances[minIndx] = set<Distance,lessDist>();
+		patternPoints[8] = distances[maxKP2];
+		distances[maxKP2] = set<Distance, lessDist>();
+		patternPoints[10] = distances[minKP2];
+		distances[minKP2] = set<Distance, lessDist>();
 	} 
 	else if (minKP1 == maxKP2) {
-		patternPoints[11] = distances[minIndx];
-		patternPoints[8]  = distances[maxIndx];
-		int i;
-		for (i = 0; minKP2 != (*(distances[i].begin())).keyPoint1; i++);
-		patternPoints[10] = distances[i];
+		patternPoints[11] = distances[minKP1];
+		distances[minKP1] = set<Distance, lessDist>();
+		patternPoints[8]  = distances[maxKP1];
+		distances[maxKP1] = set<Distance, lessDist>();
+		patternPoints[10] = distances[minKP2];
+		distances[minKP2] = set<Distance, lessDist>();
 	}
 	else if (minKP2 == maxKP1) {
-		int i = 0;
-		for (i = 0; minKP2 != (*(distances[i].begin())).keyPoint1; i++);
-		patternPoints[11] = distances[i];
-		for (i = 0; maxKP2 != (*(distances[i].rend()++)).keyPoint1; i++);
-		patternPoints[8] = distances[i];
-		patternPoints[10] = distances[minIndx];
+		patternPoints[11] = distances[minKP2];
+		distances[minKP2] = set<Distance, lessDist>();
+		patternPoints[8]  = distances[maxKP2];
+		distances[maxKP2] = set<Distance, lessDist>();
+		patternPoints[10] = distances[minKP1];
+		distances[minKP1] = set<Distance, lessDist>();
 	}
 	else {
-		int i = 0;
-		for (i = 0; minKP2 != (*(distances[i].begin())).keyPoint1; i++);
-		patternPoints[11] = distances[i];
-		patternPoints[8]  = distances[maxIndx];
-		patternPoints[10] = distances[minIndx];
+		patternPoints[11] = distances[minKP2];
+		distances[minKP2] = set<Distance, lessDist>();
+		patternPoints[8]  = distances[maxKP1];
+		distances[maxKP1] = set<Distance, lessDist>();
+		patternPoints[10] = distances[minKP1];
+		distances[minKP1] = set<Distance, lessDist>();
 	}
 
 	set<Distance,lessDist>::reverse_iterator riter = patternPoints[10].rend();
 	riter++;
 	riter++;
-	KeyPoint *kp1 = (*riter).keyPoint2;
-	int i = 0;
-	for (i = 0; kp1 != (*(distances[i].begin())).keyPoint1; i++);
-	patternPoints[9] = distances[i];
+	int kp1 = (*riter).keyPoint2;
+	patternPoints[9] = distances[kp1];
+	distances[kp1] = set<Distance, lessDist>();
 	riter++;
 	kp1 = (*riter).keyPoint2;
-	for (i = 0; kp1 != (*(distances[i].begin())).keyPoint1; i++);
-	patternPoints[5] = distances[i];
-	
+	patternPoints[5] = distances[kp1];
+	distances[kp1] = set<Distance, lessDist>();
+
 	set<Distance, lessDist>::iterator iter1 = patternPoints[5].begin();
-	kp1 = (*riter).keyPoint2;
+	kp1 = (*iter1).keyPoint2;
 	iter1++;
-	KeyPoint *kp2 = (*iter1).keyPoint2;
+	int kp2 = (*iter1).keyPoint2;
 	int firstFound = 0;
 	for (set<Distance, lessDist>::iterator iter2 = patternPoints[8].begin(); iter2 != patternPoints[8].end();) {
-		KeyPoint *kp = (*iter2).keyPoint2;
+		int kp = (*iter2).keyPoint2;
 		iter2++;
 		if (kp == kp1) {
-			int i;
-			for (i = 0; kp1 != (*(distances[i].begin())).keyPoint1; i++);
-			patternPoints[1] = distances[i];
-			for (i = 0; kp2 != (*(distances[i].begin())).keyPoint1; i++);
-			patternPoints[0] = distances[i];
+			patternPoints[1] = distances[kp1];
+			distances[kp1] = set<Distance, lessDist>();
+			patternPoints[0] = distances[kp2];
+			distances[kp2] = set<Distance, lessDist>();
 			iter2 = patternPoints[8].end();
 		}
 		else if (kp == kp2) {
-			int i;
-			for (i = 0; kp2 != (*(distances[i].begin())).keyPoint1; i++);
-			patternPoints[1] = distances[i];
-			for (i = 0; kp1 != (*(distances[i].begin())).keyPoint1; i++);
-			patternPoints[0] = distances[i];
+			patternPoints[1] = distances[kp2];
+			distances[kp2] = set<Distance, lessDist>();
+			patternPoints[0] = distances[kp1];
+			distances[kp1] = set<Distance, lessDist>();
 			iter2 = patternPoints[8].end();
 		}
 	}
@@ -349,31 +356,36 @@ vector<KeyPoint> pattern1(vector<KeyPoint> &keyPoints) {
 	iter++;
 	iter++;
 	kp1 = (*iter).keyPoint2;
-	i = 0;
-	for (i = 0; kp1 != (*(distances[i].begin())).keyPoint1; i++);
-	patternPoints[2] = distances[i];
+	patternPoints[2] = distances[kp1];
+	distances[kp1] = set<Distance, lessDist>();
 
 	//led 7
 	iter = patternPoints[9].begin();
 	iter++;
 	kp1 = (*iter).keyPoint2;
-	i = 0;
-	for (i = 0; kp1 != (*(distances[i].begin())).keyPoint1; i++);
-	patternPoints[6] = distances[i];
+	patternPoints[6] = distances[kp1];
+	distances[kp1] = set<Distance, lessDist>();
 
 	//led 4
 	iter = patternPoints[6].begin();
 	iter++;
 	kp1 = (*iter).keyPoint2;
-	i = 0;
-	for (i = 0; kp1 != (*(distances[i].begin())).keyPoint1; i++);
-	patternPoints[3] = distances[i];
+	patternPoints[3] = distances[kp1];
+	distances[kp1] = set<Distance, lessDist>();
 
 	//led 5 e 8
+	int fiveAndEight[2];
+	int j = 0;
+	for (int i = 0; i < 12, j < 2; i++) {
+		if (!distances[i].empty()) {
+			fiveAndEight[j++] = i;
+		}
+	}
+	/*
 	int keyPointFound = 0;
-	KeyPoint *fiveAndEight[2];
+	int fiveAndEight[2];
 	for (int i = 0; i < 12 && keyPointFound < 2; i++) {
-		kp1 = (*(distances[i].begin())).keyPoint1;
+		kp1 = i;
 		bool found = false;
 		for (int j = 0; j < 12; j++) {
 			if (!patternPoints[j].empty()) {
@@ -387,6 +399,7 @@ vector<KeyPoint> pattern1(vector<KeyPoint> &keyPoints) {
 			fiveAndEight[keyPointFound++] = kp1;
 		}
 	}
+	*/
 
 	vector<KeyPoint> finalKeyPoints = vector<KeyPoint>(12);
 	for (int i = 0; i < 12; i++) {
@@ -394,17 +407,17 @@ vector<KeyPoint> pattern1(vector<KeyPoint> &keyPoints) {
 			finalKeyPoints[i] = *((*(patternPoints[i].begin())).keyPoint1);
 	}
 
-	for (iter = patternPoints[3].begin(), i = 0; iter != patternPoints[3].end(); i++) {
+	for (iter = patternPoints[3].begin(); iter != patternPoints[3].end(); ) {
 		kp1 = (*iter).keyPoint2;
 		iter++;
 		if (fiveAndEight[0] == kp1) {
-			finalKeyPoints[4] = *fiveAndEight[0];
-			finalKeyPoints[7] = *fiveAndEight[1];
+			finalKeyPoints[4] = *(*(distances[fiveAndEight[0]].begin())).keyPoint1;
+			finalKeyPoints[7] = *(*(distances[fiveAndEight[1]].begin())).keyPoint1;
 			iter == patternPoints[3].end();
 		}
 		else if(fiveAndEight[1] == kp1) {
-			finalKeyPoints[4] = *fiveAndEight[1];
-			finalKeyPoints[7] = *fiveAndEight[0];
+			finalKeyPoints[4] = *(*(distances[fiveAndEight[1]].begin())).keyPoint1;
+			finalKeyPoints[7] = *(*(distances[fiveAndEight[0]].begin())).keyPoint1;
 			iter == patternPoints[3].end();
 		}
 	}
