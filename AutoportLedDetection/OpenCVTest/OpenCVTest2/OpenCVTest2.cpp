@@ -35,7 +35,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 
 	// Initialize global strings
 	LoadString(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
-	LoadString(hInstance, IDC_OPENCVtest2, szWindowClass, MAX_LOADSTRING);
+	LoadString(hInstance, IDC_OPENCVTEST2, szWindowClass, MAX_LOADSTRING);
 	MyRegisterClass(hInstance);
 
 	MyWinMain(hInstance, hPrevInstance, (LPSTR)lpCmdLine, nCmdShow);
@@ -46,7 +46,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 		return FALSE;
 	}
 
-	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_OPENCVtest2));
+	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_OPENCVTEST2));
 
 	// Main message loop:
 	while (GetMessage(&msg, NULL, 0, 0))
@@ -98,10 +98,10 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 	wcex.cbClsExtra		= 0;
 	wcex.cbWndExtra		= 0;
 	wcex.hInstance		= hInstance;
-	wcex.hIcon			= LoadIcon(hInstance, MAKEINTRESOURCE(IDI_OPENCVtest2));
+	wcex.hIcon			= LoadIcon(hInstance, MAKEINTRESOURCE(IDI_OPENCVTEST2));
 	wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
 	wcex.hbrBackground	= (HBRUSH)(COLOR_WINDOW+1);
-	wcex.lpszMenuName	= MAKEINTRESOURCE(IDC_OPENCVtest2);
+	wcex.lpszMenuName	= MAKEINTRESOURCE(IDC_OPENCVTEST2);
 	wcex.lpszClassName	= szWindowClass;
 	wcex.hIconSm		= LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 

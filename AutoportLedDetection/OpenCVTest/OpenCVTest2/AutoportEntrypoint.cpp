@@ -1,7 +1,5 @@
 
 #include "stdafx.h"
-#include <stdio.h>
-#include <io.h>
 #include "ImgAnalysisFunctions.h"
 #include "Functions.h"
 #include "Simulations.h"
@@ -12,8 +10,8 @@ using namespace std;
 void run() {
 
 	string imgName = "image.jpg";
-	imgLedDetection(imgName);
-	
+	pattern1(imgLedDetection(imgName));
 
+	getchar();
 	return;
 }
