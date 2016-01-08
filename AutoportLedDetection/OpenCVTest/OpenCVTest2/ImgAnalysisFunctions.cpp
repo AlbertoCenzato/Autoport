@@ -91,8 +91,8 @@ vector<KeyPoint> imgLedDetection(string &imgName)
 	drawKeypoints(imgThresholded, keypoints, imgThresholded, Scalar(0, 0, 255), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 
 	for (uint i = 0; i < keypoints.size(); i++) {
-		Point pt = keypoints[i].pt;
-		printf("Point %d - x:%d      y:%d\n", i+1, pt.x, pt.y);
+		Point2f pt = keypoints[i].pt;
+		cout << "\nPoint " << i+1 << ": x[" << pt.x << "] y[" << pt.y << "]";
 	}
 
 	namedWindow("Thresholded Image", WINDOW_NORMAL);
@@ -282,6 +282,7 @@ vector<KeyPoint> pattern1(vector<KeyPoint> &keyPoints) {
 	int maxKP1 = maxIndx;
 	int maxKP2 = (*(++distances[maxIndx].rend())).keyPoint2;
 
+	//LED 12, 11, 9
 	if (minKP1 == maxKP1) {
 		patternPoints[11] = distances[minIndx];  //CHECK: retruns by value or by reference??
 		distances[minIndx] = set<Distance,lessDist>();
@@ -315,6 +316,7 @@ vector<KeyPoint> pattern1(vector<KeyPoint> &keyPoints) {
 		distances[minKP1] = set<Distance, lessDist>();
 	}
 
+	//LED 10, 6
 	set<Distance,lessDist>::reverse_iterator riter = patternPoints[10].rend();
 	riter++;
 	riter++;
@@ -326,6 +328,7 @@ vector<KeyPoint> pattern1(vector<KeyPoint> &keyPoints) {
 	patternPoints[5] = distances[kp1];
 	distances[kp1] = set<Distance, lessDist>();
 
+	//LED 1 e 2
 	set<Distance, lessDist>::iterator iter1 = patternPoints[5].begin();
 	kp1 = (*iter1).keyPoint2;
 	iter1++;
