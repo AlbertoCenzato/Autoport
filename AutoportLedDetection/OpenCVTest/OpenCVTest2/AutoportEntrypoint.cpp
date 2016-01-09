@@ -15,9 +15,7 @@ void run() {
 	
 	cv::Mat image;
 	vector<cv::KeyPoint> keyPoints = pattern1(imgLedDetection(imgName,image),image);
-	for (int i = 0; i < 12; i++){
-		cout << "\nPoint " << i + 1 << ": x[" << keyPoints[i].pt.x << "] y[" << keyPoints[i].pt.y << "]";
-	}
+	
 	
 	getchar();
 	return;
