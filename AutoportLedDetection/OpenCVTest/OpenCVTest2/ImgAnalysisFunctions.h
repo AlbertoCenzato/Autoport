@@ -13,6 +13,7 @@ extern std::vector<cv::KeyPoint> imgLedDetection(std::string&,cv::Mat&);
 extern std::vector<cv::KeyPoint> vidLedDetection(std::string&);
 
 extern std::vector<cv::KeyPoint> pattern1(std::vector<cv::KeyPoint>&, cv::Mat&);
+extern std::vector<cv::KeyPoint> pattern3(std::vector<cv::KeyPoint>&, cv::Mat&);
 
 
 

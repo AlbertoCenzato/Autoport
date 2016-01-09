@@ -230,11 +230,8 @@ vector<KeyPoint> vidLedDetection(string &vidName)
 vector<KeyPoint> pattern1(vector<KeyPoint> &keyPoints, Mat &image) {
 	
 	//compute the distances between points
-	
 	set<Distance, lessDist> distances[12];
-	//set<Distance, lessDist>	distances;	//TODO: preallocate the exact vector size if possible...
 	Distance d;
-	int k = 0;
 	for (uint i = 0; i < 12; i++)	{
 		for (int j = 0; j < 12; j++) {
 			if (i != j) {
@@ -455,6 +452,216 @@ vector<KeyPoint> pattern1(vector<KeyPoint> &keyPoints, Mat &image) {
 	return finalKeyPoints;
 }
 
+//led recognition algorithm
+vector<KeyPoint> pattern3(vector<KeyPoint> &keyPoints, Mat &image) {
+
+	//compute the distances between points
+	set<Distance, lessDist> distances[12];
+	Distance d;
+	for (uint i = 0; i < 12; i++)	{
+		for (int j = 0; j < 12; j++) {
+			if (j != i) {
+				d.keyPoint1 = &keyPoints[i];
+				d.keyPoint2 = j;
+				d.dist = myDistance(d.keyPoint1, &(keyPoints[j]));
+				distances[i].insert(d);
+			}
+		}
+	}
+
+	//print distances
+	for (int j = 0; j < 12; j++) {
+		cout << "\nPoint " << j + 1 << ":";
+		int i = 1;
+		for (std::set<Distance, lessDist>::iterator it = distances[j].begin(); it != distances[j].end(); ++it) {
+			Distance d = *it;
+			cout << "\n   Distance " << i++ << ": " << d.dist;
+		}
+	}
+
+	//find the max and min distance
+	int minIndx = 0;
+	int maxIndx = 0;
+	for (int i = 0; i < 12; i++){
+		float newMinDist = (*(distances[i].begin())).dist;
+		float newMaxDist = (*(distances[i].rbegin())).dist;
+		if (newMinDist < (*(distances[minIndx].begin())).dist)
+			minIndx = i;
+		if (newMaxDist >(*(distances[maxIndx].rbegin())).dist)
+			maxIndx = i;
+	}
+
+	cout << "\nMin distance: " << (*(distances[minIndx].begin())).dist;
+	cout << "\nMax distance: " << (*(++distances[maxIndx].rend())).dist;
+
+	set<Distance, lessDist> patternPoints[12];
+
+	/*
+	KeyPoint *minKP1 = (*(distances[minIndx].begin())).keyPoint1;
+	KeyPoint *minKP2 = (*(distances[minIndx].begin())).keyPoint2;
+	KeyPoint *maxKP1 = (*(++(distances[maxIndx].rend()))).keyPoint1;
+	KeyPoint *maxKP2 = (*(++(distances[maxIndx].rend()))).keyPoint2;
+	*/
+	int minKP1 = minIndx;
+	int minKP2 = (*(distances[minIndx].begin())).keyPoint2;
+	int maxKP1 = maxIndx;
+	int maxKP2 = (*(distances[maxIndx].rbegin())).keyPoint2;
+
+	int prevPos[12];
+
+	//LED 12, 11, 6
+	if (minKP1 == maxKP1) {
+		patternPoints[11] = distances[minKP1];  //CHECK: retruns by value or by reference??
+		prevPos[11] = minKP1;
+		distances[minKP1] = set<Distance, lessDist>();
+		patternPoints[8] = distances[maxKP2];
+		prevPos[8] = maxKP2;
+		distances[maxKP2] = set<Distance, lessDist>();
+		patternPoints[5] = distances[minKP2];
+		prevPos[5] = minKP2;
+		distances[minKP2] = set<Distance, lessDist>();
+	}
+	else if (minKP1 == maxKP2) {
+		patternPoints[11] = distances[minKP1];
+		prevPos[11] = minKP1;
+		distances[minKP1] = set<Distance, lessDist>();
+		patternPoints[8] = distances[maxKP1];
+		prevPos[8] = maxKP1;
+		distances[maxKP1] = set<Distance, lessDist>();
+		patternPoints[5] = distances[minKP2];
+		prevPos[5] = minKP2;
+		distances[minKP2] = set<Distance, lessDist>();
+	}
+	else if (minKP2 == maxKP1) {
+		patternPoints[11] = distances[minKP2];
+		prevPos[11] = minKP2;
+		distances[minKP2] = set<Distance, lessDist>();
+		patternPoints[8] = distances[maxKP2];
+		prevPos[8] = maxKP2;
+		distances[maxKP2] = set<Distance, lessDist>();
+		patternPoints[5] = distances[minKP1];
+		prevPos[5] = minKP1;
+		distances[minKP1] = set<Distance, lessDist>();
+	}
+	else {
+		patternPoints[11] = distances[minKP2];
+		prevPos[11] = minKP2;
+		distances[minKP2] = set<Distance, lessDist>();
+		patternPoints[8] = distances[maxKP1];
+		prevPos[8] = maxKP1;
+		distances[maxKP1] = set<Distance, lessDist>();
+		patternPoints[5] = distances[minKP1];
+		prevPos[5] = minKP1;
+		distances[minKP1] = set<Distance, lessDist>();
+	}
+
+	string s = "9";
+	drawDetectedLed(image, *(*patternPoints[8].begin()).keyPoint1, s);
+	s = "6";
+	drawDetectedLed(image, *(*patternPoints[5].begin()).keyPoint1, s);
+	s = "12";
+	drawDetectedLed(image, *(*patternPoints[11].begin()).keyPoint1, s);
+
+	//led 2
+	set<Distance, lessDist>::iterator iter = patternPoints[5].begin();
+	int kp1 = (*iter).keyPoint2;
+	while (kp1 == prevPos[11] || kp1 == prevPos[8])
+		kp1 = (*++iter).keyPoint2;
+	patternPoints[1] = distances[kp1];
+	prevPos[1] = kp1;
+	distances[kp1] = set<Distance, lessDist>();
+	s = "2";
+	drawDetectedLed(image, *(*patternPoints[1].begin()).keyPoint1, s);
+
+	//led 7
+	iter = patternPoints[11].begin();
+	kp1 = (*iter).keyPoint2;
+	while (kp1 == prevPos[1] || kp1 == prevPos[5] || kp1 == prevPos[8])
+		kp1 = (*++iter).keyPoint2;
+	patternPoints[6] = distances[kp1];
+	prevPos[6] = kp1;
+	distances[kp1] = set<Distance, lessDist>();
+	s = "7";
+	drawDetectedLed(image, *(*patternPoints[6].begin()).keyPoint1, s);
+
+	//led 3
+	iter = patternPoints[6].begin();
+	kp1 = (*iter).keyPoint2;
+	while (kp1 == prevPos[1] || kp1 == prevPos[5] || kp1 == prevPos[8] || kp1 == prevPos[11])
+		kp1 = (*++iter).keyPoint2;
+	patternPoints[2] = distances[kp1];
+	prevPos[2] = kp1;
+	distances[kp1] = set<Distance, lessDist>();
+	s = "3";
+	drawDetectedLed(image, *(*patternPoints[2].begin()).keyPoint1, s);
+
+	//led 1
+	iter = patternPoints[1].begin();
+	kp1 = (*iter).keyPoint2;
+	while (kp1 == prevPos[2] || kp1 == prevPos[5] || kp1 == prevPos[6] || kp1 == prevPos[8] || kp1 == prevPos[11])
+		kp1 = (*++iter).keyPoint2;
+	patternPoints[0] = distances[kp1];
+	prevPos[0] = kp1;
+	distances[kp1] = set<Distance, lessDist>();
+	s = "1";
+	drawDetectedLed(image, *(*patternPoints[0].begin()).keyPoint1, s);
+
+	//led 4
+	iter = patternPoints[2].begin();
+	kp1 = (*iter).keyPoint2;
+	while (kp1 == prevPos[0] || kp1 == prevPos[1] || kp1 == prevPos[5] || kp1 == prevPos[6] || kp1 == prevPos[8] || kp1 == prevPos[11])
+		kp1 = (*++iter).keyPoint2;
+	patternPoints[3] = distances[kp1];
+	prevPos[3] = kp1;
+	distances[kp1] = set<Distance, lessDist>();
+	s = "4";
+	drawDetectedLed(image, *(*patternPoints[3].begin()).keyPoint1, s);
+
+	//led 5
+	iter = patternPoints[0].begin();
+	kp1 = (*iter).keyPoint2;
+	while (kp1 == prevPos[1] || kp1 == prevPos[2] || kp1 == prevPos[3] || kp1 == prevPos[5] || kp1 == prevPos[6] || kp1 == prevPos[8] || kp1 == prevPos[11])
+		kp1 = (*++iter).keyPoint2;
+	patternPoints[4] = distances[kp1];
+	prevPos[4] = kp1;
+	distances[kp1] = set<Distance, lessDist>();
+	s = "5";
+	drawDetectedLed(image, *(*patternPoints[4].begin()).keyPoint1, s);
+
+	//led 8
+	iter = patternPoints[2].begin();
+	kp1 = (*iter).keyPoint2;
+	while (kp1 == prevPos[0] || kp1 == prevPos[1] || kp1 == prevPos[3] || kp1 == prevPos[4] || kp1 == prevPos[5] || kp1 == prevPos[6] || kp1 == prevPos[8] || kp1 == prevPos[11])
+		kp1 = (*++iter).keyPoint2;
+	patternPoints[7] = distances[kp1];
+	prevPos[7] = kp1;
+	distances[kp1] = set<Distance, lessDist>();
+	s = "8";
+	drawDetectedLed(image, *(*patternPoints[7].begin()).keyPoint1, s);
+
+
+	vector<KeyPoint> finalKeyPoints = vector<KeyPoint>(12);
+	for (int i = 0; i < 12; i++) {
+		if (!patternPoints[i].empty())
+			finalKeyPoints[i] = *((*(patternPoints[i].begin())).keyPoint1);
+	}
+
+	//led 10 e 11
+	int i = 9;
+	for (iter = patternPoints[8].begin(); iter != patternPoints[9].end(), i < 11;) {
+		kp1 = (*(iter++)).keyPoint2;
+		if (!distances[kp1].empty()) {
+			finalKeyPoints[i++] = *(*(distances[kp1].begin())).keyPoint1;
+		}
+	}
+	s = "10";
+	drawDetectedLed(image, finalKeyPoints[9], s);
+	s = "11";
+	drawDetectedLed(image, finalKeyPoints[10], s);
+
+	return finalKeyPoints;
+}
+
 
 //---Private functions---
 
@@ -467,7 +674,6 @@ void drawDetectedLed(Mat &image, KeyPoint &keyPoint, string &number) {
 	imshow("Thresholded Image", image);
 	waitKey(25);
 }
-
 
 //---Callback functions for sliders in GUI---
 

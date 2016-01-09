@@ -11,6 +11,8 @@
 using namespace std;
 using namespace Eigen;
 
+void printMatrix(MatrixXd, int, int);
+
 /* This function finds the angles (in RADIANS) of the yaw - pitch - roll sequence
 R1(gamma)*R2(beta)*R3(alpha) from the direction cosine matrix
 Q - direction cosine matrix
@@ -63,19 +65,19 @@ Matrix<double, 3, 4> p3p_solver(Matrix<double, 3, 4> &P, Matrix<double, 3, 4> &f
 	iV.col(0) = f.col(0); //iV.col(0) = f1;
 	iV.col(1) = f.col(1); //iV.col(1) = f2;
 	iV.col(2) = f.col(3); //iV.col(2) = f4; 
-	/*
+	
 	printf("\niV:");
 	printMatrix(iV, 3, 3);
 	printf("\nwP;");
 	printMatrix(wP, 3, 3);
-	*/
+	
 	//risoluzione del p3p
 	P3p p3p;
 	Eigen::Matrix<double, 3, 16> poses = p3p.computePoses(iV, wP);	//set n and m dimension
-	/*
+	
 	printf("poses: \n");
 	printMatrix(poses, 3, 16);
-	*/
+	
 	//Vector3d C1 = poses.col(0);
 	//Vector3d C2 = poses.col(4);
 	//Vector3d C3 = poses.col(8);
@@ -84,29 +86,29 @@ Matrix<double, 3, 4> p3p_solver(Matrix<double, 3, 4> &P, Matrix<double, 3, 4> &f
 	R1.col(0) = poses.col(1);
 	R1.col(1) = poses.col(2);
 	R1.col(2) = poses.col(3);
-	//printf("R1: ");
-	//printMatrix(R1, 3, 3);
+	printf("R1: ");
+	printMatrix(R1, 3, 3);
 
 	Matrix3d R2;
 	R2.col(0) = poses.col(5);
 	R2.col(1) = poses.col(6);
 	R2.col(2) = poses.col(7);
-	//printf("R2: ");
-	//printMatrix(R2, 3, 3);
+	printf("R2: ");
+	printMatrix(R2, 3, 3);
 
 	Matrix3d R3;
 	R3.col(0) = poses.col(9);
 	R3.col(1) = poses.col(10);
 	R3.col(2) = poses.col(11);
-	//printf("R3: ");
-	//printMatrix(R3, 3, 3);
+	printf("R3: ");
+	printMatrix(R3, 3, 3);
 
 	Matrix3d R4;
 	R4.col(0) = poses.col(13);
 	R4.col(1) = poses.col(14);
 	R4.col(2) = poses.col(15);
-	//printf("R4: ");
-	//printMatrix(R4, 3, 3);
+	printf("R4: ");
+	printMatrix(R4, 3, 3);
 
 	//Eigen::Matrix<double, 3, 4> C;
 	//C.col(0) = C1;
@@ -118,8 +120,8 @@ Matrix<double, 3, 4> p3p_solver(Matrix<double, 3, 4> &P, Matrix<double, 3, 4> &f
 
 	Eigen::Matrix<double, 3, 12> R;
 	R << R1, R2, R3, R4;
-	//printf("R: ");
-	//printMatrix(R, 3, 12);
+	printf("R: ");
+	printMatrix(R, 3, 12);
 
 	//Discriminazione della soluzione esatta
 	Vector3d F31 = (R1*(P3 - poses.col(0)));	//Vector3d F31 = (R1*(P3 - C1));
@@ -130,19 +132,19 @@ Matrix<double, 3, 4> p3p_solver(Matrix<double, 3, 4> &P, Matrix<double, 3, 4> &f
 	F32.normalize();
 	F33.normalize();
 	F34.normalize();
-	//printf("F31: ");
-	//printMatrix(F31, 3, 1);
-	//printf("F32: ");
-	//printMatrix(F32, 3, 1);
-	//printf("F33: ");
-	//printMatrix(F33, 3, 1);
-	//printf("F34: ");
-	//printMatrix(F34, 3, 1);
+	printf("F31: ");
+	printMatrix(F31, 3, 1);
+	printf("F32: ");
+	printMatrix(F32, 3, 1);
+	printf("F33: ");
+	printMatrix(F33, 3, 1);
+	printf("F34: ");
+	printMatrix(F34, 3, 1);
 
 	Eigen::Matrix<double, 4, 1> dF;
 	dF << abs((F31 - f3).norm()), abs((F32 - f3).norm()), abs((F33 - f3).norm()), abs((F34 - f3).norm());
-	//printf("dF: ");
-	//printMatrix(dF, 4, 1);
+	printf("dF: ");
+	printMatrix(dF, 4, 1);
 
 
 	//find a better algorithm for min finding
