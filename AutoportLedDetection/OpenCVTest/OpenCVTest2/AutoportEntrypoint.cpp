@@ -10,11 +10,11 @@ using namespace std;
 //entrypoint function from the main (OpenCVtest2.cpp) 
 void run() {
 
-	string imgName = "pattern3.jpg";
+	string imgName = "patternMirko.jpg";
 	//vidLedDetection(imgName);
 	
 	cv::Mat image;
-	vector<cv::KeyPoint> keyPoints = pattern3(imgLedDetection(imgName,image),image);
+	vector<cv::Point2f> keyPoints = patternMirko(imgLedDetection(imgName,image),image, 15);
 	/*
 	Eigen::Vector3d pointsCS1;
 	Eigen::Vector3d pointsCS2;

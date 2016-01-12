@@ -28,24 +28,22 @@ struct orderByX : binary_function <Point2f, Point2f, bool> {
 //---Function declaration---
 inline void tbColorCallback(int state, void* userdata);
 inline void tbBlobCallback(int state, void* userdata);
-inline float myDistance(cv::KeyPoint*, cv::KeyPoint*);
-inline void drawDetectedLed(Mat &, KeyPoint &, string &);
+inline float myDistance(cv::Point2f &, cv::Point2f &);
+inline void drawDetectedLed(Mat &, Point2f &, string &);
 
 //---Function definition---
 
 //simple image analysis, with color filtering
-vector<KeyPoint> imgLedDetection(string &imgName,Mat &imgThresholded)
+vector<Point2f> imgLedDetection(string &imgName,Mat &imgThresholded)
 {
-
 	//---Color filtering----
-
 	int iLowH = 150;
 	int iHighH = 180;
 
-	int iLowS = 100;
-	int iHighS = 200;
+	int iLowS = 125;
+	int iHighS = 255;
 
-	int iLowV = 100;
+	int iLowV = 125;
 	int iHighV = 255;
 
 	int64 start = getTickCount();
@@ -78,9 +76,9 @@ vector<KeyPoint> imgLedDetection(string &imgName,Mat &imgThresholded)
 	params.filterByInertia = true;
 	params.minInertiaRatio = 0.5;
 	params.maxInertiaRatio = 1;
-	params.filterByArea = false;
-	params.minArea = 0;
-	params.maxArea = 100;
+	params.filterByArea = true;
+	params.minArea = 100;
+	params.maxArea = 1000;
 	params.filterByConvexity = true;
 	params.minConvexity = 0.5;
 	params.maxConvexity = 1;
@@ -95,8 +93,10 @@ vector<KeyPoint> imgLedDetection(string &imgName,Mat &imgThresholded)
 	// DrawMatchesFlags::DRAW_RICH_KEYPOINTS flag ensures the size of the circle corresponds to the size of blob
 	drawKeypoints(imgThresholded, keypoints, imgThresholded, Scalar(0, 0, 255), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 
+	vector<Point2f> points;
 	for (uint i = 0; i < keypoints.size(); i++) {
 		Point2f pt = keypoints[i].pt;
+		points.push_back(pt);
 		cout << "\nPoint " << i+1 << ": x[" << pt.x << "] y[" << pt.y << "]";
 	}
 
@@ -108,7 +108,7 @@ vector<KeyPoint> imgLedDetection(string &imgName,Mat &imgThresholded)
 
 	waitKey(25);
 
-	return keypoints;
+	return points;
 }
 
 //image analysis on video, RETURNS ONLY THE KEYPOINTS DETECTED IN THE LAST FRAME (WELL...
@@ -721,9 +721,8 @@ vector<Point2f> patternMirko(vector<Point2f> &keyPoints, Mat &image, double tole
 	//transfer the aligned points from set to vector
 	vector<Point2f> alignedPoints[4];
 	for (int i = 0; i < 4; i++) {
-		set<Point2f, orderByX>::iterator iter = alPoints[i].begin();
 		for each (Point2f p in alPoints[i]) {
-			alignedPoints[i].push_back = *iter;
+			alignedPoints[i].push_back(p);
 		}
 	}
 
@@ -884,6 +883,8 @@ vector<Point2f> patternMirko(vector<Point2f> &keyPoints, Mat &image, double tole
 
 	return ledPattern;
 }
+
+
 //---Private functions---
 
 float myDistance(Point2f &point1, Point2f &point2) {
