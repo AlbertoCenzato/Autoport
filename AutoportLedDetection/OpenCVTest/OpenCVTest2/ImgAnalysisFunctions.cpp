@@ -21,6 +21,10 @@ struct lessDist : binary_function <Distance, Distance, bool> {
 	bool operator() (const Distance &d1, const Distance &d2) const { return d1.dist < d2.dist; }
 };
 
+struct orderByX : binary_function <Point2f, Point2f, bool> {
+	bool operator() (const Point2f &p1, const Point2f &p2) const { return p1.x < p2.x; }
+};
+
 //---Function declaration---
 inline void tbColorCallback(int state, void* userdata);
 inline void tbBlobCallback(int state, void* userdata);
@@ -670,11 +674,60 @@ vector<Point2f> pattern3(vector<Point2f> &keyPoints, Mat &image) {
 //@tolerance: tolerance in the alignement pixels
 vector<Point2f> patternMirko(vector<Point2f> &keyPoints, Mat &image, double tolerance) {
 	
-	vector<Point2f> alignedPoints[4];
+	//vector<Point2f> alignedPoints[4];
+	set<Point2f, orderByX> alPoints[4];
 	double angle = 0;	//angle of the line
 	double m;			//angolar coefficent of the line
 	int i = 0;			//number of aligned sets found;
 
+	for each (Point2f p1 in keyPoints) {
+		for each (Point2f p2 in keyPoints) {
+			if (&p1 == &p2) {
+				//compute the equation of the line laying on p1 and p2
+				double m = (p1.x - p2.x) / (p1.y - p2.y);
+				double q = p1.y - m*p1.x;
+				//look for another point that satisfies the equation
+				for each (Point2f p3 in keyPoints) {
+					if (&p3 == &p1 && &p3 == &p2 && p3.y - p3.x == q) {
+						//check if the set {p1, p2, p3} has been already found
+						bool alreadyFound[3] = { true, true, true };
+						int count = 0;
+						set<Point2f, orderByX> tmp;
+						tmp.insert(p1);
+						tmp.insert(p2);
+						tmp.insert(p3);
+						set<Point2f, orderByX>::iterator iter1;
+						set<Point2f, orderByX>::iterator iter2;
+						for (int j = i-1; j >= 0; j--) {
+							iter1 = tmp.begin();
+							iter2 = alPoints[j].begin();
+							if (&(*iter1++) != &(*iter2++)) alreadyFound[count++] = false;
+						}
+						bool alFnd = false;
+						for (int k = 0; k < i; k++) {
+							if (alreadyFound[k]) alFnd = true;
+						}
+						if (!alFnd) {
+							alPoints[i].  insert(p1);
+							alPoints[i].  insert(p2);
+							alPoints[i++].insert(p3);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	//transfer the aligned points from set to vector
+	vector<Point2f> alignedPoints[4];
+	for (int i = 0; i < 4; i++) {
+		set<Point2f, orderByX>::iterator iter = alPoints[i].begin();
+		for each (Point2f p in alPoints[i]) {
+			alignedPoints[i].push_back = *iter;
+		}
+	}
+
+	/*
 	//look for 4 sets of 3 aligned points until all possible angles have been considered
 	while (angle < 180) {
 		m = tan(angle++);	//how to handle the case angle = 90 and m = +inf? angle should be in DEG or RAD?
@@ -711,7 +764,7 @@ vector<Point2f> patternMirko(vector<Point2f> &keyPoints, Mat &image, double tole
 				if (p.x == 0 && p.y == 0)	p = *(iter++);
 		}
 	}
-
+	*/
 	//compute the mass center for every set
 	Point2f massCenter[4];
 	for (int j = 0; j < 4; j++) {
