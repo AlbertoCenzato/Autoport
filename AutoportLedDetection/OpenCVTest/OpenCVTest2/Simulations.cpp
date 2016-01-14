@@ -9,23 +9,25 @@
 #include "Functions.h"
 
 using namespace Eigen;
+using namespace cv;
 
+/*
 double simulazioneCompleta() {
 
 	//Vector3d q_d(400, 0, 0);		//Coordinate del Quadrant Detector nel sistema drone
-	Vector3d P1_T(500, -500, 0);	//Coordinate del led 1 nel sistema target
-	Vector3d P2_T(500,  500, 0);	//Coordinate del led 2 nel sistema target
-	Vector3d P3_T(  0,  500, 0);	//Coordinate del led 3 nel sistema target
-	Vector3d P4_T(-500, 500, 0);	//Coordinate del led 4 nel sistema target
+	Point3d P1_T(500, -500, 0);	//Coordinate del led 1 nel sistema target
+	Point3d P2_T(500,  500, 0);	//Coordinate del led 2 nel sistema target
+	Point3d P3_T(  0,  500, 0);	//Coordinate del led 3 nel sistema target
+	Point3d P4_T(-500, 500, 0);	//Coordinate del led 4 nel sistema target
 
 	//Vector3d q_dn = q_d + Vector3d(0.1, 0.1, 0);		//Coordinate con RUMORE del Quadrant Detector nel sistema drone
-	Vector3d P1_Tn = P1_T + Vector3d( 0.1, -0.1, 0.2);	//Coordinate con RUMORE del led 1 nel sistema target
-	Vector3d P2_Tn = P2_T + Vector3d(-0.3,    1,  -1);	//Coordinate con RUMORE del led 2 nel sistema target
-	Vector3d P3_Tn = P3_T + Vector3d(   2, -1.3,   0);	//Coordinate con RUMORE del led 3 nel sistema target
-	Vector3d P4_Tn = P4_T + Vector3d( 0.1, -0.5, 0.8);	//Coordinate con RUMORE del led 4 nel sistema target
+	Point3d P1_Tn = P1_T + Point3d( 0.1, -0.1, 0.2);	//Coordinate con RUMORE del led 1 nel sistema target
+	Point3d P2_Tn = P2_T + Point3d(-0.3,    1,  -1);	//Coordinate con RUMORE del led 2 nel sistema target
+	Point3d P3_Tn = P3_T + Point3d(   2, -1.3,   0);	//Coordinate con RUMORE del led 3 nel sistema target
+	Point3d P4_Tn = P4_T + Point3d( 0.1, -0.5, 0.8);	//Coordinate con RUMORE del led 4 nel sistema target
 
 	//Istante iniziale
-	Vector3d T_0(0, 0, 2000);
+	Point3d T_0(0, 0, 2000);
 	double yaw0 = 90 * M_PI / 180;		//in RAD
 	double pitch0 = 0 * M_PI / 180;		//in RAD
 	double roll0 = 180 * M_PI / 180;	//in RAD
@@ -48,59 +50,39 @@ double simulazioneCompleta() {
 	double R32_0 = sinYaw0*sinPitch0*cosRoll0 - cosYaw0*sinRoll0;
 	double R33_0 = cosPitch0*cosRoll0;
 
-	//TODO: rename R_0 to R0, it will be overwritten after calling p3p_solver but it doesn't matter
 	Matrix3d R0;
 	R0 << R11_0, R12_0, R13_0, R21_0, R22_0, R23_0, R31_0, R32_0, R33_0;
-	/*
-	printf("\nR_0:");
-	printMatrix(R_0, 3, 3);
-	*/
-	Vector3d f1d_0 = R0*(P1_Tn - T_0); // Versori nel sistema camera
-	f1d_0.normalize();
-	Vector3d f2d_0 = R0*(P2_Tn - T_0);
-	f2d_0.normalize();
-	Vector3d f3d_0 = R0*(P3_Tn - T_0);
-	f3d_0.normalize();
-	Vector3d f4d_0 = R0*(P4_Tn - T_0);
-	f4d_0.normalize();
+	
+	Point3d f0d_0 = multiply3d(R0, P1_Tn - T_0); // Versori nel sistema camera
+	Point3d f1d_0 = multiply3d(R0, P2_Tn - T_0);
+	Point3d f2d_0 = multiply3d(R0, P3_Tn - T_0);
+	Point3d f3d_0 = multiply3d(R0, P4_Tn - T_0);
+	f0d_0 = normalize(f0d_0);
+	f1d_0 = normalize(f1d_0);
+	f2d_0 = normalize(f2d_0);
+	f3d_0 = normalize(f3d_0);
 
 	//Risoluzione del punto iniziale tramite p3p
-	Eigen::Matrix<double, 3, 4> P;
-	P.col(0) = P1_T;
-	P.col(1) = P2_T;
-	P.col(2) = P3_T;
-	P.col(3) = P4_T;
+	Point3d points[4];
+	points[0] = P1_T;
+	points[1] = P2_T;
+	points[2] = P3_T;
+	points[3] = P4_T;
 
-	Matrix<double, 3, 4> fd_0;
-	fd_0.col(0) = f1d_0;
-	fd_0.col(1) = f2d_0;
-	fd_0.col(2) = f3d_0;
-	fd_0.col(3) = f4d_0;
-	/*
-	printf("\nP:");
-	printMatrix(P, 3, 4);
-	printf("\nfd_0:");
-	printMatrix(fd_0, 3, 4);
-	*/
+	Point3d vers[4];
+	vers[0] = f0d_0;
+	vers[1] = f1d_0;
+	vers[2] = f2d_0;
+	vers[3] = f3d_0;
 
-	Matrix<double, 3, 4> sol = p3p_solver(P, fd_0);
+	Matrix<double, 3, 4> sol = p3p_solver(points, vers);
 	//T_0 = sol.col(0);
 	R0.col(0) = sol.col(1);
 	R0.col(1) = sol.col(2);
 	R0.col(2) = sol.col(3);
-	/*
-	printf("\nT_0: ");
-	printMatrix(T_0, 3, 1);
-	printf("\nR0 :");
-	printMatrix(R0, 3, 3);
-	*/
+	
 	double ypr[3];
 	dcm_to_ypr(R0, ypr);	//ypr = vector containing yaw, pitch, roll in DEGREES!!!
-	/*
-	printf("\nyaw: %f", (double)ypr[0]);
-	printf("\npitch: %f", (double)ypr[1]);
-	printf("\nroll: %f", (double)ypr[2]);
-	*/
 
 	Vector3d T_s = sol.col(0); //Vector3d T_s = T_0;
 	double Yaw_s = yaw0;
@@ -133,12 +115,7 @@ double simulazioneCompleta() {
 		Yaw_nt[i] = yaw;		//in DEG
 		Pitch_nt[i] = pitch;	//in DEG 
 		Roll_nt[i] = roll;		//in DEG
-		/*
-		printf("\nyaw: %f", (double)Yaw_nt[iter-1]);
-		printf("\npitch: %f", (double)Pitch_nt[iter - 1]);
-		printf("\nroll: %f", (double)Roll_nt[iter - 1]);
-		printf("\noscillation: %f", oscillation);
-		*/
+		
 		Matrix<double, 3, 1001> T_nt;
 		T_nt.col(i) = T_0;
 
@@ -175,93 +152,62 @@ double simulazioneCompleta() {
 		//printf("\nq_d:");
 		//printMatrix(q_d, 3, 1);
 
-		Vector3d v = -(R_nt*T_nt.col(i)); //+ q_dn);
-		v.normalize();
+		Point3d v = -multiply3d(R_nt,T_0);//-(R_nt*T_nt.col(i)); //+ q_dn);
+		v = normalize(v);
 		//double vx = v(0);
 		//double vy = v(1);
 		//double vz = v(2);
 
 		//printf("\nv:");
 		//printMatrix(v, 3, 1);
-		/*
-		printf("\nT_nt.col:");
-		printMatrix(T_nt.col(i), 3, 1);
-		printf("\nP1_Tn:");
-		printMatrix(P1_Tn, 3, 1);
-		*/
 
 		//TODO: computes three entire vectors only to keep three values, change
-		Vector3d z1 = (R_nt*(T_nt.col(i) + P1_Tn)); // Riferimento drone
-		double Z1 = z1(2);
-		Vector3d z2 = (R_nt*(T_nt.col(i) + P2_Tn)); // Riferimento drone
-		double Z2 = z2(2);
-		Vector3d z3 = (R_nt*(T_nt.col(i) + P3_Tn)); // Riferimento drone
-		double Z3 = z3(2);
-		Vector3d z4 = (R_nt*(T_nt.col(i) + P4_Tn)); // Riferimento drone
-		double Z4 = z4(2);
-		/*
-		if (i == 0) {
-		printf("\nZ1: %f",Z1);
-		printf("\nZ2: %f",Z2);
-		printf("\nZ3: %f",Z3);
-		printf("\nZ4: %f",Z4);
-		}
-		*/
+		Point3d z0 = multiply3d(R_nt,(T_0 + P1_Tn)); // Riferimento drone
+		Point3d z1 = multiply3d(R_nt,(T_0 + P2_Tn)); // Riferimento drone
+		Point3d z2 = multiply3d(R_nt,(T_0 + P3_Tn)); // Riferimento drone
+		Point3d z3 = multiply3d(R_nt,(T_0 + P4_Tn)); // Riferimento drone
+		double Z0 = z0.z;
+		double Z1 = z1.z;
+		double Z2 = z2.z;
+		double Z3 = z3.z;
+		
 		Matrix<double, 2, 3> sparseFocal;
 		sparseFocal << focal, 0, 0, 0, focal, 0;
+		Vector2d PXL0 = (1 / (Z0*d_pxl)) * sparseFocal * (R_nt*(T_nt.col(i) + P0_Tn));
 		Vector2d PXL1 = (1 / (Z1*d_pxl)) * sparseFocal * (R_nt*(T_nt.col(i) + P1_Tn));
 		Vector2d PXL2 = (1 / (Z2*d_pxl)) * sparseFocal * (R_nt*(T_nt.col(i) + P2_Tn));
 		Vector2d PXL3 = (1 / (Z3*d_pxl)) * sparseFocal * (R_nt*(T_nt.col(i) + P3_Tn));
 		Vector2d PXL4 = (1 / (Z4*d_pxl)) * sparseFocal * (R_nt*(T_nt.col(i) + P4_Tn));
-		/*
-		printf("\nPXL1:");
-		printMatrix(PXL1, 2, 1);
-		printf("\nPXL2:");
-		printMatrix(PXL2, 2, 1);
-		printf("\nPXL3:");
-		printMatrix(PXL3, 2, 1);
-		printf("\nPXL4:");
-		printMatrix(PXL4, 2, 1);
-		*/
-		double x_pxl_1 = PXL1(0);
-		double y_pxl_1 = PXL1(1);
-		double x_pxl_2 = PXL2(0);
-		double y_pxl_2 = PXL2(1);
-		double x_pxl_3 = PXL3(0);
-		double y_pxl_3 = PXL3(1);
-		double x_pxl_4 = PXL4(0);
-		double y_pxl_4 = PXL4(1);
+		Vector2d PXL5 = (1 / (Z5*d_pxl)) * sparseFocal * (R_nt*(T_nt.col(i) + P5_Tn));
+		Vector2d PXL6 = (1 / (Z6*d_pxl)) * sparseFocal * (R_nt*(T_nt.col(i) + P6_Tn));
+		Vector2d PXL7 = (1 / (Z7*d_pxl)) * sparseFocal * (R_nt*(T_nt.col(i) + P7_Tn));
 
-		double Px_1 = P1_T(0);
-		double Px_2 = P2_T(0);
-		double Px_3 = P3_T(0);
-		double Px_4 = P4_T(0);
-		double Py_1 = P1_T(1);
-		double Py_2 = P2_T(1);
-		double Py_3 = P3_T(1);
-		double Py_4 = P4_T(1);
-		double Pz_1 = P1_T(2);
-		double Pz_2 = P2_T(2);
-		double Pz_3 = P3_T(2);
-		double Pz_4 = P4_T(2);
+		Point2f leds[8];
+		Point2f leds[0] = Point2f(PXL0(0),PXL0(1));
+		Point2f leds[1] = Point2f(PXL1(0),PXL1(1));
+		Point2f leds[2] = Point2f(PXL2(0),PXL2(1));
+		Point2f leds[3] = Point2f(PXL3(0),PXL3(1));
+		Point2f leds[4] = Point2f(PXL4(0),PXL4(1));
+		Point2f leds[5] = Point2f(PXL5(0),PXL5(1));
+		Point2f leds[6] = Point2f(PXL6(0),PXL6(1));
+		Point2f leds[7] = Point2f(PXL7(0),PXL7(1));
+		
+		Point3f points[8];
+		Point3f points[0] = Point3f(P0_T(0), P0_T(1), P0_T(2));
+		Point3f points[1] = Point3f(P1_T(0), P1_T(1), P1_T(2));
+		Point3f points[2] = Point3f(P2_T(0), P2_T(1), P2_T(2));
+		Point3f points[3] = Point3f(P3_T(0), P3_T(1), P3_T(2));
+		Point3f points[4] = Point3f(P4_T(0), P4_T(1), P4_T(2));
+		Point3f points[5] = Point3f(P5_T(0), P5_T(1), P5_T(2));
+		Point3f points[6] = Point3f(P6_T(0), P6_T(1), P6_T(2));
+		Point3f points[7] = Point3f(P7_T(0), P7_T(1), P7_T(2));
 
 		Matrix<double, 6, 1> X0;
 		X0 << T_s(0), T_s(1), T_s(2), Yaw_s, Pitch_s, Roll_s;  // Condizioni iniziali PinHole;
-		/*
-		if (i == 0) {
-		printf("\nX0 input:");
-		printMatrix(X0, 6, 1);
-		}
-		*/
 
-		long time = pinHoleFSolve(X0, v.data(), PXL1.data(), PXL2.data(), PXL3.data(), PXL4.data(), P1_T.data(), P2_T.data(), P3_T.data(), P4_T.data(), focal, d_pxl);
+		long time = pinHoleFSolve(X0, v.data(), leds, points, focal, d_pxl);
 		totalTime += (double)time;
-		/*
-		if (i == 0) {
-		printf("\nX0 output:");
-		printMatrix(X0, 6, 1);
-		}
-		*/
+
 		T_s << X0(0), X0(1), X0(2);
 		Yaw_s = X0(3);
 		Pitch_s = X0(4);
@@ -276,32 +222,5 @@ double simulazioneCompleta() {
 	}
 	double meanTime = totalTime / 1001;
 	return meanTime;//plots missing!
-}
-
-
-/*
-long simulazioneUS() {
-	Eigen::Matrix<double, 6, 1> X0 = Eigen::Matrix<double, 6, 1>::Random();
-	Vector3d q_d = Vector3d::Random();
-	Vector2d PXL1 = Vector2d::Random();
-	Vector2d PXL2 = Vector2d::Random();
-	Vector2d PXL3 = Vector2d::Random();
-	Vector2d PXL4 = Vector2d::Random();
-	Vector3d P1_T = Vector3d::Random();
-	Vector3d P2_T = Vector3d::Random();
-	Vector3d P3_T = Vector3d::Random();
-	Vector3d P4_T = Vector3d::Random();
-	Vector3d delta = Vector3d::Random();
-	Vector3d d1 = Vector3d::Random();
-	Vector3d d2 = Vector3d::Random();
-	Vector3d d3 = Vector3d::Random();
-	Vector3d d4 = Vector3d::Random();
-	double focal = 3.46031;
-	double d_pxl = 1.4e-3;
-	double v = 343800; // mm / s
-					   //double* q_d, double* PXL1, double* PXL2, double* PXL3, double* PXL4, double* P1_T, double* P2_T, double* P3_T, double* P4_T, double* delta, double* d1, double* d2, double* d3, double* d4, double focal, double d_pxl, double v
-	long time = pinHoleFSolveUS(X0, q_d.data(), PXL1.data(), PXL2.data(), PXL3.data(), PXL4.data(), P1_T.data(), P2_T.data(), P3_T.data(), P4_T.data(), delta.data(), d1.data(), d2.data(), d3.data(), d4.data(), focal, d_pxl, v);
-	return time;
-
 }
 */

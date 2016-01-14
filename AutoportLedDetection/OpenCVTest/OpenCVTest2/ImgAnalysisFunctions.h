@@ -1,5 +1,4 @@
-#include <math.h>
-#include <opencv2/core/core.hpp>
+//#include <math.h>
 
 //---Callback functions for sliders in GUI---
 extern inline void tbColorCallback(int, void*);
@@ -14,7 +13,7 @@ extern std::vector<cv::KeyPoint> vidLedDetection(std::string&);
 
 extern std::vector<cv::Point2f> pattern1(std::vector<cv::Point2f>&, cv::Mat&);
 extern std::vector<cv::Point2f> pattern3(std::vector<cv::Point2f>&, cv::Mat&);
-extern std::vector<cv::Point2f> patternMirko(std::vector<cv::Point2f>&, cv::Mat&, double tolerance);
+extern std::vector<cv::Point2f> patternMirko(std::vector<cv::Point2f>&, cv::Mat&, int tolerance);
 
 
 

@@ -18,4 +18,5 @@
 #include <tchar.h>
 
 
-// TODO: reference additional headers your program requires here
+//reference additional headers your program requires here
+#include <opencv2/core/core.hpp>

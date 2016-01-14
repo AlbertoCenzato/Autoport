@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include <iostream>
 #include <set>
-#include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2\imgproc\imgproc.hpp>
 #include <opencv2\features2d\features2d.hpp>
@@ -37,13 +36,13 @@ inline void drawDetectedLed(Mat &, Point2f &, string &);
 vector<Point2f> imgLedDetection(string &imgName,Mat &imgThresholded)
 {
 	//---Color filtering----
-	int iLowH = 150;
-	int iHighH = 180;
+	int iLowH = 80;
+	int iHighH = 110;
 
-	int iLowS = 125;
+	int iLowS = 0;
 	int iHighS = 255;
 
-	int iLowV = 125;
+	int iLowV = 0;
 	int iHighV = 255;
 
 	int64 start = getTickCount();
@@ -53,6 +52,8 @@ vector<Point2f> imgLedDetection(string &imgName,Mat &imgThresholded)
 	//Convert the captured frame from BGR to HSV
 	Mat imgHSV;
 	cvtColor(imgOriginal, imgHSV, COLOR_BGR2HSV); 
+
+	cout << "\nTime elapsed in RGB->HSV convertion: " << (getTickCount() - start)/getTickFrequency() << "s    MA SIAMO SICURI CHE SIA IN SECONDI???";
 
 	//Threshold the image
 	//Mat imgThresholded;
@@ -78,7 +79,7 @@ vector<Point2f> imgLedDetection(string &imgName,Mat &imgThresholded)
 	params.maxInertiaRatio = 1;
 	params.filterByArea = true;
 	params.minArea = 100;
-	params.maxArea = 1000;
+	params.maxArea = 10000;
 	params.filterByConvexity = true;
 	params.minConvexity = 0.5;
 	params.maxConvexity = 1;
@@ -672,45 +673,70 @@ vector<Point2f> pattern3(vector<Point2f> &keyPoints, Mat &image) {
 //@keyPoints: vector containig identified leds in the image
 //@image: Mat containing thresholded image with identified leds
 //@tolerance: tolerance in the alignement pixels
-vector<Point2f> patternMirko(vector<Point2f> &keyPoints, Mat &image, double tolerance) {
+vector<Point2f> patternMirko(vector<Point2f> &keyPoints, Mat &image, int tolerance) {
 	
 	//vector<Point2f> alignedPoints[4];
-	set<Point2f, orderByX> alPoints[4];
+	//set<Point2f, orderByX> alPoints[4];
+	int numOfPoints = keyPoints.size();
 	double angle = 0;	//angle of the line
 	double m;			//angolar coefficent of the line
-	int i = 0;			//number of aligned sets found;
+	int setNumber = 0;			//number of aligned sets found;
 
-	for each (Point2f p1 in keyPoints) {
-		for each (Point2f p2 in keyPoints) {
-			if (&p1 == &p2) {
-				//compute the equation of the line laying on p1 and p2
-				double m = (p1.x - p2.x) / (p1.y - p2.y);
-				double q = p1.y - m*p1.x;
-				//look for another point that satisfies the equation
-				for each (Point2f p3 in keyPoints) {
-					if (&p3 == &p1 && &p3 == &p2 && p3.y - p3.x == q) {
+	vector<Point2f> alignedPoints[4];	//TODO: use an array of vectors of POINTERS to Point2f
+
+	long alignedPointsHash[4];
+	//look for the 4 sets of 3 aligned points
+	for (int i = 0; i < numOfPoints; i++) {
+		Point2f *p1 = &keyPoints[i];
+		//for each couple of points...
+		for (int j = 0; j < numOfPoints; j++) {
+			Point2f *p2 = &keyPoints[j];
+			if (p1 != p2) {
+				//... compute the equation of the line laying on p1 and p2...
+				float dx = p1->x - p2->x;
+				float q;
+				float m;
+				if (dx != 0) {
+					m = (p1->y - p2->y) / dx;
+					q = p1->y - m*p1->x;
+				} 
+				else {
+					q = NAN;	//CHECK: probably a division by zero returns NAN anyway
+				}
+				//... and look for another point that satisfies the equation
+				for (int k = 0; k < numOfPoints; k++) {
+					Point2f *p3 = &keyPoints[k];
+					bool validSet = false;
+					if (p3 != p1 && p3 != p2) {
+						if (q != NAN) {
+							if (p3->y - m*(p3->x) < q + tolerance && p3->y - m*(p3->x) > q - tolerance) {
+								validSet = true;
+							}
+						}
+						else if (p3->x - p1->x == 0) {
+							validSet = true;
+						}
+					}
+					if (validSet) {
+						line(image, *p1, *p2, Scalar(0, 0, 255));
+						imshow("Thresholded Image", image);
+						waitKey(1);
+						cout << "\nvalid set";
 						//check if the set {p1, p2, p3} has been already found
-						bool alreadyFound[3] = { true, true, true };
-						int count = 0;
-						set<Point2f, orderByX> tmp;
-						tmp.insert(p1);
-						tmp.insert(p2);
-						tmp.insert(p3);
-						set<Point2f, orderByX>::iterator iter1;
-						set<Point2f, orderByX>::iterator iter2;
-						for (int j = i-1; j >= 0; j--) {
-							iter1 = tmp.begin();
-							iter2 = alPoints[j].begin();
-							if (&(*iter1++) != &(*iter2++)) alreadyFound[count++] = false;
+						bool alreadyFound = false;
+						long hash = (long)p1 + (long)p2 + (long)p3;
+						for (int h = setNumber - 1; h >= 0; h--) {
+							if (hash == alignedPointsHash[h])
+								alreadyFound = true;
 						}
-						bool alFnd = false;
-						for (int k = 0; k < i; k++) {
-							if (alreadyFound[k]) alFnd = true;
-						}
-						if (!alFnd) {
-							alPoints[i].  insert(p1);
-							alPoints[i].  insert(p2);
-							alPoints[i++].insert(p3);
+						if (!alreadyFound) {
+							alignedPointsHash[setNumber] = hash;
+							alignedPoints[setNumber].push_back(*p1);
+							alignedPoints[setNumber].push_back(*p2);
+							alignedPoints[setNumber++].push_back(*p3);
+							cout << "\nAligned set " << setNumber - 1 << ": p1[" << p1->x << "," << p1->y << "]"
+															  <<  " p2[" << p2->x << "," << p2->y << "]"
+															  <<  " p3[" << p3->x << "," << p3->y << "]";
 						}
 					}
 				}
@@ -718,66 +744,23 @@ vector<Point2f> patternMirko(vector<Point2f> &keyPoints, Mat &image, double tole
 		}
 	}
 
-	//transfer the aligned points from set to vector
-	vector<Point2f> alignedPoints[4];
-	for (int i = 0; i < 4; i++) {
-		for each (Point2f p in alPoints[i]) {
-			alignedPoints[i].push_back(p);
-		}
-	}
-
-	/*
-	//look for 4 sets of 3 aligned points until all possible angles have been considered
-	while (angle < 180) {
-		m = tan(angle++);	//how to handle the case angle = 90 and m = +inf? angle should be in DEG or RAD?
-		int setsFound = 0;
-		for each (Point2f kp in keyPoints) {
-			double q = kp.y - m*kp.x;	//compute the q coeff. of the equation of the line passing through kp
-			for (vector<Point2f>::iterator iter = keyPoints.begin(); iter < keyPoints.end(); iter++)
-				//if the point (*iter) isn't included in another set with the same angle and isn't kp...
-				if (iter->x != 0 && iter->y != 0 && &(*iter) != &kp)
-					//if the point has the same q (more or less) of kp (so they lay on the same line)...
-					if (iter->y - m*iter->x < q + tolerance && iter->y - m*iter->x > q - tolerance) {
-						//put it in the alignedPoints set and mark it as used for a set (x=0,y=0)
-						alignedPoints[i].push_back(*iter);
-						*iter = Point2f(0, 0); //what if a led is in 0,0? It can't be, but, like Fermat, I don't have enough space to demonstrate it here. You can struggle for the next three centuries to find the solution if you want
-					}
-			//now I have all the aligned points for the line y = mx + q
-			//if they are at least two...
-			if (alignedPoints[i].size() > 1) {
-				alignedPoints[i++].push_back(kp); //add kp to the aligned points set
-				setsFound++;
-			}
-			//if it is only one...
-			else if (alignedPoints[i].size() == 1){
-				vector<Point2f>::iterator iter = alignedPoints[i].begin();
-				for each(Point2f p in keyPoints)
-					if (p.x == 0 && p.y == 0)	p = *(iter++);	//put it back in its original position
-				alignedPoints[i].clear();	//and clear the aligned points set
-			}
-		}
-		//once all aligned sets for the angle "angle" are found put the points back in their original position
-		for (int j = 1; j <= setsFound; j++) {
-			vector<Point2f>::iterator iter = alignedPoints[i - j].begin();
-			for each(Point2f p in keyPoints)
-				if (p.x == 0 && p.y == 0)	p = *(iter++);
-		}
-	}
-	*/
 	//compute the mass center for every set
 	Point2f massCenter[4];
-	for (int j = 0; j < 4; j++) {
+	for (int i = 0; i < 4; i++) {
 		int x = 0, y = 0;
-		for each(Point2f p in alignedPoints[j]) {
+		for each(Point2f p in alignedPoints[i]) {
 			x += p.x;
 			y += p.y;
 		}
-		massCenter[j] = Point2f(x / 3, y / 3);
+		massCenter[i] = Point2f(x / 3, y / 3);
+		cout << "\nMass center " << i + 1 << ": " << massCenter[i];
 	}
 
+	//order lines: 0 extern vertical, 1 intern vertical, 2 upper horizontal, 3 lower horizontal
 	int maxMinCouples[2][2];
 	int secondMinDist[2];
 	float maxDist = 0, minDist = INT_MAX;
+	//find couples of lines with min distance, second min distance and max distance
 	for (int j = 0; j < 4; j++)
 		for (int k = 0; k < 4; k++)
 			if (k != j) {
@@ -795,8 +778,11 @@ vector<Point2f> patternMirko(vector<Point2f> &keyPoints, Mat &image, double tole
 					maxMinCouples[1][1] = k;
 				}
 			}
+	cout << "\nMin distance: (" << maxMinCouples[0][0] << "," << maxMinCouples[0][1] << ")";
+	cout << "\nMax distance: (" << maxMinCouples[1][0] << "," << maxMinCouples[1][1] << ")";
 
 	int lines[4];
+	//the line that has both min distance and second min distance is the internal vertical line, the others are assigned consequently
 	if (secondMinDist[0] == maxMinCouples[0][0]) {
 		//secondMinDist[0] internal vertical line
 		lines[1] = secondMinDist[0];
@@ -822,6 +808,11 @@ vector<Point2f> patternMirko(vector<Point2f> &keyPoints, Mat &image, double tole
 		lines[2] = secondMinDist[0];
 		lines[3] = maxMinCouples[1][0] != secondMinDist[0] ? maxMinCouples[1][0] : maxMinCouples[1][1];
 	}
+	cout << "\nLine 0: " << lines[0];
+	cout << "\nLine 1: " << lines[1];
+	cout << "\nLine 2: " << lines[2];
+	cout << "\nLine 3: " << lines[3];
+
 
 	vector<Point2f> ledPattern = vector<Point2f>(8);
 	int count = 0;
