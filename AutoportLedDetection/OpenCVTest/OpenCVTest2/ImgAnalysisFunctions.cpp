@@ -53,7 +53,7 @@ vector<Point2f> imgLedDetection(string &imgName,Mat &imgThresholded)
 	Mat imgHSV;
 	cvtColor(imgOriginal, imgHSV, COLOR_BGR2HSV); 
 
-	cout << "\nTime elapsed in RGB->HSV convertion: " << (getTickCount() - start)/getTickFrequency() << "s    MA SIAMO SICURI CHE SIA IN SECONDI???";
+	std::cout << "\nTime elapsed in RGB->HSV convertion: " << (getTickCount() - start)/getTickFrequency() << "s    MA SIAMO SICURI CHE SIA IN SECONDI???";
 
 	//Threshold the image
 	//Mat imgThresholded;
@@ -98,7 +98,7 @@ vector<Point2f> imgLedDetection(string &imgName,Mat &imgThresholded)
 	for (uint i = 0; i < keypoints.size(); i++) {
 		Point2f pt = keypoints[i].pt;
 		points.push_back(pt);
-		cout << "\nPoint " << i+1 << ": x[" << pt.x << "] y[" << pt.y << "]";
+		std::cout << "\nPoint " << i+1 << ": x[" << pt.x << "] y[" << pt.y << "]";
 	}
 
 	namedWindow("Thresholded Image", WINDOW_NORMAL);
@@ -250,11 +250,11 @@ vector<Point2f> pattern1(vector<Point2f> &keyPoints, Mat &image) {
 
 	//print distances
 	for (int j = 0; j < 12; j++) {
-		cout << "\nPoint " << j+1 << ":";
+		std::cout << "\nPoint " << j+1 << ":";
 		int i = 1;
 		for (std::set<Distance, lessDist>::iterator it = distances[j].begin(); it != distances[j].end(); ++it) {
 			Distance d = *it;
-			cout << "\n   Distance " << i++ << ": " << d.dist;
+			std::cout << "\n   Distance " << i++ << ": " << d.dist;
 		}
 	}
 
@@ -269,8 +269,8 @@ vector<Point2f> pattern1(vector<Point2f> &keyPoints, Mat &image) {
 			maxIndx = i;
 	}
 
-	cout << "\nMin distance: " << (*(distances[minIndx].begin())).dist;
-	cout << "\nMax distance: " << (*(++distances[maxIndx].rend())).dist;
+	std::cout << "\nMin distance: " << (*(distances[minIndx].begin())).dist;
+	std::cout << "\nMax distance: " << (*(++distances[maxIndx].rend())).dist;
 	
 	set<Distance, lessDist> patternPoints[12];
 	
@@ -477,11 +477,11 @@ vector<Point2f> pattern3(vector<Point2f> &keyPoints, Mat &image) {
 
 	//print distances
 	for (int j = 0; j < 12; j++) {
-		cout << "\nPoint " << j + 1 << ":";
+		std::cout << "\nPoint " << j + 1 << ":";
 		int i = 1;
 		for (std::set<Distance, lessDist>::iterator it = distances[j].begin(); it != distances[j].end(); ++it) {
 			Distance d = *it;
-			cout << "\n   Distance " << i++ << ": " << d.dist;
+			std::cout << "\n   Distance " << i++ << ": " << d.dist;
 		}
 	}
 
@@ -497,8 +497,8 @@ vector<Point2f> pattern3(vector<Point2f> &keyPoints, Mat &image) {
 			maxIndx = i;
 	}
 
-	cout << "\nMin distance: " << (*(distances[minIndx].begin())).dist;
-	cout << "\nMax distance: " << (*(++distances[maxIndx].rend())).dist;
+	std::cout << "\nMin distance: " << (*(distances[minIndx].begin())).dist;
+	std::cout << "\nMax distance: " << (*(++distances[maxIndx].rend())).dist;
 
 	set<Distance, lessDist> patternPoints[12];
 
@@ -721,7 +721,7 @@ vector<Point2f> patternMirko(vector<Point2f> &keyPoints, Mat &image, int toleran
 						line(image, *p1, *p2, Scalar(0, 0, 255));
 						imshow("Thresholded Image", image);
 						waitKey(1);
-						cout << "\nvalid set";
+						std::cout << "\nvalid set";
 						//check if the set {p1, p2, p3} has been already found
 						bool alreadyFound = false;
 						long hash = (long)p1 + (long)p2 + (long)p3;
@@ -734,7 +734,7 @@ vector<Point2f> patternMirko(vector<Point2f> &keyPoints, Mat &image, int toleran
 							alignedPoints[setNumber].push_back(*p1);
 							alignedPoints[setNumber].push_back(*p2);
 							alignedPoints[setNumber++].push_back(*p3);
-							cout << "\nAligned set " << setNumber - 1 << ": p1[" << p1->x << "," << p1->y << "]"
+							std::cout << "\nAligned set " << setNumber - 1 << ": p1[" << p1->x << "," << p1->y << "]"
 															  <<  " p2[" << p2->x << "," << p2->y << "]"
 															  <<  " p3[" << p3->x << "," << p3->y << "]";
 						}
@@ -753,7 +753,7 @@ vector<Point2f> patternMirko(vector<Point2f> &keyPoints, Mat &image, int toleran
 			y += p.y;
 		}
 		massCenter[i] = Point2f(x / 3, y / 3);
-		cout << "\nMass center " << i + 1 << ": " << massCenter[i];
+		std::cout << "\nMass center " << i << ": " << massCenter[i];
 	}
 
 	//order lines: 0 extern vertical, 1 intern vertical, 2 upper horizontal, 3 lower horizontal
@@ -778,8 +778,8 @@ vector<Point2f> patternMirko(vector<Point2f> &keyPoints, Mat &image, int toleran
 					maxMinCouples[1][1] = k;
 				}
 			}
-	cout << "\nMin distance: (" << maxMinCouples[0][0] << "," << maxMinCouples[0][1] << ")";
-	cout << "\nMax distance: (" << maxMinCouples[1][0] << "," << maxMinCouples[1][1] << ")";
+	std::cout << "\nMin distance: (" << maxMinCouples[0][0] << "," << maxMinCouples[0][1] << ")";
+	std::cout << "\nMax distance: (" << maxMinCouples[1][0] << "," << maxMinCouples[1][1] << ")";
 
 	int lines[4];
 	//the line that has both min distance and second min distance is the internal vertical line, the others are assigned consequently
@@ -808,10 +808,10 @@ vector<Point2f> patternMirko(vector<Point2f> &keyPoints, Mat &image, int toleran
 		lines[2] = secondMinDist[0];
 		lines[3] = maxMinCouples[1][0] != secondMinDist[0] ? maxMinCouples[1][0] : maxMinCouples[1][1];
 	}
-	cout << "\nLine 0: " << lines[0];
-	cout << "\nLine 1: " << lines[1];
-	cout << "\nLine 2: " << lines[2];
-	cout << "\nLine 3: " << lines[3];
+	std::cout << "\nLine 0: " << lines[0];
+	std::cout << "\nLine 1: " << lines[1];
+	std::cout << "\nLine 2: " << lines[2];
+	std::cout << "\nLine 3: " << lines[3];
 
 
 	vector<Point2f> ledPattern = vector<Point2f>(8);
