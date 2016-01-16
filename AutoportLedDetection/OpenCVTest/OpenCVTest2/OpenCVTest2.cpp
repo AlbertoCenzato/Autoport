@@ -38,7 +38,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	LoadString(hInstance, IDC_OPENCVTEST2, szWindowClass, MAX_LOADSTRING);
 	MyRegisterClass(hInstance);
 
-	MyWinMain(hInstance, hPrevInstance, (LPSTR)lpCmdLine, nCmdShow);
+	MyWinOpenCVTest2(hInstance, hPrevInstance, (LPSTR)lpCmdLine, nCmdShow);
 
 	// Perform application initialization:
 	if (!InitInstance (hInstance, nCmdShow))
@@ -63,7 +63,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 
 
 
-int APIENTRY MyWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
+int APIENTRY MyWinOpenCVTest2(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
 	AllocConsole();
 
 	HANDLE handle_out = GetStdHandle(STD_OUTPUT_HANDLE);

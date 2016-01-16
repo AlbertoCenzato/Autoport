@@ -2,4 +2,4 @@
 
 #include "resource.h"
 
-int APIENTRY MyWinMain(HINSTANCE, HINSTANCE, LPSTR, int);
+int APIENTRY MyWinOpenCVTest2(HINSTANCE, HINSTANCE, LPSTR, int);
