@@ -813,15 +813,16 @@ vector<Point2f> patternMirko(vector<Point2f> &keyPoints, Mat &image, int toleran
 	std::cout << "\nLine 2: " << lines[2];
 	std::cout << "\nLine 3: " << lines[3];
 
+	
 
 	vector<Point2f> ledPattern = vector<Point2f>(8);
 	int count = 0;
 	for (int i = 0; i < 2; i++) {
 		double minDist = INT_MAX, maxDist = 0;
 		int minIndx[2], maxIndx[2];
-		vector<Point2f> alignedSet = alignedPoints[lines[0]];
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
+		vector<Point2f> alignedSet = alignedPoints[lines[i]];
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
 				if (i != j) {
 					double dist = myDistance(alignedSet[i], alignedSet[j]);
 					if (dist < minDist) {
@@ -859,17 +860,25 @@ vector<Point2f> patternMirko(vector<Point2f> &keyPoints, Mat &image, int toleran
 		}
 	}
 
-	for each (Point2f p in alignedPoints[2]) {
+	for each (Point2f p in alignedPoints[lines[2]]) {
 		if (&p != &ledPattern[0] && &p != &ledPattern[3]) {
 			ledPattern[6] = p;
 			break;
 		}
 	}
-	for each (Point2f p in alignedPoints[3]) {
-		if (&p != &ledPattern[2] && &p != &ledPattern[5]) {
-			ledPattern[7] = p;
+	for (int i = 0; i < 3; i++) {
+		Point2f *p = &alignedPoints[lines[3]][i];
+		if (p->x != ledPattern[2].x && p->y != ledPattern[2].y && p->x != ledPattern[5].x && p->y != ledPattern[5].y) {
+			ledPattern[7] = *p;
 			break;
 		}
+	}
+
+	for (int i = 0; i < 8; i++) {
+		ostringstream convert;  
+		convert << i;
+		string s = convert.str();
+		drawDetectedLed(image, ledPattern[i], s);
 	}
 
 	return ledPattern;
@@ -887,6 +896,7 @@ void drawDetectedLed(Mat &image, Point2f &keyPoint, string &number) {
 	imshow("Thresholded Image", image);
 	waitKey(25);
 }
+
 
 //---Callback functions for sliders in GUI---
 
