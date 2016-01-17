@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenCVTest2", "OpenCVTest2\OpenCVTest2.vcxproj", "{4CB9C5C7-776D-4FE1-87AF-18B0D2C6CBEC}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Main", "OpenCVTest2\OpenCVTest2.vcxproj", "{4CB9C5C7-776D-4FE1-87AF-18B0D2C6CBEC}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AutoportTests", "AutoportTests\AutoportTests.vcxproj", "{A2DCF877-3CAC-413F-BE68-751BF8A15BC7}"
 	ProjectSection(ProjectDependencies) = postProject

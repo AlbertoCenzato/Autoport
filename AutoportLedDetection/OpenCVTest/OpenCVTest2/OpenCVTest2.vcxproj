@@ -92,7 +92,7 @@
   <ItemGroup>
     <ClInclude Include="AutoportEntrypoint.h" />
     <ClInclude Include="Functions.h" />
-    <ClInclude Include="OpenCVTest2.h" />
+    <ClInclude Include="Main.h" />
     <ClInclude Include="P3p.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Simulations.h" />
@@ -103,7 +103,7 @@
   <ItemGroup>
     <ClCompile Include="AutoportEntrypoint.cpp" />
     <ClCompile Include="Functions.cpp" />
-    <ClCompile Include="OpenCVTest2.cpp" />
+    <ClCompile Include="Main.cpp" />
     <ClCompile Include="P3p.cpp" />
     <ClCompile Include="Simulations.cpp" />
     <ClCompile Include="stdafx.cpp">

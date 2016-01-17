@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <io.h>
 #include <fcntl.h>
-#include "OpenCVtest2.h"
+#include "Main.h"
 #include "AutoportEntrypoint.h"
 
 #define MAX_LOADSTRING 100

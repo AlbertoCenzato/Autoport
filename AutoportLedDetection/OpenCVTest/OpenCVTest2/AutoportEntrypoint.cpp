@@ -14,7 +14,26 @@ void run() {
 	string imgName = path + "p7d300a1.bmp";
 	cv::Mat image;
 	vector<cv::Point2f> keyPoints = patternMirko(imgLedDetection(imgName,image),image, 20);
-	
+	Matrix<double, 3, 4> realPoints;
+	realPoints << -50, -50,  30, -30,  //1, 3, 7, 5
+				  -30,  20, -20, -10,
+					0,   0,  20,   0;
+	Vector3d p1 = { keyPoints[0].x, keyPoints[0].y, 0 };
+	Vector3d p2 = { keyPoints[2].x, keyPoints[2].y, 0 };
+	Vector3d p3 = { keyPoints[6].x, keyPoints[6].y, 0 };
+	Vector3d p4 = { keyPoints[4].x, keyPoints[4].y, 0 };
+	Vector3d translation = { 2592 / 2, 1944 / 2, 0 };
+	Vector3d p1t = (p1 - translation);
+	Vector3d p2t = (p2 - translation);
+	Vector3d p3t = (p3 - translation);
+	Vector3d p4t = (p4 - translation);
+	p1t.normalize();
+	p2t.normalize();
+	p3t.normalize();
+	p4t.normalize();
+	Matrix<double, 3, 4> cameraSystemPoints;
+	cameraSystemPoints << p1t, p2t, p3t, p4t;
+
 	getchar();
 	return;
 }
