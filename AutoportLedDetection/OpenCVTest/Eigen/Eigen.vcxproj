@@ -1,0 +1,1206 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{3E2DB1D3-2AFF-4331-BDEB-5AF9749A05A3}</ProjectGuid>
+    <SccProjectName>SAK</SccProjectName>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccProvider>SAK</SccProvider>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>Win32Project1</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <ProjectName>Eigen</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\alber\Documents\Visual Studio 2015\Projects\Autoport\Eigen;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="bench\basicbenchmark.h" />
+    <ClInclude Include="bench\BenchSparseUtil.h" />
+    <ClInclude Include="bench\BenchTimer.h" />
+    <ClInclude Include="bench\BenchUtil.h" />
+    <ClInclude Include="bench\btl\actions\action_aat_product.hh" />
+    <ClInclude Include="bench\btl\actions\action_ata_product.hh" />
+    <ClInclude Include="bench\btl\actions\action_atv_product.hh" />
+    <ClInclude Include="bench\btl\actions\action_axpby.hh" />
+    <ClInclude Include="bench\btl\actions\action_axpy.hh" />
+    <ClInclude Include="bench\btl\actions\action_cholesky.hh" />
+    <ClInclude Include="bench\btl\actions\action_ger.hh" />
+    <ClInclude Include="bench\btl\actions\action_hessenberg.hh" />
+    <ClInclude Include="bench\btl\actions\action_lu_decomp.hh" />
+    <ClInclude Include="bench\btl\actions\action_lu_solve.hh" />
+    <ClInclude Include="bench\btl\actions\action_matrix_matrix_product.hh" />
+    <ClInclude Include="bench\btl\actions\action_matrix_matrix_product_bis.hh" />
+    <ClInclude Include="bench\btl\actions\action_matrix_vector_product.hh" />
+    <ClInclude Include="bench\btl\actions\action_partial_lu.hh" />
+    <ClInclude Include="bench\btl\actions\action_rot.hh" />
+    <ClInclude Include="bench\btl\actions\action_symv.hh" />
+    <ClInclude Include="bench\btl\actions\action_syr2.hh" />
+    <ClInclude Include="bench\btl\actions\action_trisolve.hh" />
+    <ClInclude Include="bench\btl\actions\action_trisolve_matrix.hh" />
+    <ClInclude Include="bench\btl\actions\action_trmm.hh" />
+    <ClInclude Include="bench\btl\actions\basic_actions.hh" />
+    <ClInclude Include="bench\btl\data\gnuplot_common_settings.hh" />
+    <ClInclude Include="bench\btl\generic_bench\bench.hh" />
+    <ClInclude Include="bench\btl\generic_bench\bench_parameter.hh" />
+    <ClInclude Include="bench\btl\generic_bench\btl.hh" />
+    <ClInclude Include="bench\btl\generic_bench\init\init_function.hh" />
+    <ClInclude Include="bench\btl\generic_bench\init\init_matrix.hh" />
+    <ClInclude Include="bench\btl\generic_bench\init\init_vector.hh" />
+    <ClInclude Include="bench\btl\generic_bench\static\bench_static.hh" />
+    <ClInclude Include="bench\btl\generic_bench\static\intel_bench_fixed_size.hh" />
+    <ClInclude Include="bench\btl\generic_bench\static\static_size_generator.hh" />
+    <ClInclude Include="bench\btl\generic_bench\timers\mixed_perf_analyzer.hh" />
+    <ClInclude Include="bench\btl\generic_bench\timers\portable_perf_analyzer.hh" />
+    <ClInclude Include="bench\btl\generic_bench\timers\portable_perf_analyzer_old.hh" />
+    <ClInclude Include="bench\btl\generic_bench\timers\portable_timer.hh" />
+    <ClInclude Include="bench\btl\generic_bench\timers\STL_perf_analyzer.hh" />
+    <ClInclude Include="bench\btl\generic_bench\timers\STL_timer.hh" />
+    <ClInclude Include="bench\btl\generic_bench\timers\x86_perf_analyzer.hh" />
+    <ClInclude Include="bench\btl\generic_bench\timers\x86_timer.hh" />
+    <ClInclude Include="bench\btl\generic_bench\utils\size_lin_log.hh" />
+    <ClInclude Include="bench\btl\generic_bench\utils\size_log.hh" />
+    <ClInclude Include="bench\btl\generic_bench\utils\utilities.h" />
+    <ClInclude Include="bench\btl\generic_bench\utils\xy_file.hh" />
+    <ClInclude Include="bench\btl\libs\BLAS\blas.h" />
+    <ClInclude Include="bench\btl\libs\BLAS\blas_interface.hh" />
+    <ClInclude Include="bench\btl\libs\BLAS\blas_interface_impl.hh" />
+    <ClInclude Include="bench\btl\libs\BLAS\c_interface_base.h" />
+    <ClInclude Include="bench\btl\libs\blitz\blitz_interface.hh" />
+    <ClInclude Include="bench\btl\libs\blitz\blitz_LU_solve_interface.hh" />
+    <ClInclude Include="bench\btl\libs\blitz\tiny_blitz_interface.hh" />
+    <ClInclude Include="bench\btl\libs\eigen2\eigen2_interface.hh" />
+    <ClInclude Include="bench\btl\libs\eigen3\eigen3_interface.hh" />
+    <ClInclude Include="bench\btl\libs\gmm\gmm_interface.hh" />
+    <ClInclude Include="bench\btl\libs\gmm\gmm_LU_solve_interface.hh" />
+    <ClInclude Include="bench\btl\libs\mtl4\mtl4_interface.hh" />
+    <ClInclude Include="bench\btl\libs\mtl4\mtl4_LU_solve_interface.hh" />
+    <ClInclude Include="bench\btl\libs\STL\STL_interface.hh" />
+    <ClInclude Include="bench\btl\libs\tvmet\tvmet_interface.hh" />
+    <ClInclude Include="bench\btl\libs\ublas\ublas_interface.hh" />
+    <ClInclude Include="bench\spbench\spbenchsolver.h" />
+    <ClInclude Include="bench\spbench\spbenchstyle.h" />
+    <ClInclude Include="blas\BandTriangularSolver.h" />
+    <ClInclude Include="blas\common.h" />
+    <ClInclude Include="blas\GeneralRank1Update.h" />
+    <ClInclude Include="blas\level1_cplx_impl.h" />
+    <ClInclude Include="blas\level1_impl.h" />
+    <ClInclude Include="blas\level1_real_impl.h" />
+    <ClInclude Include="blas\level2_cplx_impl.h" />
+    <ClInclude Include="blas\level2_impl.h" />
+    <ClInclude Include="blas\level2_real_impl.h" />
+    <ClInclude Include="blas\level3_impl.h" />
+    <ClInclude Include="blas\PackedSelfadjointProduct.h" />
+    <ClInclude Include="blas\PackedTriangularMatrixVector.h" />
+    <ClInclude Include="blas\PackedTriangularSolverVector.h" />
+    <ClInclude Include="blas\Rank2Update.h" />
+    <ClInclude Include="demos\mandelbrot\mandelbrot.h" />
+    <ClInclude Include="demos\mix_eigen_and_c\binary_library.h" />
+    <ClInclude Include="demos\opengl\camera.h" />
+    <ClInclude Include="demos\opengl\gpuhelper.h" />
+    <ClInclude Include="demos\opengl\icosphere.h" />
+    <ClInclude Include="demos\opengl\quaternion_demo.h" />
+    <ClInclude Include="demos\opengl\trackball.h" />
+    <ClInclude Include="Eigen\src\Cholesky\LDLT.h" />
+    <ClInclude Include="Eigen\src\Cholesky\LLT.h" />
+    <ClInclude Include="Eigen\src\Cholesky\LLT_MKL.h" />
+    <ClInclude Include="Eigen\src\CholmodSupport\CholmodSupport.h" />
+    <ClInclude Include="Eigen\src\Core\arch\AltiVec\Complex.h" />
+    <ClInclude Include="Eigen\src\Core\arch\AltiVec\PacketMath.h" />
+    <ClInclude Include="Eigen\src\Core\arch\Default\Settings.h" />
+    <ClInclude Include="Eigen\src\Core\arch\NEON\Complex.h" />
+    <ClInclude Include="Eigen\src\Core\arch\NEON\PacketMath.h" />
+    <ClInclude Include="Eigen\src\Core\arch\SSE\Complex.h" />
+    <ClInclude Include="Eigen\src\Core\arch\SSE\MathFunctions.h" />
+    <ClInclude Include="Eigen\src\Core\arch\SSE\PacketMath.h" />
+    <ClInclude Include="Eigen\src\Core\Array.h" />
+    <ClInclude Include="Eigen\src\Core\ArrayBase.h" />
+    <ClInclude Include="Eigen\src\Core\ArrayWrapper.h" />
+    <ClInclude Include="Eigen\src\Core\Assign.h" />
+    <ClInclude Include="Eigen\src\Core\Assign_MKL.h" />
+    <ClInclude Include="Eigen\src\Core\BandMatrix.h" />
+    <ClInclude Include="Eigen\src\Core\Block.h" />
+    <ClInclude Include="Eigen\src\Core\BooleanRedux.h" />
+    <ClInclude Include="Eigen\src\Core\CommaInitializer.h" />
+    <ClInclude Include="Eigen\src\Core\CoreIterators.h" />
+    <ClInclude Include="Eigen\src\Core\CwiseBinaryOp.h" />
+    <ClInclude Include="Eigen\src\Core\CwiseNullaryOp.h" />
+    <ClInclude Include="Eigen\src\Core\CwiseUnaryOp.h" />
+    <ClInclude Include="Eigen\src\Core\CwiseUnaryView.h" />
+    <ClInclude Include="Eigen\src\Core\DenseBase.h" />
+    <ClInclude Include="Eigen\src\Core\DenseCoeffsBase.h" />
+    <ClInclude Include="Eigen\src\Core\DenseStorage.h" />
+    <ClInclude Include="Eigen\src\Core\Diagonal.h" />
+    <ClInclude Include="Eigen\src\Core\DiagonalMatrix.h" />
+    <ClInclude Include="Eigen\src\Core\DiagonalProduct.h" />
+    <ClInclude Include="Eigen\src\Core\Dot.h" />
+    <ClInclude Include="Eigen\src\Core\EigenBase.h" />
+    <ClInclude Include="Eigen\src\Core\Flagged.h" />
+    <ClInclude Include="Eigen\src\Core\ForceAlignedAccess.h" />
+    <ClInclude Include="Eigen\src\Core\Functors.h" />
+    <ClInclude Include="Eigen\src\Core\Fuzzy.h" />
+    <ClInclude Include="Eigen\src\Core\GeneralProduct.h" />
+    <ClInclude Include="Eigen\src\Core\GenericPacketMath.h" />
+    <ClInclude Include="Eigen\src\Core\GlobalFunctions.h" />
+    <ClInclude Include="Eigen\src\Core\IO.h" />
+    <ClInclude Include="Eigen\src\Core\Map.h" />
+    <ClInclude Include="Eigen\src\Core\MapBase.h" />
+    <ClInclude Include="Eigen\src\Core\MathFunctions.h" />
+    <ClInclude Include="Eigen\src\Core\Matrix.h" />
+    <ClInclude Include="Eigen\src\Core\MatrixBase.h" />
+    <ClInclude Include="Eigen\src\Core\NestByValue.h" />
+    <ClInclude Include="Eigen\src\Core\NoAlias.h" />
+    <ClInclude Include="Eigen\src\Core\NumTraits.h" />
+    <ClInclude Include="Eigen\src\Core\PermutationMatrix.h" />
+    <ClInclude Include="Eigen\src\Core\PlainObjectBase.h" />
+    <ClInclude Include="Eigen\src\Core\ProductBase.h" />
+    <ClInclude Include="Eigen\src\Core\products\CoeffBasedProduct.h" />
+    <ClInclude Include="Eigen\src\Core\products\GeneralBlockPanelKernel.h" />
+    <ClInclude Include="Eigen\src\Core\products\GeneralMatrixMatrix.h" />
+    <ClInclude Include="Eigen\src\Core\products\GeneralMatrixMatrixTriangular.h" />
+    <ClInclude Include="Eigen\src\Core\products\GeneralMatrixMatrixTriangular_MKL.h" />
+    <ClInclude Include="Eigen\src\Core\products\GeneralMatrixMatrix_MKL.h" />
+    <ClInclude Include="Eigen\src\Core\products\GeneralMatrixVector.h" />
+    <ClInclude Include="Eigen\src\Core\products\GeneralMatrixVector_MKL.h" />
+    <ClInclude Include="Eigen\src\Core\products\Parallelizer.h" />
+    <ClInclude Include="Eigen\src\Core\products\SelfadjointMatrixMatrix.h" />
+    <ClInclude Include="Eigen\src\Core\products\SelfadjointMatrixMatrix_MKL.h" />
+    <ClInclude Include="Eigen\src\Core\products\SelfadjointMatrixVector.h" />
+    <ClInclude Include="Eigen\src\Core\products\SelfadjointMatrixVector_MKL.h" />
+    <ClInclude Include="Eigen\src\Core\products\SelfadjointProduct.h" />
+    <ClInclude Include="Eigen\src\Core\products\SelfadjointRank2Update.h" />
+    <ClInclude Include="Eigen\src\Core\products\TriangularMatrixMatrix.h" />
+    <ClInclude Include="Eigen\src\Core\products\TriangularMatrixMatrix_MKL.h" />
+    <ClInclude Include="Eigen\src\Core\products\TriangularMatrixVector.h" />
+    <ClInclude Include="Eigen\src\Core\products\TriangularMatrixVector_MKL.h" />
+    <ClInclude Include="Eigen\src\Core\products\TriangularSolverMatrix.h" />
+    <ClInclude Include="Eigen\src\Core\products\TriangularSolverMatrix_MKL.h" />
+    <ClInclude Include="Eigen\src\Core\products\TriangularSolverVector.h" />
+    <ClInclude Include="Eigen\src\Core\Random.h" />
+    <ClInclude Include="Eigen\src\Core\Redux.h" />
+    <ClInclude Include="Eigen\src\Core\Ref.h" />
+    <ClInclude Include="Eigen\src\Core\Replicate.h" />
+    <ClInclude Include="Eigen\src\Core\ReturnByValue.h" />
+    <ClInclude Include="Eigen\src\Core\Reverse.h" />
+    <ClInclude Include="Eigen\src\Core\Select.h" />
+    <ClInclude Include="Eigen\src\Core\SelfAdjointView.h" />
+    <ClInclude Include="Eigen\src\Core\SelfCwiseBinaryOp.h" />
+    <ClInclude Include="Eigen\src\Core\SolveTriangular.h" />
+    <ClInclude Include="Eigen\src\Core\StableNorm.h" />
+    <ClInclude Include="Eigen\src\Core\Stride.h" />
+    <ClInclude Include="Eigen\src\Core\Swap.h" />
+    <ClInclude Include="Eigen\src\Core\Transpose.h" />
+    <ClInclude Include="Eigen\src\Core\Transpositions.h" />
+    <ClInclude Include="Eigen\src\Core\TriangularMatrix.h" />
+    <ClInclude Include="Eigen\src\Core\util\BlasUtil.h" />
+    <ClInclude Include="Eigen\src\Core\util\Constants.h" />
+    <ClInclude Include="Eigen\src\Core\util\DisableStupidWarnings.h" />
+    <ClInclude Include="Eigen\src\Core\util\ForwardDeclarations.h" />
+    <ClInclude Include="Eigen\src\Core\util\Macros.h" />
+    <ClInclude Include="Eigen\src\Core\util\Memory.h" />
+    <ClInclude Include="Eigen\src\Core\util\Meta.h" />
+    <ClInclude Include="Eigen\src\Core\util\MKL_support.h" />
+    <ClInclude Include="Eigen\src\Core\util\NonMPL2.h" />
+    <ClInclude Include="Eigen\src\Core\util\ReenableStupidWarnings.h" />
+    <ClInclude Include="Eigen\src\Core\util\StaticAssert.h" />
+    <ClInclude Include="Eigen\src\Core\util\XprHelper.h" />
+    <ClInclude Include="Eigen\src\Core\VectorBlock.h" />
+    <ClInclude Include="Eigen\src\Core\VectorwiseOp.h" />
+    <ClInclude Include="Eigen\src\Core\Visitor.h" />
+    <ClInclude Include="Eigen\src\Eigen2Support\Block.h" />
+    <ClInclude Include="Eigen\src\Eigen2Support\Cwise.h" />
+    <ClInclude Include="Eigen\src\Eigen2Support\CwiseOperators.h" />
+    <ClInclude Include="Eigen\src\Eigen2Support\Geometry\AlignedBox.h" />
+    <ClInclude Include="Eigen\src\Eigen2Support\Geometry\All.h" />
+    <ClInclude Include="Eigen\src\Eigen2Support\Geometry\AngleAxis.h" />
+    <ClInclude Include="Eigen\src\Eigen2Support\Geometry\Hyperplane.h" />
+    <ClInclude Include="Eigen\src\Eigen2Support\Geometry\ParametrizedLine.h" />
+    <ClInclude Include="Eigen\src\Eigen2Support\Geometry\Quaternion.h" />
+    <ClInclude Include="Eigen\src\Eigen2Support\Geometry\Rotation2D.h" />
+    <ClInclude Include="Eigen\src\Eigen2Support\Geometry\RotationBase.h" />
+    <ClInclude Include="Eigen\src\Eigen2Support\Geometry\Scaling.h" />
+    <ClInclude Include="Eigen\src\Eigen2Support\Geometry\Transform.h" />
+    <ClInclude Include="Eigen\src\Eigen2Support\Geometry\Translation.h" />
+    <ClInclude Include="Eigen\src\Eigen2Support\Lazy.h" />
+    <ClInclude Include="Eigen\src\Eigen2Support\LeastSquares.h" />
+    <ClInclude Include="Eigen\src\Eigen2Support\LU.h" />
+    <ClInclude Include="Eigen\src\Eigen2Support\Macros.h" />
+    <ClInclude Include="Eigen\src\Eigen2Support\MathFunctions.h" />
+    <ClInclude Include="Eigen\src\Eigen2Support\Memory.h" />
+    <ClInclude Include="Eigen\src\Eigen2Support\Meta.h" />
+    <ClInclude Include="Eigen\src\Eigen2Support\Minor.h" />
+    <ClInclude Include="Eigen\src\Eigen2Support\QR.h" />
+    <ClInclude Include="Eigen\src\Eigen2Support\SVD.h" />
+    <ClInclude Include="Eigen\src\Eigen2Support\TriangularSolver.h" />
+    <ClInclude Include="Eigen\src\Eigen2Support\VectorBlock.h" />
+    <ClInclude Include="Eigen\src\Eigenvalues\ComplexEigenSolver.h" />
+    <ClInclude Include="Eigen\src\Eigenvalues\ComplexSchur.h" />
+    <ClInclude Include="Eigen\src\Eigenvalues\ComplexSchur_MKL.h" />
+    <ClInclude Include="Eigen\src\Eigenvalues\EigenSolver.h" />
+    <ClInclude Include="Eigen\src\Eigenvalues\GeneralizedEigenSolver.h" />
+    <ClInclude Include="Eigen\src\Eigenvalues\GeneralizedSelfAdjointEigenSolver.h" />
+    <ClInclude Include="Eigen\src\Eigenvalues\HessenbergDecomposition.h" />
+    <ClInclude Include="Eigen\src\Eigenvalues\MatrixBaseEigenvalues.h" />
+    <ClInclude Include="Eigen\src\Eigenvalues\RealQZ.h" />
+    <ClInclude Include="Eigen\src\Eigenvalues\RealSchur.h" />
+    <ClInclude Include="Eigen\src\Eigenvalues\RealSchur_MKL.h" />
+    <ClInclude Include="Eigen\src\Eigenvalues\SelfAdjointEigenSolver.h" />
+    <ClInclude Include="Eigen\src\Eigenvalues\SelfAdjointEigenSolver_MKL.h" />
+    <ClInclude Include="Eigen\src\Eigenvalues\Tridiagonalization.h" />
+    <ClInclude Include="Eigen\src\Geometry\AlignedBox.h" />
+    <ClInclude Include="Eigen\src\Geometry\AngleAxis.h" />
+    <ClInclude Include="Eigen\src\Geometry\arch\Geometry_SSE.h" />
+    <ClInclude Include="Eigen\src\Geometry\EulerAngles.h" />
+    <ClInclude Include="Eigen\src\Geometry\Homogeneous.h" />
+    <ClInclude Include="Eigen\src\Geometry\Hyperplane.h" />
+    <ClInclude Include="Eigen\src\Geometry\OrthoMethods.h" />
+    <ClInclude Include="Eigen\src\Geometry\ParametrizedLine.h" />
+    <ClInclude Include="Eigen\src\Geometry\Quaternion.h" />
+    <ClInclude Include="Eigen\src\Geometry\Rotation2D.h" />
+    <ClInclude Include="Eigen\src\Geometry\RotationBase.h" />
+    <ClInclude Include="Eigen\src\Geometry\Scaling.h" />
+    <ClInclude Include="Eigen\src\Geometry\Transform.h" />
+    <ClInclude Include="Eigen\src\Geometry\Translation.h" />
+    <ClInclude Include="Eigen\src\Geometry\Umeyama.h" />
+    <ClInclude Include="Eigen\src\Householder\BlockHouseholder.h" />
+    <ClInclude Include="Eigen\src\Householder\Householder.h" />
+    <ClInclude Include="Eigen\src\Householder\HouseholderSequence.h" />
+    <ClInclude Include="Eigen\src\IterativeLinearSolvers\BasicPreconditioners.h" />
+    <ClInclude Include="Eigen\src\IterativeLinearSolvers\BiCGSTAB.h" />
+    <ClInclude Include="Eigen\src\IterativeLinearSolvers\ConjugateGradient.h" />
+    <ClInclude Include="Eigen\src\IterativeLinearSolvers\IncompleteLUT.h" />
+    <ClInclude Include="Eigen\src\IterativeLinearSolvers\IterativeSolverBase.h" />
+    <ClInclude Include="Eigen\src\Jacobi\Jacobi.h" />
+    <ClInclude Include="Eigen\src\LU\arch\Inverse_SSE.h" />
+    <ClInclude Include="Eigen\src\LU\Determinant.h" />
+    <ClInclude Include="Eigen\src\LU\FullPivLU.h" />
+    <ClInclude Include="Eigen\src\LU\Inverse.h" />
+    <ClInclude Include="Eigen\src\LU\PartialPivLU.h" />
+    <ClInclude Include="Eigen\src\LU\PartialPivLU_MKL.h" />
+    <ClInclude Include="Eigen\src\MetisSupport\MetisSupport.h" />
+    <ClInclude Include="Eigen\src\misc\blas.h" />
+    <ClInclude Include="Eigen\src\misc\Image.h" />
+    <ClInclude Include="Eigen\src\misc\Kernel.h" />
+    <ClInclude Include="Eigen\src\misc\Solve.h" />
+    <ClInclude Include="Eigen\src\misc\SparseSolve.h" />
+    <ClInclude Include="Eigen\src\OrderingMethods\Amd.h" />
+    <ClInclude Include="Eigen\src\OrderingMethods\Eigen_Colamd.h" />
+    <ClInclude Include="Eigen\src\OrderingMethods\Ordering.h" />
+    <ClInclude Include="Eigen\src\PardisoSupport\PardisoSupport.h" />
+    <ClInclude Include="Eigen\src\PaStiXSupport\PaStiXSupport.h" />
+    <ClInclude Include="Eigen\src\plugins\ArrayCwiseBinaryOps.h" />
+    <ClInclude Include="Eigen\src\plugins\ArrayCwiseUnaryOps.h" />
+    <ClInclude Include="Eigen\src\plugins\BlockMethods.h" />
+    <ClInclude Include="Eigen\src\plugins\CommonCwiseBinaryOps.h" />
+    <ClInclude Include="Eigen\src\plugins\CommonCwiseUnaryOps.h" />
+    <ClInclude Include="Eigen\src\plugins\MatrixCwiseBinaryOps.h" />
+    <ClInclude Include="Eigen\src\plugins\MatrixCwiseUnaryOps.h" />
+    <ClInclude Include="Eigen\src\QR\ColPivHouseholderQR.h" />
+    <ClInclude Include="Eigen\src\QR\ColPivHouseholderQR_MKL.h" />
+    <ClInclude Include="Eigen\src\QR\FullPivHouseholderQR.h" />
+    <ClInclude Include="Eigen\src\QR\HouseholderQR.h" />
+    <ClInclude Include="Eigen\src\QR\HouseholderQR_MKL.h" />
+    <ClInclude Include="Eigen\src\SparseCholesky\SimplicialCholesky.h" />
+    <ClInclude Include="Eigen\src\SparseCholesky\SimplicialCholesky_impl.h" />
+    <ClInclude Include="Eigen\src\SparseCore\AmbiVector.h" />
+    <ClInclude Include="Eigen\src\SparseCore\CompressedStorage.h" />
+    <ClInclude Include="Eigen\src\SparseCore\ConservativeSparseSparseProduct.h" />
+    <ClInclude Include="Eigen\src\SparseCore\MappedSparseMatrix.h" />
+    <ClInclude Include="Eigen\src\SparseCore\SparseBlock.h" />
+    <ClInclude Include="Eigen\src\SparseCore\SparseColEtree.h" />
+    <ClInclude Include="Eigen\src\SparseCore\SparseCwiseBinaryOp.h" />
+    <ClInclude Include="Eigen\src\SparseCore\SparseCwiseUnaryOp.h" />
+    <ClInclude Include="Eigen\src\SparseCore\SparseDenseProduct.h" />
+    <ClInclude Include="Eigen\src\SparseCore\SparseDiagonalProduct.h" />
+    <ClInclude Include="Eigen\src\SparseCore\SparseDot.h" />
+    <ClInclude Include="Eigen\src\SparseCore\SparseFuzzy.h" />
+    <ClInclude Include="Eigen\src\SparseCore\SparseMatrix.h" />
+    <ClInclude Include="Eigen\src\SparseCore\SparseMatrixBase.h" />
+    <ClInclude Include="Eigen\src\SparseCore\SparsePermutation.h" />
+    <ClInclude Include="Eigen\src\SparseCore\SparseProduct.h" />
+    <ClInclude Include="Eigen\src\SparseCore\SparseRedux.h" />
+    <ClInclude Include="Eigen\src\SparseCore\SparseSelfAdjointView.h" />
+    <ClInclude Include="Eigen\src\SparseCore\SparseSparseProductWithPruning.h" />
+    <ClInclude Include="Eigen\src\SparseCore\SparseTranspose.h" />
+    <ClInclude Include="Eigen\src\SparseCore\SparseTriangularView.h" />
+    <ClInclude Include="Eigen\src\SparseCore\SparseUtil.h" />
+    <ClInclude Include="Eigen\src\SparseCore\SparseVector.h" />
+    <ClInclude Include="Eigen\src\SparseCore\SparseView.h" />
+    <ClInclude Include="Eigen\src\SparseCore\TriangularSolver.h" />
+    <ClInclude Include="Eigen\src\SparseLU\SparseLU.h" />
+    <ClInclude Include="Eigen\src\SparseLU\SparseLUImpl.h" />
+    <ClInclude Include="Eigen\src\SparseLU\SparseLU_column_bmod.h" />
+    <ClInclude Include="Eigen\src\SparseLU\SparseLU_column_dfs.h" />
+    <ClInclude Include="Eigen\src\SparseLU\SparseLU_copy_to_ucol.h" />
+    <ClInclude Include="Eigen\src\SparseLU\SparseLU_gemm_kernel.h" />
+    <ClInclude Include="Eigen\src\SparseLU\SparseLU_heap_relax_snode.h" />
+    <ClInclude Include="Eigen\src\SparseLU\SparseLU_kernel_bmod.h" />
+    <ClInclude Include="Eigen\src\SparseLU\SparseLU_Memory.h" />
+    <ClInclude Include="Eigen\src\SparseLU\SparseLU_panel_bmod.h" />
+    <ClInclude Include="Eigen\src\SparseLU\SparseLU_panel_dfs.h" />
+    <ClInclude Include="Eigen\src\SparseLU\SparseLU_pivotL.h" />
+    <ClInclude Include="Eigen\src\SparseLU\SparseLU_pruneL.h" />
+    <ClInclude Include="Eigen\src\SparseLU\SparseLU_relax_snode.h" />
+    <ClInclude Include="Eigen\src\SparseLU\SparseLU_Structs.h" />
+    <ClInclude Include="Eigen\src\SparseLU\SparseLU_SupernodalMatrix.h" />
+    <ClInclude Include="Eigen\src\SparseLU\SparseLU_Utils.h" />
+    <ClInclude Include="Eigen\src\SparseQR\SparseQR.h" />
+    <ClInclude Include="Eigen\src\SPQRSupport\SuiteSparseQRSupport.h" />
+    <ClInclude Include="Eigen\src\StlSupport\details.h" />
+    <ClInclude Include="Eigen\src\StlSupport\StdDeque.h" />
+    <ClInclude Include="Eigen\src\StlSupport\StdList.h" />
+    <ClInclude Include="Eigen\src\StlSupport\StdVector.h" />
+    <ClInclude Include="Eigen\src\SuperLUSupport\SuperLUSupport.h" />
+    <ClInclude Include="Eigen\src\SVD\JacobiSVD.h" />
+    <ClInclude Include="Eigen\src\SVD\JacobiSVD_MKL.h" />
+    <ClInclude Include="Eigen\src\SVD\UpperBidiagonalization.h" />
+    <ClInclude Include="Eigen\src\UmfPackSupport\UmfPackSupport.h" />
+    <ClInclude Include="lapack\lapack_common.h" />
+    <ClInclude Include="test\eigen2\gsl_helper.h" />
+    <ClInclude Include="test\eigen2\main.h" />
+    <ClInclude Include="test\eigen2\product.h" />
+    <ClInclude Include="test\eigen2\sparse.h" />
+    <ClInclude Include="test\main.h" />
+    <ClInclude Include="test\product.h" />
+    <ClInclude Include="test\sparse.h" />
+    <ClInclude Include="test\sparse_solver.h" />
+    <ClInclude Include="unsupported\Eigen\src\AutoDiff\AutoDiffJacobian.h" />
+    <ClInclude Include="unsupported\Eigen\src\AutoDiff\AutoDiffScalar.h" />
+    <ClInclude Include="unsupported\Eigen\src\AutoDiff\AutoDiffVector.h" />
+    <ClInclude Include="unsupported\Eigen\src\BVH\BVAlgorithms.h" />
+    <ClInclude Include="unsupported\Eigen\src\BVH\KdBVH.h" />
+    <ClInclude Include="unsupported\Eigen\src\Eigenvalues\ArpackSelfAdjointEigenSolver.h" />
+    <ClInclude Include="unsupported\Eigen\src\FFT\ei_fftw_impl.h" />
+    <ClInclude Include="unsupported\Eigen\src\FFT\ei_kissfft_impl.h" />
+    <ClInclude Include="unsupported\Eigen\src\IterativeSolvers\ConstrainedConjGrad.h" />
+    <ClInclude Include="unsupported\Eigen\src\IterativeSolvers\DGMRES.h" />
+    <ClInclude Include="unsupported\Eigen\src\IterativeSolvers\GMRES.h" />
+    <ClInclude Include="unsupported\Eigen\src\IterativeSolvers\IncompleteCholesky.h" />
+    <ClInclude Include="unsupported\Eigen\src\IterativeSolvers\IncompleteLU.h" />
+    <ClInclude Include="unsupported\Eigen\src\IterativeSolvers\IterationController.h" />
+    <ClInclude Include="unsupported\Eigen\src\IterativeSolvers\MINRES.h" />
+    <ClInclude Include="unsupported\Eigen\src\IterativeSolvers\Scaling.h" />
+    <ClInclude Include="unsupported\Eigen\src\KroneckerProduct\KroneckerTensorProduct.h" />
+    <ClInclude Include="unsupported\Eigen\src\LevenbergMarquardt\LevenbergMarquardt.h" />
+    <ClInclude Include="unsupported\Eigen\src\LevenbergMarquardt\LMcovar.h" />
+    <ClInclude Include="unsupported\Eigen\src\LevenbergMarquardt\LMonestep.h" />
+    <ClInclude Include="unsupported\Eigen\src\LevenbergMarquardt\LMpar.h" />
+    <ClInclude Include="unsupported\Eigen\src\LevenbergMarquardt\LMqrsolv.h" />
+    <ClInclude Include="unsupported\Eigen\src\MatrixFunctions\MatrixExponential.h" />
+    <ClInclude Include="unsupported\Eigen\src\MatrixFunctions\MatrixFunction.h" />
+    <ClInclude Include="unsupported\Eigen\src\MatrixFunctions\MatrixFunctionAtomic.h" />
+    <ClInclude Include="unsupported\Eigen\src\MatrixFunctions\MatrixLogarithm.h" />
+    <ClInclude Include="unsupported\Eigen\src\MatrixFunctions\MatrixPower.h" />
+    <ClInclude Include="unsupported\Eigen\src\MatrixFunctions\MatrixSquareRoot.h" />
+    <ClInclude Include="unsupported\Eigen\src\MatrixFunctions\StemFunction.h" />
+    <ClInclude Include="unsupported\Eigen\src\MoreVectorization\MathFunctions.h" />
+    <ClInclude Include="unsupported\Eigen\src\NonLinearOptimization\chkder.h" />
+    <ClInclude Include="unsupported\Eigen\src\NonLinearOptimization\covar.h" />
+    <ClInclude Include="unsupported\Eigen\src\NonLinearOptimization\dogleg.h" />
+    <ClInclude Include="unsupported\Eigen\src\NonLinearOptimization\fdjac1.h" />
+    <ClInclude Include="unsupported\Eigen\src\NonLinearOptimization\HybridNonLinearSolver.h" />
+    <ClInclude Include="unsupported\Eigen\src\NonLinearOptimization\LevenbergMarquardt.h" />
+    <ClInclude Include="unsupported\Eigen\src\NonLinearOptimization\lmpar.h" />
+    <ClInclude Include="unsupported\Eigen\src\NonLinearOptimization\qrsolv.h" />
+    <ClInclude Include="unsupported\Eigen\src\NonLinearOptimization\r1mpyq.h" />
+    <ClInclude Include="unsupported\Eigen\src\NonLinearOptimization\r1updt.h" />
+    <ClInclude Include="unsupported\Eigen\src\NonLinearOptimization\rwupdt.h" />
+    <ClInclude Include="unsupported\Eigen\src\NumericalDiff\NumericalDiff.h" />
+    <ClInclude Include="unsupported\Eigen\src\Polynomials\Companion.h" />
+    <ClInclude Include="unsupported\Eigen\src\Polynomials\PolynomialSolver.h" />
+    <ClInclude Include="unsupported\Eigen\src\Polynomials\PolynomialUtils.h" />
+    <ClInclude Include="unsupported\Eigen\src\Skyline\SkylineInplaceLU.h" />
+    <ClInclude Include="unsupported\Eigen\src\Skyline\SkylineMatrix.h" />
+    <ClInclude Include="unsupported\Eigen\src\Skyline\SkylineMatrixBase.h" />
+    <ClInclude Include="unsupported\Eigen\src\Skyline\SkylineProduct.h" />
+    <ClInclude Include="unsupported\Eigen\src\Skyline\SkylineStorage.h" />
+    <ClInclude Include="unsupported\Eigen\src\Skyline\SkylineUtil.h" />
+    <ClInclude Include="unsupported\Eigen\src\SparseExtra\BlockOfDynamicSparseMatrix.h" />
+    <ClInclude Include="unsupported\Eigen\src\SparseExtra\DynamicSparseMatrix.h" />
+    <ClInclude Include="unsupported\Eigen\src\SparseExtra\MarketIO.h" />
+    <ClInclude Include="unsupported\Eigen\src\SparseExtra\MatrixMarketIterator.h" />
+    <ClInclude Include="unsupported\Eigen\src\SparseExtra\RandomSetter.h" />
+    <ClInclude Include="unsupported\Eigen\src\Splines\Spline.h" />
+    <ClInclude Include="unsupported\Eigen\src\Splines\SplineFitting.h" />
+    <ClInclude Include="unsupported\Eigen\src\Splines\SplineFwd.h" />
+    <ClInclude Include="unsupported\Eigen\src\SVD\BDCSVD.h" />
+    <ClInclude Include="unsupported\Eigen\src\SVD\JacobiSVD.h" />
+    <ClInclude Include="unsupported\Eigen\src\SVD\SVDBase.h" />
+    <ClInclude Include="unsupported\test\matrix_functions.h" />
+    <ClInclude Include="unsupported\test\mpreal\mpreal.h" />
+    <ClInclude Include="unsupported\test\svd_common.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="bench\basicbenchmark.cpp" />
+    <ClCompile Include="bench\benchBlasGemm.cpp" />
+    <ClCompile Include="bench\benchCholesky.cpp" />
+    <ClCompile Include="bench\benchEigenSolver.cpp" />
+    <ClCompile Include="bench\benchFFT.cpp" />
+    <ClCompile Include="bench\benchGeometry.cpp" />
+    <ClCompile Include="bench\benchmark.cpp" />
+    <ClCompile Include="bench\benchmarkSlice.cpp" />
+    <ClCompile Include="bench\benchmarkX.cpp" />
+    <ClCompile Include="bench\benchmarkXcwise.cpp" />
+    <ClCompile Include="bench\benchVecAdd.cpp" />
+    <ClCompile Include="bench\bench_gemm.cpp" />
+    <ClCompile Include="bench\bench_norm.cpp" />
+    <ClCompile Include="bench\bench_reverse.cpp" />
+    <ClCompile Include="bench\bench_sum.cpp" />
+    <ClCompile Include="bench\btl\data\mean.cxx" />
+    <ClCompile Include="bench\btl\data\regularize.cxx" />
+    <ClCompile Include="bench\btl\data\smooth.cxx" />
+    <ClCompile Include="bench\btl\libs\BLAS\main.cpp" />
+    <ClCompile Include="bench\btl\libs\blitz\btl_blitz.cpp" />
+    <ClCompile Include="bench\btl\libs\blitz\btl_tiny_blitz.cpp" />
+    <ClCompile Include="bench\btl\libs\eigen2\btl_tiny_eigen2.cpp" />
+    <ClCompile Include="bench\btl\libs\eigen2\main_adv.cpp" />
+    <ClCompile Include="bench\btl\libs\eigen2\main_linear.cpp" />
+    <ClCompile Include="bench\btl\libs\eigen2\main_matmat.cpp" />
+    <ClCompile Include="bench\btl\libs\eigen2\main_vecmat.cpp" />
+    <ClCompile Include="bench\btl\libs\eigen3\btl_tiny_eigen3.cpp" />
+    <ClCompile Include="bench\btl\libs\eigen3\main_adv.cpp" />
+    <ClCompile Include="bench\btl\libs\eigen3\main_linear.cpp" />
+    <ClCompile Include="bench\btl\libs\eigen3\main_matmat.cpp" />
+    <ClCompile Include="bench\btl\libs\eigen3\main_vecmat.cpp" />
+    <ClCompile Include="bench\btl\libs\gmm\main.cpp" />
+    <ClCompile Include="bench\btl\libs\mtl4\main.cpp" />
+    <ClCompile Include="bench\btl\libs\STL\main.cpp" />
+    <ClCompile Include="bench\btl\libs\tvmet\main.cpp" />
+    <ClCompile Include="bench\btl\libs\ublas\main.cpp" />
+    <ClCompile Include="bench\check_cache_queries.cpp" />
+    <ClCompile Include="bench\eig33.cpp" />
+    <ClCompile Include="bench\geometry.cpp" />
+    <ClCompile Include="bench\product_threshold.cpp" />
+    <ClCompile Include="bench\quatmul.cpp" />
+    <ClCompile Include="bench\quat_slerp.cpp" />
+    <ClCompile Include="bench\sparse_cholesky.cpp" />
+    <ClCompile Include="bench\sparse_dense_product.cpp" />
+    <ClCompile Include="bench\sparse_lu.cpp" />
+    <ClCompile Include="bench\sparse_product.cpp" />
+    <ClCompile Include="bench\sparse_randomsetter.cpp" />
+    <ClCompile Include="bench\sparse_setter.cpp" />
+    <ClCompile Include="bench\sparse_transpose.cpp" />
+    <ClCompile Include="bench\sparse_trisolver.cpp" />
+    <ClCompile Include="bench\spbench\spbenchsolver.cpp" />
+    <ClCompile Include="bench\spbench\sp_solver.cpp" />
+    <ClCompile Include="bench\spbench\test_sparseLU.cpp" />
+    <ClCompile Include="bench\spmv.cpp" />
+    <ClCompile Include="bench\vdw_new.cpp" />
+    <ClCompile Include="blas\complex_double.cpp" />
+    <ClCompile Include="blas\complex_single.cpp" />
+    <ClCompile Include="blas\double.cpp" />
+    <ClCompile Include="blas\single.cpp" />
+    <ClCompile Include="blas\xerbla.cpp" />
+    <ClCompile Include="demos\mandelbrot\mandelbrot.cpp" />
+    <ClCompile Include="demos\mix_eigen_and_c\binary_library.cpp" />
+    <ClCompile Include="demos\mix_eigen_and_c\example.c" />
+    <ClCompile Include="demos\opengl\camera.cpp" />
+    <ClCompile Include="demos\opengl\gpuhelper.cpp" />
+    <ClCompile Include="demos\opengl\icosphere.cpp" />
+    <ClCompile Include="demos\opengl\quaternion_demo.cpp" />
+    <ClCompile Include="demos\opengl\trackball.cpp" />
+    <ClCompile Include="doc\examples\class_Block.cpp" />
+    <ClCompile Include="doc\examples\class_CwiseBinaryOp.cpp" />
+    <ClCompile Include="doc\examples\class_CwiseUnaryOp.cpp" />
+    <ClCompile Include="doc\examples\class_CwiseUnaryOp_ptrfun.cpp" />
+    <ClCompile Include="doc\examples\class_FixedBlock.cpp" />
+    <ClCompile Include="doc\examples\class_FixedVectorBlock.cpp" />
+    <ClCompile Include="doc\examples\class_VectorBlock.cpp" />
+    <ClCompile Include="doc\examples\DenseBase_middleCols_int.cpp" />
+    <ClCompile Include="doc\examples\DenseBase_middleRows_int.cpp" />
+    <ClCompile Include="doc\examples\DenseBase_template_int_middleCols.cpp" />
+    <ClCompile Include="doc\examples\DenseBase_template_int_middleRows.cpp" />
+    <ClCompile Include="doc\examples\function_taking_eigenbase.cpp" />
+    <ClCompile Include="doc\examples\function_taking_ref.cpp" />
+    <ClCompile Include="doc\examples\MatrixBase_cwise_const.cpp" />
+    <ClCompile Include="doc\examples\QuickStart_example.cpp" />
+    <ClCompile Include="doc\examples\QuickStart_example2_dynamic.cpp" />
+    <ClCompile Include="doc\examples\QuickStart_example2_fixed.cpp" />
+    <ClCompile Include="doc\examples\TemplateKeyword_flexible.cpp" />
+    <ClCompile Include="doc\examples\TemplateKeyword_simple.cpp" />
+    <ClCompile Include="doc\examples\TutorialLinAlgComputeTwice.cpp" />
+    <ClCompile Include="doc\examples\TutorialLinAlgExComputeSolveError.cpp" />
+    <ClCompile Include="doc\examples\TutorialLinAlgExSolveColPivHouseholderQR.cpp" />
+    <ClCompile Include="doc\examples\TutorialLinAlgExSolveLDLT.cpp" />
+    <ClCompile Include="doc\examples\TutorialLinAlgInverseDeterminant.cpp" />
+    <ClCompile Include="doc\examples\TutorialLinAlgRankRevealing.cpp" />
+    <ClCompile Include="doc\examples\TutorialLinAlgSelfAdjointEigenSolver.cpp" />
+    <ClCompile Include="doc\examples\TutorialLinAlgSetThreshold.cpp" />
+    <ClCompile Include="doc\examples\TutorialLinAlgSVDSolve.cpp" />
+    <ClCompile Include="doc\examples\Tutorial_ArrayClass_accessors.cpp" />
+    <ClCompile Include="doc\examples\Tutorial_ArrayClass_addition.cpp" />
+    <ClCompile Include="doc\examples\Tutorial_ArrayClass_cwise_other.cpp" />
+    <ClCompile Include="doc\examples\Tutorial_ArrayClass_interop.cpp" />
+    <ClCompile Include="doc\examples\Tutorial_ArrayClass_interop_matrix.cpp" />
+    <ClCompile Include="doc\examples\Tutorial_ArrayClass_mult.cpp" />
+    <ClCompile Include="doc\examples\Tutorial_BlockOperations_block_assignment.cpp" />
+    <ClCompile Include="doc\examples\Tutorial_BlockOperations_colrow.cpp" />
+    <ClCompile Include="doc\examples\Tutorial_BlockOperations_corner.cpp" />
+    <ClCompile Include="doc\examples\Tutorial_BlockOperations_print_block.cpp" />
+    <ClCompile Include="doc\examples\Tutorial_BlockOperations_vector.cpp" />
+    <ClCompile Include="doc\examples\Tutorial_PartialLU_solve.cpp" />
+    <ClCompile Include="doc\examples\Tutorial_ReductionsVisitorsBroadcasting_broadcast_1nn.cpp" />
+    <ClCompile Include="doc\examples\Tutorial_ReductionsVisitorsBroadcasting_broadcast_simple.cpp" />
+    <ClCompile Include="doc\examples\Tutorial_ReductionsVisitorsBroadcasting_broadcast_simple_rowwise.cpp" />
+    <ClCompile Include="doc\examples\Tutorial_ReductionsVisitorsBroadcasting_colwise.cpp" />
+    <ClCompile Include="doc\examples\Tutorial_ReductionsVisitorsBroadcasting_maxnorm.cpp" />
+    <ClCompile Include="doc\examples\Tutorial_ReductionsVisitorsBroadcasting_reductions_bool.cpp" />
+    <ClCompile Include="doc\examples\Tutorial_ReductionsVisitorsBroadcasting_reductions_norm.cpp" />
+    <ClCompile Include="doc\examples\Tutorial_ReductionsVisitorsBroadcasting_rowwise.cpp" />
+    <ClCompile Include="doc\examples\Tutorial_ReductionsVisitorsBroadcasting_visitors.cpp" />
+    <ClCompile Include="doc\examples\Tutorial_simple_example_dynamic_size.cpp" />
+    <ClCompile Include="doc\examples\Tutorial_simple_example_fixed_size.cpp" />
+    <ClCompile Include="doc\examples\tut_arithmetic_add_sub.cpp" />
+    <ClCompile Include="doc\examples\tut_arithmetic_dot_cross.cpp" />
+    <ClCompile Include="doc\examples\tut_arithmetic_matrix_mul.cpp" />
+    <ClCompile Include="doc\examples\tut_arithmetic_redux_basic.cpp" />
+    <ClCompile Include="doc\examples\tut_arithmetic_scalar_mul_div.cpp" />
+    <ClCompile Include="doc\examples\tut_matrix_coefficient_accessors.cpp" />
+    <ClCompile Include="doc\examples\tut_matrix_resize.cpp" />
+    <ClCompile Include="doc\examples\tut_matrix_resize_fixed_size.cpp" />
+    <ClCompile Include="doc\snippets\AngleAxis_mimic_euler.cpp" />
+    <ClCompile Include="doc\snippets\class_FullPivLU.cpp" />
+    <ClCompile Include="doc\snippets\ColPivHouseholderQR_solve.cpp" />
+    <ClCompile Include="doc\snippets\ComplexEigenSolver_compute.cpp" />
+    <ClCompile Include="doc\snippets\ComplexEigenSolver_eigenvalues.cpp" />
+    <ClCompile Include="doc\snippets\ComplexEigenSolver_eigenvectors.cpp" />
+    <ClCompile Include="doc\snippets\ComplexSchur_compute.cpp" />
+    <ClCompile Include="doc\snippets\ComplexSchur_matrixT.cpp" />
+    <ClCompile Include="doc\snippets\ComplexSchur_matrixU.cpp" />
+    <ClCompile Include="doc\snippets\Cwise_abs.cpp" />
+    <ClCompile Include="doc\snippets\Cwise_abs2.cpp" />
+    <ClCompile Include="doc\snippets\Cwise_acos.cpp" />
+    <ClCompile Include="doc\snippets\Cwise_asin.cpp" />
+    <ClCompile Include="doc\snippets\Cwise_boolean_and.cpp" />
+    <ClCompile Include="doc\snippets\Cwise_boolean_or.cpp" />
+    <ClCompile Include="doc\snippets\Cwise_cos.cpp" />
+    <ClCompile Include="doc\snippets\Cwise_cube.cpp" />
+    <ClCompile Include="doc\snippets\Cwise_equal_equal.cpp" />
+    <ClCompile Include="doc\snippets\Cwise_exp.cpp" />
+    <ClCompile Include="doc\snippets\Cwise_greater.cpp" />
+    <ClCompile Include="doc\snippets\Cwise_greater_equal.cpp" />
+    <ClCompile Include="doc\snippets\Cwise_inverse.cpp" />
+    <ClCompile Include="doc\snippets\Cwise_less.cpp" />
+    <ClCompile Include="doc\snippets\Cwise_less_equal.cpp" />
+    <ClCompile Include="doc\snippets\Cwise_log.cpp" />
+    <ClCompile Include="doc\snippets\Cwise_max.cpp" />
+    <ClCompile Include="doc\snippets\Cwise_min.cpp" />
+    <ClCompile Include="doc\snippets\Cwise_minus.cpp" />
+    <ClCompile Include="doc\snippets\Cwise_minus_equal.cpp" />
+    <ClCompile Include="doc\snippets\Cwise_not_equal.cpp" />
+    <ClCompile Include="doc\snippets\Cwise_plus.cpp" />
+    <ClCompile Include="doc\snippets\Cwise_plus_equal.cpp" />
+    <ClCompile Include="doc\snippets\Cwise_pow.cpp" />
+    <ClCompile Include="doc\snippets\Cwise_product.cpp" />
+    <ClCompile Include="doc\snippets\Cwise_quotient.cpp" />
+    <ClCompile Include="doc\snippets\Cwise_sin.cpp" />
+    <ClCompile Include="doc\snippets\Cwise_slash_equal.cpp" />
+    <ClCompile Include="doc\snippets\Cwise_sqrt.cpp" />
+    <ClCompile Include="doc\snippets\Cwise_square.cpp" />
+    <ClCompile Include="doc\snippets\Cwise_tan.cpp" />
+    <ClCompile Include="doc\snippets\Cwise_times_equal.cpp" />
+    <ClCompile Include="doc\snippets\DenseBase_LinSpaced.cpp" />
+    <ClCompile Include="doc\snippets\DenseBase_LinSpaced_seq.cpp" />
+    <ClCompile Include="doc\snippets\DenseBase_setLinSpaced.cpp" />
+    <ClCompile Include="doc\snippets\DirectionWise_replicate.cpp" />
+    <ClCompile Include="doc\snippets\DirectionWise_replicate_int.cpp" />
+    <ClCompile Include="doc\snippets\EigenSolver_compute.cpp" />
+    <ClCompile Include="doc\snippets\EigenSolver_EigenSolver_MatrixType.cpp" />
+    <ClCompile Include="doc\snippets\EigenSolver_eigenvalues.cpp" />
+    <ClCompile Include="doc\snippets\EigenSolver_eigenvectors.cpp" />
+    <ClCompile Include="doc\snippets\EigenSolver_pseudoEigenvectors.cpp" />
+    <ClCompile Include="doc\snippets\FullPivHouseholderQR_solve.cpp" />
+    <ClCompile Include="doc\snippets\FullPivLU_image.cpp" />
+    <ClCompile Include="doc\snippets\FullPivLU_kernel.cpp" />
+    <ClCompile Include="doc\snippets\FullPivLU_solve.cpp" />
+    <ClCompile Include="doc\snippets\GeneralizedEigenSolver.cpp" />
+    <ClCompile Include="doc\snippets\HessenbergDecomposition_compute.cpp" />
+    <ClCompile Include="doc\snippets\HessenbergDecomposition_matrixH.cpp" />
+    <ClCompile Include="doc\snippets\HessenbergDecomposition_packedMatrix.cpp" />
+    <ClCompile Include="doc\snippets\HouseholderQR_householderQ.cpp" />
+    <ClCompile Include="doc\snippets\HouseholderQR_solve.cpp" />
+    <ClCompile Include="doc\snippets\HouseholderSequence_HouseholderSequence.cpp" />
+    <ClCompile Include="doc\snippets\IOFormat.cpp" />
+    <ClCompile Include="doc\snippets\JacobiSVD_basic.cpp" />
+    <ClCompile Include="doc\snippets\Jacobi_makeGivens.cpp" />
+    <ClCompile Include="doc\snippets\Jacobi_makeJacobi.cpp" />
+    <ClCompile Include="doc\snippets\LLT_example.cpp" />
+    <ClCompile Include="doc\snippets\LLT_solve.cpp" />
+    <ClCompile Include="doc\snippets\Map_general_stride.cpp" />
+    <ClCompile Include="doc\snippets\Map_inner_stride.cpp" />
+    <ClCompile Include="doc\snippets\Map_outer_stride.cpp" />
+    <ClCompile Include="doc\snippets\Map_placement_new.cpp" />
+    <ClCompile Include="doc\snippets\Map_simple.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_adjoint.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_all.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_applyOnTheLeft.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_applyOnTheRight.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_array.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_array_const.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_asDiagonal.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_block_int_int.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_block_int_int_int_int.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_bottomLeftCorner_int_int.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_bottomRightCorner_int_int.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_bottomRows_int.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_cast.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_col.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_colwise.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_computeInverseAndDetWithCheck.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_computeInverseWithCheck.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_cwiseAbs.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_cwiseAbs2.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_cwiseEqual.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_cwiseInverse.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_cwiseMax.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_cwiseMin.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_cwiseNotEqual.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_cwiseProduct.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_cwiseQuotient.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_cwiseSqrt.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_diagonal.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_diagonal_int.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_diagonal_template_int.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_eigenvalues.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_end_int.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_eval.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_extract.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_fixedBlock_int_int.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_identity.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_identity_int_int.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_inverse.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_isDiagonal.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_isIdentity.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_isOnes.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_isOrthogonal.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_isUnitary.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_isZero.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_leftCols_int.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_marked.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_noalias.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_ones.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_ones_int.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_ones_int_int.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_operatorNorm.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_part.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_prod.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_random.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_random_int.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_random_int_int.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_replicate.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_replicate_int_int.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_reverse.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_rightCols_int.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_row.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_rowwise.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_segment_int_int.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_select.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_set.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_setIdentity.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_setOnes.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_setRandom.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_setZero.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_start_int.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_template_int_bottomRows.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_template_int_end.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_template_int_int_block_int_int_int_int.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_template_int_int_bottomLeftCorner.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_template_int_int_bottomLeftCorner_int_int.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_template_int_int_bottomRightCorner.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_template_int_int_bottomRightCorner_int_int.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_template_int_int_topLeftCorner.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_template_int_int_topLeftCorner_int_int.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_template_int_int_topRightCorner.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_template_int_int_topRightCorner_int_int.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_template_int_leftCols.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_template_int_rightCols.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_template_int_segment.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_template_int_start.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_template_int_topRows.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_topLeftCorner_int_int.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_topRightCorner_int_int.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_topRows_int.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_transpose.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_zero.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_zero_int.cpp" />
+    <ClCompile Include="doc\snippets\MatrixBase_zero_int_int.cpp" />
+    <ClCompile Include="doc\snippets\Matrix_resize_int.cpp" />
+    <ClCompile Include="doc\snippets\Matrix_resize_int_int.cpp" />
+    <ClCompile Include="doc\snippets\Matrix_resize_int_NoChange.cpp" />
+    <ClCompile Include="doc\snippets\Matrix_resize_NoChange_int.cpp" />
+    <ClCompile Include="doc\snippets\Matrix_setConstant_int.cpp" />
+    <ClCompile Include="doc\snippets\Matrix_setConstant_int_int.cpp" />
+    <ClCompile Include="doc\snippets\Matrix_setIdentity_int_int.cpp" />
+    <ClCompile Include="doc\snippets\Matrix_setOnes_int.cpp" />
+    <ClCompile Include="doc\snippets\Matrix_setOnes_int_int.cpp" />
+    <ClCompile Include="doc\snippets\Matrix_setRandom_int.cpp" />
+    <ClCompile Include="doc\snippets\Matrix_setRandom_int_int.cpp" />
+    <ClCompile Include="doc\snippets\Matrix_setZero_int.cpp" />
+    <ClCompile Include="doc\snippets\Matrix_setZero_int_int.cpp" />
+    <ClCompile Include="doc\snippets\PartialPivLU_solve.cpp" />
+    <ClCompile Include="doc\snippets\PartialRedux_count.cpp" />
+    <ClCompile Include="doc\snippets\PartialRedux_maxCoeff.cpp" />
+    <ClCompile Include="doc\snippets\PartialRedux_minCoeff.cpp" />
+    <ClCompile Include="doc\snippets\PartialRedux_norm.cpp" />
+    <ClCompile Include="doc\snippets\PartialRedux_prod.cpp" />
+    <ClCompile Include="doc\snippets\PartialRedux_squaredNorm.cpp" />
+    <ClCompile Include="doc\snippets\PartialRedux_sum.cpp" />
+    <ClCompile Include="doc\snippets\RealQZ_compute.cpp" />
+    <ClCompile Include="doc\snippets\RealSchur_compute.cpp" />
+    <ClCompile Include="doc\snippets\RealSchur_RealSchur_MatrixType.cpp" />
+    <ClCompile Include="doc\snippets\SelfAdjointEigenSolver_compute_MatrixType.cpp" />
+    <ClCompile Include="doc\snippets\SelfAdjointEigenSolver_compute_MatrixType2.cpp" />
+    <ClCompile Include="doc\snippets\SelfAdjointEigenSolver_eigenvalues.cpp" />
+    <ClCompile Include="doc\snippets\SelfAdjointEigenSolver_eigenvectors.cpp" />
+    <ClCompile Include="doc\snippets\SelfAdjointEigenSolver_operatorInverseSqrt.cpp" />
+    <ClCompile Include="doc\snippets\SelfAdjointEigenSolver_operatorSqrt.cpp" />
+    <ClCompile Include="doc\snippets\SelfAdjointEigenSolver_SelfAdjointEigenSolver.cpp" />
+    <ClCompile Include="doc\snippets\SelfAdjointEigenSolver_SelfAdjointEigenSolver_MatrixType.cpp" />
+    <ClCompile Include="doc\snippets\SelfAdjointEigenSolver_SelfAdjointEigenSolver_MatrixType2.cpp" />
+    <ClCompile Include="doc\snippets\SelfAdjointView_eigenvalues.cpp" />
+    <ClCompile Include="doc\snippets\SelfAdjointView_operatorNorm.cpp" />
+    <ClCompile Include="doc\snippets\TopicAliasing_block.cpp" />
+    <ClCompile Include="doc\snippets\TopicAliasing_block_correct.cpp" />
+    <ClCompile Include="doc\snippets\TopicAliasing_cwise.cpp" />
+    <ClCompile Include="doc\snippets\TopicAliasing_mult1.cpp" />
+    <ClCompile Include="doc\snippets\TopicAliasing_mult2.cpp" />
+    <ClCompile Include="doc\snippets\TopicAliasing_mult3.cpp" />
+    <ClCompile Include="doc\snippets\TopicStorageOrders_example.cpp" />
+    <ClCompile Include="doc\snippets\Tridiagonalization_compute.cpp" />
+    <ClCompile Include="doc\snippets\Tridiagonalization_decomposeInPlace.cpp" />
+    <ClCompile Include="doc\snippets\Tridiagonalization_diagonal.cpp" />
+    <ClCompile Include="doc\snippets\Tridiagonalization_householderCoefficients.cpp" />
+    <ClCompile Include="doc\snippets\Tridiagonalization_packedMatrix.cpp" />
+    <ClCompile Include="doc\snippets\Tridiagonalization_Tridiagonalization_MatrixType.cpp" />
+    <ClCompile Include="doc\snippets\Tutorial_AdvancedInitialization_Block.cpp" />
+    <ClCompile Include="doc\snippets\Tutorial_AdvancedInitialization_CommaTemporary.cpp" />
+    <ClCompile Include="doc\snippets\Tutorial_AdvancedInitialization_Join.cpp" />
+    <ClCompile Include="doc\snippets\Tutorial_AdvancedInitialization_LinSpaced.cpp" />
+    <ClCompile Include="doc\snippets\Tutorial_AdvancedInitialization_ThreeWays.cpp" />
+    <ClCompile Include="doc\snippets\Tutorial_AdvancedInitialization_Zero.cpp" />
+    <ClCompile Include="doc\snippets\Tutorial_commainit_01.cpp" />
+    <ClCompile Include="doc\snippets\Tutorial_commainit_01b.cpp" />
+    <ClCompile Include="doc\snippets\Tutorial_commainit_02.cpp" />
+    <ClCompile Include="doc\snippets\Tutorial_Map_rowmajor.cpp" />
+    <ClCompile Include="doc\snippets\Tutorial_Map_using.cpp" />
+    <ClCompile Include="doc\snippets\Tutorial_solve_matrix_inverse.cpp" />
+    <ClCompile Include="doc\snippets\Tutorial_solve_multiple_rhs.cpp" />
+    <ClCompile Include="doc\snippets\Tutorial_solve_reuse_decomposition.cpp" />
+    <ClCompile Include="doc\snippets\Tutorial_solve_singular.cpp" />
+    <ClCompile Include="doc\snippets\Tutorial_solve_triangular.cpp" />
+    <ClCompile Include="doc\snippets\Tutorial_solve_triangular_inplace.cpp" />
+    <ClCompile Include="doc\snippets\tut_arithmetic_redux_minmax.cpp" />
+    <ClCompile Include="doc\snippets\tut_arithmetic_transpose_aliasing.cpp" />
+    <ClCompile Include="doc\snippets\tut_arithmetic_transpose_conjugate.cpp" />
+    <ClCompile Include="doc\snippets\tut_arithmetic_transpose_inplace.cpp" />
+    <ClCompile Include="doc\snippets\tut_matrix_assignment_resizing.cpp" />
+    <ClCompile Include="doc\snippets\Vectorwise_reverse.cpp" />
+    <ClCompile Include="doc\special_examples\Tutorial_sparse_example.cpp" />
+    <ClCompile Include="doc\special_examples\Tutorial_sparse_example_details.cpp" />
+    <ClCompile Include="doc\tutorial.cpp" />
+    <ClCompile Include="failtest\block_nonconst_ctor_on_const_xpr_0.cpp" />
+    <ClCompile Include="failtest\block_nonconst_ctor_on_const_xpr_1.cpp" />
+    <ClCompile Include="failtest\block_nonconst_ctor_on_const_xpr_2.cpp" />
+    <ClCompile Include="failtest\block_on_const_type_actually_const_0.cpp" />
+    <ClCompile Include="failtest\block_on_const_type_actually_const_1.cpp" />
+    <ClCompile Include="failtest\colpivqr_int.cpp" />
+    <ClCompile Include="failtest\const_qualified_block_method_retval_0.cpp" />
+    <ClCompile Include="failtest\const_qualified_block_method_retval_1.cpp" />
+    <ClCompile Include="failtest\const_qualified_diagonal_method_retval.cpp" />
+    <ClCompile Include="failtest\const_qualified_transpose_method_retval.cpp" />
+    <ClCompile Include="failtest\diagonal_nonconst_ctor_on_const_xpr.cpp" />
+    <ClCompile Include="failtest\diagonal_on_const_type_actually_const.cpp" />
+    <ClCompile Include="failtest\eigensolver_cplx.cpp" />
+    <ClCompile Include="failtest\eigensolver_int.cpp" />
+    <ClCompile Include="failtest\failtest_sanity_check.cpp" />
+    <ClCompile Include="failtest\fullpivlu_int.cpp" />
+    <ClCompile Include="failtest\fullpivqr_int.cpp" />
+    <ClCompile Include="failtest\jacobisvd_int.cpp" />
+    <ClCompile Include="failtest\ldlt_int.cpp" />
+    <ClCompile Include="failtest\llt_int.cpp" />
+    <ClCompile Include="failtest\map_nonconst_ctor_on_const_ptr_0.cpp" />
+    <ClCompile Include="failtest\map_nonconst_ctor_on_const_ptr_1.cpp" />
+    <ClCompile Include="failtest\map_nonconst_ctor_on_const_ptr_2.cpp" />
+    <ClCompile Include="failtest\map_nonconst_ctor_on_const_ptr_3.cpp" />
+    <ClCompile Include="failtest\map_nonconst_ctor_on_const_ptr_4.cpp" />
+    <ClCompile Include="failtest\map_on_const_type_actually_const_0.cpp" />
+    <ClCompile Include="failtest\map_on_const_type_actually_const_1.cpp" />
+    <ClCompile Include="failtest\partialpivlu_int.cpp" />
+    <ClCompile Include="failtest\qr_int.cpp" />
+    <ClCompile Include="failtest\ref_1.cpp" />
+    <ClCompile Include="failtest\ref_2.cpp" />
+    <ClCompile Include="failtest\ref_3.cpp" />
+    <ClCompile Include="failtest\ref_4.cpp" />
+    <ClCompile Include="failtest\ref_5.cpp" />
+    <ClCompile Include="failtest\transpose_nonconst_ctor_on_const_xpr.cpp" />
+    <ClCompile Include="failtest\transpose_on_const_type_actually_const.cpp" />
+    <ClCompile Include="lapack\cholesky.cpp" />
+    <ClCompile Include="lapack\complex_double.cpp" />
+    <ClCompile Include="lapack\complex_single.cpp" />
+    <ClCompile Include="lapack\double.cpp" />
+    <ClCompile Include="lapack\eigenvalues.cpp" />
+    <ClCompile Include="lapack\lu.cpp" />
+    <ClCompile Include="lapack\single.cpp" />
+    <ClCompile Include="scripts\eigen_gen_credits.cpp" />
+    <ClCompile Include="test\adjoint.cpp" />
+    <ClCompile Include="test\array.cpp" />
+    <ClCompile Include="test\array_for_matrix.cpp" />
+    <ClCompile Include="test\array_replicate.cpp" />
+    <ClCompile Include="test\array_reverse.cpp" />
+    <ClCompile Include="test\bandmatrix.cpp" />
+    <ClCompile Include="test\basicstuff.cpp" />
+    <ClCompile Include="test\bicgstab.cpp" />
+    <ClCompile Include="test\block.cpp" />
+    <ClCompile Include="test\cholesky.cpp" />
+    <ClCompile Include="test\cholmod_support.cpp" />
+    <ClCompile Include="test\commainitializer.cpp" />
+    <ClCompile Include="test\conjugate_gradient.cpp" />
+    <ClCompile Include="test\conservative_resize.cpp" />
+    <ClCompile Include="test\corners.cpp" />
+    <ClCompile Include="test\cwiseop.cpp" />
+    <ClCompile Include="test\denseLM.cpp" />
+    <ClCompile Include="test\determinant.cpp" />
+    <ClCompile Include="test\diagonal.cpp" />
+    <ClCompile Include="test\diagonalmatrices.cpp" />
+    <ClCompile Include="test\dontalign.cpp" />
+    <ClCompile Include="test\dynalloc.cpp" />
+    <ClCompile Include="test\eigen2support.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_adjoint.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_alignedbox.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_array.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_basicstuff.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_bug_132.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_cholesky.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_commainitializer.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_cwiseop.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_determinant.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_dynalloc.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_eigensolver.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_first_aligned.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_geometry.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_geometry_with_eigen2_prefix.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_hyperplane.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_inverse.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_linearstructure.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_lu.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_map.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_meta.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_miscmatrices.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_mixingtypes.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_newstdvector.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_nomalloc.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_packetmath.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_parametrizedline.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_prec_inverse_4x4.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_product_large.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_product_small.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_qr.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_qtvector.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_regression.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_sizeof.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_smallvectors.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_sparse_basic.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_sparse_product.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_sparse_solvers.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_sparse_vector.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_stdvector.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_submatrices.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_sum.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_svd.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_swap.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_triangular.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_unalignedassert.cpp" />
+    <ClCompile Include="test\eigen2\eigen2_visitor.cpp" />
+    <ClCompile Include="test\eigensolver_complex.cpp" />
+    <ClCompile Include="test\eigensolver_generalized_real.cpp" />
+    <ClCompile Include="test\eigensolver_generic.cpp" />
+    <ClCompile Include="test\eigensolver_selfadjoint.cpp" />
+    <ClCompile Include="test\exceptions.cpp" />
+    <ClCompile Include="test\first_aligned.cpp" />
+    <ClCompile Include="test\geo_alignedbox.cpp" />
+    <ClCompile Include="test\geo_eulerangles.cpp" />
+    <ClCompile Include="test\geo_homogeneous.cpp" />
+    <ClCompile Include="test\geo_hyperplane.cpp" />
+    <ClCompile Include="test\geo_orthomethods.cpp" />
+    <ClCompile Include="test\geo_parametrizedline.cpp" />
+    <ClCompile Include="test\geo_quaternion.cpp" />
+    <ClCompile Include="test\geo_transformations.cpp" />
+    <ClCompile Include="test\hessenberg.cpp" />
+    <ClCompile Include="test\householder.cpp" />
+    <ClCompile Include="test\integer_types.cpp" />
+    <ClCompile Include="test\inverse.cpp" />
+    <ClCompile Include="test\jacobi.cpp" />
+    <ClCompile Include="test\jacobisvd.cpp" />
+    <ClCompile Include="test\linearstructure.cpp" />
+    <ClCompile Include="test\lu.cpp" />
+    <ClCompile Include="test\mapped_matrix.cpp" />
+    <ClCompile Include="test\mapstaticmethods.cpp" />
+    <ClCompile Include="test\mapstride.cpp" />
+    <ClCompile Include="test\meta.cpp" />
+    <ClCompile Include="test\metis_support.cpp" />
+    <ClCompile Include="test\miscmatrices.cpp" />
+    <ClCompile Include="test\mixingtypes.cpp" />
+    <ClCompile Include="test\mpl2only.cpp" />
+    <ClCompile Include="test\nesting_ops.cpp" />
+    <ClCompile Include="test\nomalloc.cpp" />
+    <ClCompile Include="test\nullary.cpp" />
+    <ClCompile Include="test\packetmath.cpp" />
+    <ClCompile Include="test\pardiso_support.cpp" />
+    <ClCompile Include="test\pastix_support.cpp" />
+    <ClCompile Include="test\permutationmatrices.cpp" />
+    <ClCompile Include="test\prec_inverse_4x4.cpp" />
+    <ClCompile Include="test\product_extra.cpp" />
+    <ClCompile Include="test\product_large.cpp" />
+    <ClCompile Include="test\product_mmtr.cpp" />
+    <ClCompile Include="test\product_notemporary.cpp" />
+    <ClCompile Include="test\product_selfadjoint.cpp" />
+    <ClCompile Include="test\product_small.cpp" />
+    <ClCompile Include="test\product_symm.cpp" />
+    <ClCompile Include="test\product_syrk.cpp" />
+    <ClCompile Include="test\product_trmm.cpp" />
+    <ClCompile Include="test\product_trmv.cpp" />
+    <ClCompile Include="test\product_trsolve.cpp" />
+    <ClCompile Include="test\qr.cpp" />
+    <ClCompile Include="test\qr_colpivoting.cpp" />
+    <ClCompile Include="test\qr_fullpivoting.cpp" />
+    <ClCompile Include="test\qtvector.cpp" />
+    <ClCompile Include="test\real_qz.cpp" />
+    <ClCompile Include="test\redux.cpp" />
+    <ClCompile Include="test\ref.cpp" />
+    <ClCompile Include="test\resize.cpp" />
+    <ClCompile Include="test\rvalue_types.cpp" />
+    <ClCompile Include="test\schur_complex.cpp" />
+    <ClCompile Include="test\schur_real.cpp" />
+    <ClCompile Include="test\selfadjoint.cpp" />
+    <ClCompile Include="test\simplicial_cholesky.cpp" />
+    <ClCompile Include="test\sizeof.cpp" />
+    <ClCompile Include="test\sizeoverflow.cpp" />
+    <ClCompile Include="test\smallvectors.cpp" />
+    <ClCompile Include="test\sparseLM.cpp" />
+    <ClCompile Include="test\sparselu.cpp" />
+    <ClCompile Include="test\sparseqr.cpp" />
+    <ClCompile Include="test\sparse_basic.cpp" />
+    <ClCompile Include="test\sparse_permutations.cpp" />
+    <ClCompile Include="test\sparse_product.cpp" />
+    <ClCompile Include="test\sparse_solvers.cpp" />
+    <ClCompile Include="test\sparse_vector.cpp" />
+    <ClCompile Include="test\special_numbers.cpp" />
+    <ClCompile Include="test\spqr_support.cpp" />
+    <ClCompile Include="test\stable_norm.cpp" />
+    <ClCompile Include="test\stddeque.cpp" />
+    <ClCompile Include="test\stdlist.cpp" />
+    <ClCompile Include="test\stdvector.cpp" />
+    <ClCompile Include="test\stdvector_overload.cpp" />
+    <ClCompile Include="test\superlu_support.cpp" />
+    <ClCompile Include="test\swap.cpp" />
+    <ClCompile Include="test\triangular.cpp" />
+    <ClCompile Include="test\umeyama.cpp" />
+    <ClCompile Include="test\umfpack_support.cpp" />
+    <ClCompile Include="test\unalignedassert.cpp" />
+    <ClCompile Include="test\unalignedcount.cpp" />
+    <ClCompile Include="test\upperbidiagonalization.cpp" />
+    <ClCompile Include="test\vectorization_logic.cpp" />
+    <ClCompile Include="test\vectorwiseop.cpp" />
+    <ClCompile Include="test\visitor.cpp" />
+    <ClCompile Include="test\zerosized.cpp" />
+    <ClCompile Include="unsupported\bench\bench_svd.cpp" />
+    <ClCompile Include="unsupported\doc\examples\BVH_Example.cpp" />
+    <ClCompile Include="unsupported\doc\examples\FFT.cpp" />
+    <ClCompile Include="unsupported\doc\examples\MatrixExponential.cpp" />
+    <ClCompile Include="unsupported\doc\examples\MatrixFunction.cpp" />
+    <ClCompile Include="unsupported\doc\examples\MatrixLogarithm.cpp" />
+    <ClCompile Include="unsupported\doc\examples\MatrixPower.cpp" />
+    <ClCompile Include="unsupported\doc\examples\MatrixPower_optimal.cpp" />
+    <ClCompile Include="unsupported\doc\examples\MatrixSine.cpp" />
+    <ClCompile Include="unsupported\doc\examples\MatrixSinh.cpp" />
+    <ClCompile Include="unsupported\doc\examples\MatrixSquareRoot.cpp" />
+    <ClCompile Include="unsupported\doc\examples\PolynomialSolver1.cpp" />
+    <ClCompile Include="unsupported\doc\examples\PolynomialUtils1.cpp" />
+    <ClCompile Include="unsupported\test\alignedvector3.cpp" />
+    <ClCompile Include="unsupported\test\autodiff.cpp" />
+    <ClCompile Include="unsupported\test\bdcsvd.cpp" />
+    <ClCompile Include="unsupported\test\BVH.cpp" />
+    <ClCompile Include="unsupported\test\dgmres.cpp" />
+    <ClCompile Include="unsupported\test\FFT.cpp" />
+    <ClCompile Include="unsupported\test\FFTW.cpp" />
+    <ClCompile Include="unsupported\test\forward_adolc.cpp" />
+    <ClCompile Include="unsupported\test\gmres.cpp" />
+    <ClCompile Include="unsupported\test\jacobisvd.cpp" />
+    <ClCompile Include="unsupported\test\kronecker_product.cpp" />
+    <ClCompile Include="unsupported\test\levenberg_marquardt.cpp" />
+    <ClCompile Include="unsupported\test\matrix_exponential.cpp" />
+    <ClCompile Include="unsupported\test\matrix_function.cpp" />
+    <ClCompile Include="unsupported\test\matrix_power.cpp" />
+    <ClCompile Include="unsupported\test\matrix_square_root.cpp" />
+    <ClCompile Include="unsupported\test\minres.cpp" />
+    <ClCompile Include="unsupported\test\mpreal_support.cpp" />
+    <ClCompile Include="unsupported\test\NonLinearOptimization.cpp" />
+    <ClCompile Include="unsupported\test\NumericalDiff.cpp" />
+    <ClCompile Include="unsupported\test\openglsupport.cpp" />
+    <ClCompile Include="unsupported\test\polynomialsolver.cpp" />
+    <ClCompile Include="unsupported\test\polynomialutils.cpp" />
+    <ClCompile Include="unsupported\test\sparse_extra.cpp" />
+    <ClCompile Include="unsupported\test\splines.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include=".hg_archival.txt" />
+    <Text Include="CMakeLists.txt" />
+    <Text Include="REFERENCE.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".hgeol" />
+    <None Include=".hgignore" />
+    <None Include=".hgtags" />
+    <None Include="COPYING.BSD" />
+    <None Include="COPYING.GPL" />
+    <None Include="COPYING.LGPL" />
+    <None Include="COPYING.MINPACK" />
+    <None Include="COPYING.MPL2" />
+    <None Include="COPYING.README" />
+    <None Include="CTestConfig.cmake" />
+    <None Include="CTestCustom.cmake.in" />
+    <None Include="eigen3.pc.in" />
+    <None Include="INSTALL" />
+    <None Include="signature_of_eigen3_matrix_library" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
