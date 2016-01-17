@@ -74,14 +74,12 @@ Eigen::Matrix<double, 3, 16> P3p::computePoses(Matrix3d featureVectors, Matrix3d
 
 	// Verification that world points are not colinear
 	//TODO: probably useless check!
-	/*
 	Vector3d temp1 = P2 - P1;
 	Vector3d temp2 = P3 - P1;
 	if ((temp1.cross(temp2)).norm() == 0) {
 		Eigen::Matrix<double, 3, 16> zero;
 		return zero;
 	}
-	*/
 
 	// Extraction of feature vectors
 	Vector3d f1 = featureVectors.col(0);

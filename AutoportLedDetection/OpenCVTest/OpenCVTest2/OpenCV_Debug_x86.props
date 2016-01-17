@@ -6,6 +6,7 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>C:\Users\alber\Documents\Visual Studio 2013\Projects\OpenCVTest\Eigen;$(OPENCV_DIRx86)\..\..\include</AdditionalIncludeDirectories>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(OPENCV_DIRx86)\lib</AdditionalLibraryDirectories>
