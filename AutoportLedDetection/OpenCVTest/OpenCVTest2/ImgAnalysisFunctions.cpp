@@ -675,16 +675,12 @@ vector<Point2f> pattern3(vector<Point2f> &keyPoints, Mat &image) {
 //@tolerance: tolerance in the alignement pixels
 vector<Point2f> patternMirko(vector<Point2f> &keyPoints, Mat &image, int tolerance) {
 	
-	//vector<Point2f> alignedPoints[4];
-	//set<Point2f, orderByX> alPoints[4];
 	int numOfPoints = keyPoints.size();
-	double angle = 0;	//angle of the line
-	double m;			//angolar coefficent of the line
 	int setNumber = 0;			//number of aligned sets found;
 
 	vector<Point2f> alignedPoints[4];	//TODO: use an array of vectors of POINTERS to Point2f
-
 	long alignedPointsHash[4];
+
 	//look for the 4 sets of 3 aligned points
 	for (int i = 0; i < numOfPoints; i++) {
 		Point2f *p1 = &keyPoints[i];
@@ -694,49 +690,36 @@ vector<Point2f> patternMirko(vector<Point2f> &keyPoints, Mat &image, int toleran
 			if (p1 != p2) {
 				//... compute the equation of the line laying on p1 and p2...
 				float dx = p1->x - p2->x;
-				float q;
-				float m;
-				if (dx != 0) {
-					m = (p1->y - p2->y) / dx;
-					q = p1->y - m*p1->x;
-				} 
-				else {
-					q = NAN;	//CHECK: probably a division by zero returns NAN anyway
-				}
+				float m = (p1->y - p2->y) / dx;
+				float q = p1->y - m*(p1->x);
+
 				//... and look for another point that satisfies the equation
 				for (int k = 0; k < numOfPoints; k++) {
 					Point2f *p3 = &keyPoints[k];
-					bool validSet = false;
-					if (p3 != p1 && p3 != p2) {
-						if (q != NAN) {
-							if (p3->y - m*(p3->x) < q + tolerance && p3->y - m*(p3->x) > q - tolerance) {
-								validSet = true;
+					if (p3 != p1 && p3 != p2) {		//TODO: manage strange cases like +INF, -INF, NAN
+						if (p3->y < m*(p3->x) + q + tolerance && p3->y > m*(p3->x) + q - tolerance) {
+							
+							line(image, *p1, *p2, Scalar(0, 0, 255));
+							imshow("Thresholded Image", image);
+							waitKey(1);
+							std::cout << "\nvalid set";
+
+							//check if the set {p1, p2, p3} has been already found
+							bool alreadyFound = false;
+							long hash = (long)p1 + (long)p2 + (long)p3;
+							for (int h = setNumber - 1; h >= 0; h--) {
+								if (hash == alignedPointsHash[h])
+									alreadyFound = true;
 							}
-						}
-						else if (p3->x - p1->x == 0) {
-							validSet = true;
-						}
-					}
-					if (validSet) {
-						line(image, *p1, *p2, Scalar(0, 0, 255));
-						imshow("Thresholded Image", image);
-						waitKey(1);
-						std::cout << "\nvalid set";
-						//check if the set {p1, p2, p3} has been already found
-						bool alreadyFound = false;
-						long hash = (long)p1 + (long)p2 + (long)p3;
-						for (int h = setNumber - 1; h >= 0; h--) {
-							if (hash == alignedPointsHash[h])
-								alreadyFound = true;
-						}
-						if (!alreadyFound) {
-							alignedPointsHash[setNumber] = hash;
-							alignedPoints[setNumber].push_back(*p1);
-							alignedPoints[setNumber].push_back(*p2);
-							alignedPoints[setNumber++].push_back(*p3);
-							std::cout << "\nAligned set " << setNumber - 1 << ": p1[" << p1->x << "," << p1->y << "]"
-															  <<  " p2[" << p2->x << "," << p2->y << "]"
-															  <<  " p3[" << p3->x << "," << p3->y << "]";
+							if (!alreadyFound) {
+								alignedPointsHash[setNumber] = hash;
+								alignedPoints[setNumber].push_back(*p1);
+								alignedPoints[setNumber].push_back(*p2);
+								alignedPoints[setNumber++].push_back(*p3);
+								std::cout << "\nAligned set " << setNumber - 1 << ": p1[" << p1->x << "," << p1->y << "]"
+									<< " p2[" << p2->x << "," << p2->y << "]"
+									<< " p3[" << p3->x << "," << p3->y << "]";
+							}
 						}
 					}
 				}

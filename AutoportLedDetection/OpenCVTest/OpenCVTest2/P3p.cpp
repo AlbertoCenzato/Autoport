@@ -49,8 +49,8 @@
 #include <stdio.h>
 #include <math.h>
 #include <complex>
-#include "../Eigen/Eigen/Dense"
-#include "../Eigen/Eigen/Geometry"
+#include <Eigen/Dense>
+#include <Eigen/Geometry>
 
 #include "Functions.h"
 #include "P3p.h"
