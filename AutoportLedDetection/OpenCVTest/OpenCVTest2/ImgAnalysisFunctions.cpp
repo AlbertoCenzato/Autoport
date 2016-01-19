@@ -697,7 +697,8 @@ vector<Point2f> patternMirko(vector<Point2f> &keyPoints, Mat &image, int toleran
 				for (int k = 0; k < numOfPoints; k++) {
 					Point2f *p3 = &keyPoints[k];
 					if (p3 != p1 && p3 != p2) {		//TODO: manage strange cases like +INF, -INF, NAN
-						if (p3->y < m*(p3->x) + q + tolerance && p3->y > m*(p3->x) + q - tolerance) {
+						float distance = abs(p3->y - (m*(p3->x) + q)) / sqrt(1 + pow(m, 2));
+						if (distance < tolerance) {
 							
 							line(image, *p1, *p2, Scalar(0, 0, 255));
 							imshow("Thresholded Image", image);

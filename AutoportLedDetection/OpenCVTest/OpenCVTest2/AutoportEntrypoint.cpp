@@ -13,7 +13,7 @@ void run() {
 	string path = "C:\\Users\\alber\\OneDrive\\Documenti\\Universita\\Progetto Autoport\\Sensori\\foto\\Primo laboratorio\\";
 	string imgName = path + "p7d500a30.bmp";
 	cv::Mat image;
-	vector<cv::Point2f> keyPoints = patternMirko(imgLedDetection(imgName,image),image, 10);
+	vector<cv::Point2f> keyPoints = patternMirko(imgLedDetection(imgName,image),image, 20);
 	Matrix<double, 3, 4> realPoints;
 	realPoints << -50, -50,  30, -30,  //1, 3, 7, 5
 				  -30,  20, -20, -10,
