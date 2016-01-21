@@ -25,12 +25,19 @@ struct orderByX : binary_function <Point2f, Point2f, bool> {
 };
 
 //---Function declaration---
-inline void tbColorCallback(int state, void* userdata);
-inline void tbBlobCallback(int state, void* userdata);
 inline float myDistance(cv::Point2f &, cv::Point2f &);
 inline void drawDetectedLed(Mat &, Point2f &, string &);
 
-//---Function definition---
+//---Function definitions---
+
+/// <summary>
+/// Processes the input image filtering out (black, #000000) all colors which are not in the inteval [min,max],
+/// the others are set to white (#FFFFFF)
+/// </summary>
+/// <param name="img">The Mat object containing the image to process</param>
+/// <param name="min">The lower bound specified in the HSV color space</param>
+/// <param name="max">The upper bound specified in the HSV color space</param>
+/// <returns>Black and white image as a Mat object</returns>
 Mat filterByColor(Mat img, Scalar min, Scalar max) {
 
 	//int64 start = getTickCount();
@@ -57,10 +64,17 @@ Mat filterByColor(Mat img, Scalar min, Scalar max) {
 	return imgThresholded;
 }
 
+/// <summary>
+/// Finds all color blobs that fit the specified paramethers
+/// </summary>
+/// <param name="image">Image to analyze</param>
+/// <param name="blobParam">Paramethers to fit</param>
+/// <returns>A vector of Point2f containing centroids cohordinates of detected blobs</returns>
 vector<Point2f> findBlobs(Mat image, SimpleBlobDetector::Params &blobParam) {
 	Ptr<SimpleBlobDetector> featureDetector = SimpleBlobDetector::create(blobParam);
 	vector<KeyPoint> keypoints;
-	featureDetector->detect(image, keypoints);
+
+	featureDetector->detect(image, keypoints);  //TODO: use a mask (see detect method description) to improve performances
 
 	// Draw detected blobs as red circles.
 	// DrawMatchesFlags::DRAW_RICH_KEYPOINTS flag ensures the size of the circle corresponds to the size of blob
@@ -774,21 +788,5 @@ void drawDetectedLed(Mat &image, Point2f &keyPoint, string &number) {
 	imshow("Thresholded Image", image);
 	waitKey(25);
 }
-
-
-//---Callback functions for sliders in GUI---
-
-inline void tbColorCallback(int state, void* userdata) {
-	int *ptr = (int*)userdata;
-	*ptr = state;
-	return;
-}
-
-inline void tbBlobCallback(int state, void* userdata) {
-	float *ptr = (float*)userdata;
-	*ptr = float(state) / 1000;
-	return;
-}
-
 
 
