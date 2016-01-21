@@ -575,14 +575,19 @@ vector<Point2f> pattern3(vector<Point2f> &keyPoints, Mat &image) {
 	return finalKeyPoints;
 }
 
-//Interesting algorithm, for the moment works only if all leds are detected 
-//TODO: use a quadtree data structure to drastically improve performances
-//@keyPoints: vector containig identified leds in the image
-//@image: Mat containing thresholded image with identified leds
-//@tolerance: tolerance in the alignement pixels
-vector<Point2f> patternMirko(vector<Point2f> &keyPoints, Mat &image, int tolerance) {
+/// <summary>
+/// Interesting algorithm, for the moment works only if all leds are detected 
+/// </summary>
+/// <param name="points">vector containig Point2f of the cohordinate of identified leds in the image</param>
+/// <param name="image">Mat containing thresholded image with identified leds</param>
+/// <param name="tolerance">tolerance in the alignement (in pixels)</param>
+/// <returns>vector of Point2f in pattern-aware order</returns>
+/// 
+/// TODO: use a quadtree data structure to drastically improve performances
+/// TODO: throw an exception if there are problems
+vector<Point2f> patternMirko(vector<Point2f> &points, Mat &image, int tolerance) {
 	
-	int numOfPoints = keyPoints.size();
+	int numOfPoints = points.size();
 	int setNumber = 0;			//number of aligned sets found;
 
 	vector<Point2f> alignedPoints[4];	//TODO: use an array of vectors of POINTERS to Point2f
@@ -590,10 +595,10 @@ vector<Point2f> patternMirko(vector<Point2f> &keyPoints, Mat &image, int toleran
 
 	//look for the 4 sets of 3 aligned points
 	for (int i = 0; i < numOfPoints; i++) {
-		Point2f *p1 = &keyPoints[i];
+		Point2f *p1 = &points[i];
 		//for each couple of points...
 		for (int j = 0; j < numOfPoints; j++) {
-			Point2f *p2 = &keyPoints[j];
+			Point2f *p2 = &points[j];
 			if (p1 != p2) {
 				//... compute the equation of the line laying on p1 and p2...
 				float dx = p1->x - p2->x;
@@ -602,7 +607,7 @@ vector<Point2f> patternMirko(vector<Point2f> &keyPoints, Mat &image, int toleran
 
 				//... and look for another point that satisfies the equation
 				for (int k = 0; k < numOfPoints; k++) {
-					Point2f *p3 = &keyPoints[k];
+					Point2f *p3 = &points[k];
 					if (p3 != p1 && p3 != p2) {		//TODO: manage strange cases like +INF, -INF, NAN
 						float distance = abs(p3->y - (m*(p3->x) + q)) / sqrt(1 + pow(m, 2));
 						if (distance < tolerance) {
@@ -637,7 +642,7 @@ vector<Point2f> patternMirko(vector<Point2f> &keyPoints, Mat &image, int toleran
 
 	//compute the mass center for every set
 	Point2f massCenter[4];
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < setNumber-1; i++) {
 		int x = 0, y = 0;
 		for each(Point2f p in alignedPoints[i]) {
 			x += p.x;
@@ -751,9 +756,10 @@ vector<Point2f> patternMirko(vector<Point2f> &keyPoints, Mat &image, int toleran
 		}
 	}
 
-	for each (Point2f p in alignedPoints[lines[2]]) {
-		if (&p != &ledPattern[0] && &p != &ledPattern[3]) {
-			ledPattern[6] = p;
+	for (int i = 0; i < 3; i++) {
+		Point2f *p = &alignedPoints[lines[2]][i];
+		if (p->x != ledPattern[0].x && p->y != ledPattern[0].y && p->x != ledPattern[3].x && p->y != ledPattern[3].y) {
+			ledPattern[6] = *p;
 			break;
 		}
 	}
