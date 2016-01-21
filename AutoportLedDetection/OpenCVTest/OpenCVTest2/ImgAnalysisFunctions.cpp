@@ -31,9 +31,50 @@ inline float myDistance(cv::Point2f &, cv::Point2f &);
 inline void drawDetectedLed(Mat &, Point2f &, string &);
 
 //---Function definition---
+Mat filterByColor(Mat img, Scalar min, Scalar max) {
+
+	//int64 start = getTickCount();
+
+	//Convert the captured frame from BGR to HSV
+	Mat imgHSV;
+	cvtColor(img, imgHSV, COLOR_BGR2HSV);
+
+//	std::cout << "\nTime elapsed in RGB->HSV convertion: " << (getTickCount() - start) / getTickFrequency() << "s    MA SIAMO SICURI CHE SIA IN SECONDI???";
+
+	//Threshold the image
+	Mat imgThresholded;
+	inRange(imgHSV, min, max, imgThresholded);
+	imgHSV.~Mat();
+
+	//morphological opening (remove small objects from the foreground)
+	erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+	dilate(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+
+	//morphological closing (fill small holes in the foreground)
+	dilate(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+	erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+
+	return imgThresholded;
+}
+
+vector<Point2f> findBlobs(Mat image, SimpleBlobDetector::Params &blobParam) {
+	Ptr<SimpleBlobDetector> featureDetector = SimpleBlobDetector::create(blobParam);
+	vector<KeyPoint> keypoints;
+	featureDetector->detect(image, keypoints);
+
+	// Draw detected blobs as red circles.
+	// DrawMatchesFlags::DRAW_RICH_KEYPOINTS flag ensures the size of the circle corresponds to the size of blob
+	drawKeypoints(image, keypoints, image, Scalar(0, 0, 255), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+	namedWindow("Thresholded Image", WINDOW_NORMAL);
+	imshow("Thresholded Image", image); //show the thresholded image
+
+	vector<Point2f> points;
+	KeyPoint::convert(keypoints, points);
+	return points;
+}
 
 //simple image analysis, with color filtering
-vector<Point2f> imgLedDetection(string &imgName,Mat &imgThresholded)
+vector<Point2f> imgLedDetection(Mat img, Mat imgThresholded)
 {
 	//---Color filtering----
 	int iLowH = 80;
@@ -47,25 +88,7 @@ vector<Point2f> imgLedDetection(string &imgName,Mat &imgThresholded)
 
 	int64 start = getTickCount();
 
-	Mat imgOriginal = imread(imgName, cv::ImreadModes::IMREAD_COLOR); // read a new frame from video
-
-	//Convert the captured frame from BGR to HSV
-	Mat imgHSV;
-	cvtColor(imgOriginal, imgHSV, COLOR_BGR2HSV); 
-
-	std::cout << "\nTime elapsed in RGB->HSV convertion: " << (getTickCount() - start)/getTickFrequency() << "s    MA SIAMO SICURI CHE SIA IN SECONDI???";
-
-	//Threshold the image
-	//Mat imgThresholded;
-	inRange(imgHSV, Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS, iHighV), imgThresholded); 
-
-	//morphological opening (remove small objects from the foreground)
-	erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
-	dilate(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
-
-	//morphological closing (fill small holes in the foreground)
-	dilate(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
-	erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+	imgThresholded = filterByColor(img, Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS, iHighV));
 
 	double totalTime = (((double)getTickCount()) - start)/getTickFrequency();
 
@@ -87,148 +110,18 @@ vector<Point2f> imgLedDetection(string &imgName,Mat &imgThresholded)
 	params.minCircularity = 0.5;
 	params.maxCircularity = 1;
 
-	Ptr<SimpleBlobDetector> featureDetector = SimpleBlobDetector::create(params);
-	vector<KeyPoint> keypoints;
-	featureDetector->detect(imgThresholded, keypoints);
-	// Draw detected blobs as red circles.
-	// DrawMatchesFlags::DRAW_RICH_KEYPOINTS flag ensures the size of the circle corresponds to the size of blob
-	drawKeypoints(imgThresholded, keypoints, imgThresholded, Scalar(0, 0, 255), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+	vector<Point2f> points = findBlobs(imgThresholded, params);
 
-	vector<Point2f> points;
-	for (uint i = 0; i < keypoints.size(); i++) {
-		Point2f pt = keypoints[i].pt;
-		points.push_back(pt);
-		std::cout << "\nPoint " << i+1 << ": x[" << pt.x << "] y[" << pt.y << "]";
+	for (int i = 0; i < points.size(); i++) {
+		std::cout << "\nPoint " << i + 1 << ": x[" << points[i].x << "] y[" << points[i].y << "]";
 	}
 
-	namedWindow("Thresholded Image", WINDOW_NORMAL);
 	namedWindow("Original", WINDOW_NORMAL);
-
-	imshow("Thresholded Image", imgThresholded); //show the thresholded image
-	imshow("Original", imgOriginal); //show the original image
+	imshow("Original", img); //show the original image
 
 	waitKey(25);
 
 	return points;
-}
-
-//image analysis on video, RETURNS ONLY THE KEYPOINTS DETECTED IN THE LAST FRAME (WELL...
-//IT SHOULD, BUT IT THROWS AN EXCEPTION REACHING THE EOF
-vector<KeyPoint> vidLedDetection(string &vidName)
-{
-	int iLowH = 0;
-	int iHighH = 180;
-	int iLowS = 0;
-	int iHighS = 25;
-	int iLowV = 225;
-	int iHighV = 255;
-
-	//settings trackbar color filtering
-	string settWinColor = "Color filtering settings";
-	namedWindow(settWinColor, WINDOW_NORMAL);
-
-	cv::TrackbarCallback onChange = tbColorCallback;
-
-	int trckbrLowH = createTrackbar("HueLow", settWinColor, &iLowH, 180, onChange, &iLowH);
-	int trckbrHighH = createTrackbar("HueHigh", settWinColor, &iHighH, 180, onChange, &iHighH);
-
-	int trckbrLowS = createTrackbar("SatLow", settWinColor, &iLowS, 255, onChange, &iLowS);
-	int trckbrHighS = createTrackbar("SatHigh", settWinColor, &iHighS, 255, onChange, &iHighS);
-
-	int trckbrLowV = createTrackbar("ValLow", settWinColor, &iLowV, 255, onChange, &iLowV);
-	int trckbrHighV = createTrackbar("ValHigh", settWinColor, &iHighV, 255, onChange, &iHighV);
-
-	//Mat imgOriginal = imread("image.jpg", cv::ImreadModes::IMREAD_COLOR); // read a new frame from video
-	VideoCapture videoCapture = VideoCapture(vidName);
-
-	if (!videoCapture.isOpened())
-		return vector<KeyPoint>();
-
-	Mat imgOriginal;
-	videoCapture.read(imgOriginal);
-	
-	// Set up the detector with default parameters.
-	SimpleBlobDetector::Params params;
-	params.filterByColor = true;
-	params.blobColor = 255;
-	params.filterByInertia = true;
-	int minIn = 500;	params.minInertiaRatio = float(minIn) / 1000;
-	int maxIn = 1000;	params.maxInertiaRatio = float(maxIn) / 1000;
-	params.filterByArea = true;
-	int minA = 0;		params.minArea = float(minA) / 1000;
-	int maxA = 100000;	params.maxArea = float(maxA) / 1000;
-	params.filterByConvexity = true;
-	int minCon = 500;	params.minConvexity = float(minCon) / 1000;
-	int maxCon = 1000;	params.maxConvexity = float(maxCon) / 1000;
-	params.filterByCircularity = true;
-	int minCir = 500;	params.minCircularity = float(minCir) / 1000;
-	int maxCir = 1000;	params.maxCircularity = float(maxCir) / 1000;
-
-	string settWinBlob = "Blob filtering settings";
-	namedWindow(settWinBlob, WINDOW_NORMAL);
-	onChange = tbBlobCallback;
-
-	int minIner = createTrackbar("Min Inertia", settWinBlob, &minIn, 1000, onChange, &params.minInertiaRatio);
-	int maxIner = createTrackbar("Max Inertia", settWinBlob, &maxIn, 1000, onChange, &params.maxInertiaRatio);
-
-	int minAr = createTrackbar("Min Area", settWinBlob, &minA, 100000,    onChange, &params.minArea);
-	int maxAr = createTrackbar("Max Area", settWinBlob, &maxA, 100000, onChange, &params.maxArea);
-
-	int minConv = createTrackbar("Min Convexity", settWinBlob, &minCon, 1000, onChange, &params.minConvexity);
-	int maxConv = createTrackbar("Max Convexity", settWinBlob, &maxCon, 1000, onChange, &params.maxConvexity);
-
-	int minCirc = createTrackbar("Min Circularity", settWinBlob, &minCir, 1000, onChange, &params.minCircularity);
-	int maxCirc = createTrackbar("Max Circularity", settWinBlob, &maxCir, 1000, onChange, &params.maxCircularity);
-	
-	namedWindow("Original", WINDOW_NORMAL);
-	namedWindow("Blob detection", WINDOW_NORMAL);
-
-	Mat im_with_keypoints;
-	Mat imgThresholded;
-	Mat imgHSV;
-
-	vector<KeyPoint> keypoints;
-	bool done = false;
-	while (!done) {
-
-		videoCapture.read(imgOriginal);
-			//break;
-		cvtColor(imgOriginal, imgHSV, COLOR_BGR2HSV); //Convert the captured frame from BGR to HSV
-
-		inRange(imgHSV, Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS, iHighV), imgThresholded); //Threshold the image
-		//printf("Min %d\nMax %d\n",min,max);
-
-		//morphological opening (remove small objects from the foreground)
-		erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
-		dilate(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
-
-		//morphological closing (fill small holes in the foreground)
-		dilate(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
-		erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
-
-		Ptr<SimpleBlobDetector> featureDetector = SimpleBlobDetector::create(params);
-		featureDetector->detect(imgThresholded, keypoints);
-		// Draw detected blobs as red circles.
-		// DrawMatchesFlags::DRAW_RICH_KEYPOINTS flag ensures the size of the circle corresponds to the size of blob
-		drawKeypoints(imgThresholded, keypoints, im_with_keypoints, Scalar(0, 0, 255), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
-
-		for (uint i = 0; i < keypoints.size(); i++) {
-			Point pt = keypoints[i].pt;
-			printf("Point %d - x:%d      y:%d\n", i, pt.x, pt.y);
-		}
-
-		// Show blobs
-		imshow("Blob detection", im_with_keypoints);
-
-		//namedWindow("Thresholded Image", WINDOW_NORMAL);
-		//imshow("Thresholded Image", imgThresholded); //show the thresholded image
-
-		imshow("Original", imgOriginal); //show the original image
-		waitKey(25);
-		//Sleep(100);
-		//videoCapture.set(CAP_PROP_FORMAT,)
-	}
-	return keypoints;
 }
 
 //led recognition algorithm
@@ -864,6 +757,7 @@ vector<Point2f> patternMirko(vector<Point2f> &keyPoints, Mat &image, int toleran
 		string s = convert.str();
 		drawDetectedLed(image, ledPattern[i], s);
 	}
+	waitKey(100000);
 
 	return ledPattern;
 }

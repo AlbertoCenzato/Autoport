@@ -1,19 +1,23 @@
 
 #include "stdafx.h"
 #include <iostream>
+#include <opencv2/highgui/highgui.hpp>
 #include "ImgAnalysisFunctions.h"
 #include "Functions.h"
 #include "Simulations.h"
 
 using namespace std;
+using namespace cv;
 
 //entrypoint function from the main (OpenCVtest2.cpp) 
 void run() {
 
 	string path = "C:\\Users\\alber\\OneDrive\\Documenti\\Universita\\Progetto Autoport\\Sensori\\foto\\Primo laboratorio\\";
-	string imgName = path + "p7d500a30.bmp";
-	cv::Mat image;
-	vector<cv::Point2f> keyPoints = patternMirko(imgLedDetection(imgName,image),image, 20);
+	string imgName = path + "p7d300a30.bmp";
+	Mat img = imread(imgName, ImreadModes::IMREAD_COLOR);
+	Mat imageThresholded;
+	vector<Point2f> ledPoints = imgLedDetection(img, imageThresholded);
+	vector<Point2f> keyPoints = patternMirko(ledPoints, imageThresholded, 20);
 	Matrix<double, 3, 4> realPoints;
 	realPoints << -50, -50,  30, -30,  //1, 3, 7, 5
 				  -30,  20, -20, -10,

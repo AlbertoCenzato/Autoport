@@ -8,8 +8,7 @@ extern inline void tbBlobCallback(int, void*);
 extern float myDistance(cv::Point2f &, cv::Point2f &);
 
 //---Functions---
-extern std::vector<cv::Point2f> imgLedDetection(std::string&,cv::Mat&);
-extern std::vector<cv::KeyPoint> vidLedDetection(std::string&);
+extern std::vector<cv::Point2f> imgLedDetection(cv::Mat,cv::Mat);
 
 extern std::vector<cv::Point2f> pattern1(std::vector<cv::Point2f>&, cv::Mat&);
 extern std::vector<cv::Point2f> pattern3(std::vector<cv::Point2f>&, cv::Mat&);
