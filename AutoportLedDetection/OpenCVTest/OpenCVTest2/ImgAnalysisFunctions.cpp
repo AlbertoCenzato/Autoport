@@ -38,7 +38,7 @@ inline void drawDetectedLed(Mat &, Point2f &, string &);
 /// <param name="min">The lower bound specified in the HSV color space</param>
 /// <param name="max">The upper bound specified in the HSV color space</param>
 /// <returns>Black and white image as a Mat object</returns>
-Mat filterByColor(Mat img, Scalar min, Scalar max) {
+Mat filterByColor(Mat &img, Scalar &min, Scalar &max) {
 
 	//int64 start = getTickCount();
 
@@ -70,7 +70,7 @@ Mat filterByColor(Mat img, Scalar min, Scalar max) {
 /// <param name="image">Image to analyze</param>
 /// <param name="blobParam">Paramethers to fit</param>
 /// <returns>A vector of Point2f containing centroids cohordinates of detected blobs</returns>
-vector<Point2f> findBlobs(Mat image, SimpleBlobDetector::Params &blobParam) {
+vector<Point2f> findBlobs(Mat &image, SimpleBlobDetector::Params &blobParam) {
 	Ptr<SimpleBlobDetector> featureDetector = SimpleBlobDetector::create(blobParam);
 	vector<KeyPoint> keypoints;
 
@@ -88,7 +88,7 @@ vector<Point2f> findBlobs(Mat image, SimpleBlobDetector::Params &blobParam) {
 }
 
 //simple image analysis, with color filtering
-vector<Point2f> imgLedDetection(Mat img, Mat imgThresholded)
+vector<Point2f> imgLedDetection(Mat &img, Mat &imgThresholded)
 {
 	//---Color filtering----
 	int iLowH = 80;
