@@ -808,8 +808,8 @@ vector<Point2f> patternMirko(vector<Point2f> &points, Mat &image, int tolerance)
 
 //---Private functions---
 
-float myDistance(Point2f &point1, Point2f &point2) {
-	return sqrt(pow(point1.x - point2.x, 2) + pow(point1.y - point2.y, 2));
+float myDistance(Point2f &p1, Point2f &p2) {
+	return sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2));
 }
 
 void drawDetectedLed(Mat &image, Point2f &keyPoint, string &number) {
