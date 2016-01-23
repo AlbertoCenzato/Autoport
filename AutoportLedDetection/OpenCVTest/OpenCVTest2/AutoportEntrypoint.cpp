@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include <iostream>
 #include <opencv2/highgui/highgui.hpp>
+#include <opencv2\imgproc\imgproc.hpp>
 #include "ImgAnalysisFunctions.h"
 #include "Functions.h"
 #include "Simulations.h"
@@ -16,7 +17,59 @@ void run() {
 	string imgName = path + "p7d500a30.bmp";
 	Mat img = imread(imgName, ImreadModes::IMREAD_COLOR);
 	Mat imageThresholded;
-	vector<Point2f> ledPoints = imgLedDetection(img, imageThresholded);
+
+	//---Color filtering----
+	int iLowH = 80;
+	int iHighH = 110;
+
+	int iLowS = 0;
+	int iHighS = 255;
+
+	int iLowV = 0;
+	int iHighV = 255;
+
+	//int64 start = getTickCount();
+
+	//Convert the captured frame from BGR to HSV
+	cvtColor(img, img, COLOR_BGR2HSV);
+
+	//color filtering
+	imageThresholded = filterByColor(img, Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS, iHighV));
+
+	//double totalTime = (((double)getTickCount()) - start) / getTickFrequency();
+
+	//---Blob detection---
+	SimpleBlobDetector::Params params;
+	params.filterByColor = true;
+	params.blobColor = 255;
+	params.filterByInertia = true;
+	params.minInertiaRatio = 0.5;
+	params.maxInertiaRatio = 1;
+	params.filterByArea = true;
+	params.minArea = 50;
+	params.maxArea = 700;
+	params.filterByConvexity = true;
+	params.minConvexity = 0.5;
+	params.maxConvexity = 1;
+	params.filterByCircularity = true;
+	params.minCircularity = 0.5;
+	params.maxCircularity = 1;
+
+	vector<Point2f> ledPoints = findBlobs(imageThresholded, params);
+
+	for (int i = 0; i < ledPoints.size(); i++) {
+		std::cout << "\nPoint " << i + 1 << ": x[" << ledPoints[i].x << "] y[" << ledPoints[i].y << "]";
+	}
+
+	namedWindow("Original", WINDOW_NORMAL);
+	imshow("Original", img); //show the original image
+
+	waitKey(25);
+
+	int maxH = 0, maxS = 0, maxV = 0, minH = 255, minS = 255, minV = 255;
+	for each(Point2f p in ledPoints) {
+		Vec3b color = img.at<Vec3b>(p);
+	}
 	vector<Point2f> keyPoints = patternMirko(ledPoints, imageThresholded, 10);
 	Matrix<double, 3, 4> realPoints;
 	realPoints << -50, -50,  30, -30,  //1, 3, 7, 5

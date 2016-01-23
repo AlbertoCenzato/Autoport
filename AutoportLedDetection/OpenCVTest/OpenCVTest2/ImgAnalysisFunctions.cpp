@@ -35,7 +35,7 @@ inline Point2f centroid(vector<Point2f> &);
 /// Processes the input image filtering out (black, #000000) all colors which are not in the inteval [min,max],
 /// the others are set to white (#FFFFFF)
 /// </summary>
-/// <param name="img">The Mat object containing the image to process</param>
+/// <param name="img">The Mat object (HSV color space) containing the image to process</param>
 /// <param name="min">The lower bound specified in the HSV color space</param>
 /// <param name="max">The upper bound specified in the HSV color space</param>
 /// <returns>Black and white image as a Mat object</returns>
@@ -43,16 +43,12 @@ Mat filterByColor(Mat &img, Scalar &min, Scalar &max) {
 
 	//int64 start = getTickCount();
 
-	//Convert the captured frame from BGR to HSV
-	Mat imgHSV;
-	cvtColor(img, imgHSV, COLOR_BGR2HSV);
-
+	
 //	std::cout << "\nTime elapsed in RGB->HSV convertion: " << (getTickCount() - start) / getTickFrequency() << "s    MA SIAMO SICURI CHE SIA IN SECONDI???";
 
 	//Threshold the image
 	Mat imgThresholded;
-	inRange(imgHSV, min, max, imgThresholded);
-	imgHSV.~Mat();
+	inRange(img, min, max, imgThresholded);
 
 	//morphological opening (remove small objects from the foreground)
 	erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
@@ -66,7 +62,8 @@ Mat filterByColor(Mat &img, Scalar &min, Scalar &max) {
 }
 
 /// <summary>
-/// Finds all color blobs that fit the specified paramethers
+/// Finds all color blobs that fit the specified paramethers and removes blobs which distance from the centroid
+/// of the blob set is grater than 2*meanDistance
 /// </summary>
 /// <param name="image">Image to analyze</param>
 /// <param name="blobParam">Paramethers to fit</param>
@@ -128,6 +125,10 @@ vector<Point2f> imgLedDetection(Mat &img, Mat &imgThresholded)
 	int iHighV = 255;
 
 	int64 start = getTickCount();
+
+	//Convert the captured frame from BGR to HSV
+	//Mat imgHSV;
+	cvtColor(img, img, COLOR_BGR2HSV);
 
 	imgThresholded = filterByColor(img, Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS, iHighV));
 
@@ -670,12 +671,7 @@ vector<Point2f> patternMirko(vector<Point2f> &points, Mat &image, int tolerance)
 	//compute the mass center for every set
 	Point2f massCenter[4];
 	for (int i = 0; i < setNumber-1; i++) {
-		int x = 0, y = 0;
-		for each(Point2f p in alignedPoints[i]) {
-			x += p.x;
-			y += p.y;
-		}
-		massCenter[i] = Point2f(x / 3, y / 3);
+		massCenter[i] = centroid(alignedPoints[i]);
 		std::cout << "\nMass center " << i << ": " << massCenter[i];
 	}
 
@@ -822,7 +818,7 @@ void drawDetectedLed(Mat &image, Point2f &keyPoint, string &number) {
 	waitKey(25);
 }
 
-inline Point2f centroid(vector<Point2f> &points) {
+Point2f centroid(vector<Point2f> &points) {
 	float x = 0;
 	float y = 0;
 	for each (Point2f p in points) {
