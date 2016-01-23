@@ -28,9 +28,9 @@ void run() {
 
 	Scalar low =  Scalar(iLowH, iLowS, iLowV);
 	Scalar high = Scalar(iHighH, iHighS, iHighV);
-	int tolerance = 10;
+	int tolerance = 20;
 
-	for (int i = 1000; i > 0; i = i - 100) {
+	for (int i = 600; i > 0; i = i - 100) {
 		
 		string imgName = path + "p7d" + to_string(i) + "a30.bmp";
 		Mat img = imread(imgName, ImreadModes::IMREAD_COLOR);
@@ -52,8 +52,8 @@ void run() {
 		params.minInertiaRatio = 0.3;
 		params.maxInertiaRatio = 1;
 		params.filterByArea = true;
-		params.minArea = 30;
-		params.maxArea = 60;
+		params.minArea = 50;
+		params.maxArea = 700;
 		params.filterByConvexity = true;
 		params.minConvexity = 0.5;
 		params.maxConvexity = 1;
