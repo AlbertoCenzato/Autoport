@@ -13,11 +13,11 @@ using namespace cv;
 void run() {
 
 	string path = "C:\\Users\\alber\\OneDrive\\Documenti\\Universita\\Progetto Autoport\\Sensori\\foto\\Primo laboratorio\\";
-	string imgName = path + "p7d300a30.bmp";
+	string imgName = path + "p7d500a30.bmp";
 	Mat img = imread(imgName, ImreadModes::IMREAD_COLOR);
 	Mat imageThresholded;
 	vector<Point2f> ledPoints = imgLedDetection(img, imageThresholded);
-	vector<Point2f> keyPoints = patternMirko(ledPoints, imageThresholded, 20);
+	vector<Point2f> keyPoints = patternMirko(ledPoints, imageThresholded, 10);
 	Matrix<double, 3, 4> realPoints;
 	realPoints << -50, -50,  30, -30,  //1, 3, 7, 5
 				  -30,  20, -20, -10,

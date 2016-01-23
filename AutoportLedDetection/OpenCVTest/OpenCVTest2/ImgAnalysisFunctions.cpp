@@ -27,6 +27,7 @@ struct orderByX : binary_function <Point2f, Point2f, bool> {
 //---Function declaration---
 inline float myDistance(cv::Point2f &, cv::Point2f &);
 inline void drawDetectedLed(Mat &, Point2f &, string &);
+inline Point2f centroid(vector<Point2f> &);
 
 //---Function definitions---
 
@@ -84,6 +85,32 @@ vector<Point2f> findBlobs(Mat &image, SimpleBlobDetector::Params &blobParam) {
 
 	vector<Point2f> points;
 	KeyPoint::convert(keypoints, points);
+	
+	// Removes points too far from the centroid of the detected points set
+	// computes the mean distance from the centroid
+	Point2f centr = centroid(points);
+	float meanDist = 0;
+	float distances[20];
+	for (int i = 0; i < points.size(); i++) {
+		float dist = myDistance(centr, points[i]);
+		meanDist += dist;
+		distances[i] = dist;
+	}
+	meanDist = meanDist / points.size();
+
+	// removes points
+	for (int i = 0; i < points.size(); i++) {
+		if (distances[i] > 2 * meanDist) {
+			points[i] = points[points.size() - 1];
+			points.erase(--points.end());
+		}
+	}
+
+	//draws detected points
+	for each (Point2f p in points) {
+		circle(image, p, 10, Scalar(0, 255, 0), 3);
+	}
+
 	return points;
 }
 
@@ -115,8 +142,8 @@ vector<Point2f> imgLedDetection(Mat &img, Mat &imgThresholded)
 	params.minInertiaRatio = 0.5;
 	params.maxInertiaRatio = 1;
 	params.filterByArea = true;
-	params.minArea = 100;
-	params.maxArea = 10000;
+	params.minArea = 50;
+	params.maxArea = 700;
 	params.filterByConvexity = true;
 	params.minConvexity = 0.5;
 	params.maxConvexity = 1;
@@ -795,4 +822,13 @@ void drawDetectedLed(Mat &image, Point2f &keyPoint, string &number) {
 	waitKey(25);
 }
 
+inline Point2f centroid(vector<Point2f> &points) {
+	float x = 0;
+	float y = 0;
+	for each (Point2f p in points) {
+		x += p.x;
+		y += p.y;
+	}
+	return Point2f(x / points.size(), y / points.size());
+}
 
