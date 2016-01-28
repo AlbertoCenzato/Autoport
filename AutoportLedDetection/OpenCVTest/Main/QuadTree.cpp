@@ -6,6 +6,7 @@
 //
 
 #include <iostream>
+#include "stdafx.h"
 #include "QuadTree.h"
 
 /// <summary>
