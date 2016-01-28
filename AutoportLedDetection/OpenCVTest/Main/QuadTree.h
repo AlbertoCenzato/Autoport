@@ -11,8 +11,8 @@
 class QuadTreeNodeData;
 class QuadTreeNode;
 
-typedef void(^QuadTreeNodeDataBlock)(QuadTreeNodeData data);
-typedef void(^QuadTreeNodeTraverseBlock)(QuadTreeNode *node);
+typedef void(*QuadTreeNodeDataBlock)(QuadTreeNodeData data);
+typedef void(*QuadTreeNodeTraverseBlock)(QuadTreeNode *node);
 
 /**
  * QuadTreeNodeData holds the latitude and longitude of the spatial node.
