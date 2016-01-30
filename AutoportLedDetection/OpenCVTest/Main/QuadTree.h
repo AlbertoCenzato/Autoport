@@ -11,7 +11,9 @@
 class QuadTreeNodeData;
 class QuadTreeNode;
 
+// Define a function pointer that takes as paramether a QuadTreeNodeData object and returns void
 typedef void(*QuadTreeNodeDataBlock)(QuadTreeNodeData data);
+// Define a function pointer that takes as paramether a QuadTreeNode object and returns void
 typedef void(*QuadTreeNodeTraverseBlock)(QuadTreeNode *node);
 
 /**

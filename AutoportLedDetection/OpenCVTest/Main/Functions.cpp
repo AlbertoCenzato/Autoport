@@ -6,6 +6,7 @@
 
 using namespace std;
 using namespace Eigen;
+using namespace cv;
 
 void printMatrix(MatrixXd, int, int);
 
@@ -352,26 +353,26 @@ void printMatrix(MatrixXd mtrx, int n, int m) {
 	printf("\n");
 }
 
-cv::Point2f multiply2f(Matrix2d &R, cv::Point2f &point) {
+Point2f multiply2f(Matrix2d &R, Point2f &point) {
 	cv::Point2f ret;
 	ret.x = R.row(0)[0] * point.x + R.row(0)[1] * point.y;
 	ret.y = R.row(1)[0] * point.x + R.row(1)[1] * point.y;
 	return ret;
 }
-cv::Point2d multiply2d(Matrix2d &R, cv::Point2d &point) {
+Point2d multiply2d(Matrix2d &R, Point2d &point) {
 	cv::Point2d ret;
 	ret.x = R.row(0)[0] * point.x + R.row(0)[1] * point.y;
 	ret.y = R.row(1)[0] * point.x + R.row(1)[1] * point.y;
 	return ret;
 }
-cv::Point3f multiply3f(Matrix3d &R, cv::Point3f &point) {
+Point3f multiply3f(Matrix3d &R, Point3f &point) {
 	cv::Point3f ret;
 	ret.x = R.row(0)[0] * point.x + R.row(0)[1] * point.y + R.row(0)[2] * point.z;
 	ret.y = R.row(1)[0] * point.x + R.row(1)[1] * point.y + R.row(1)[2] * point.z;
 	ret.z = R.row(2)[0] * point.x + R.row(2)[1] * point.y + R.row(2)[2] * point.z;
 	return ret;
 }
-cv::Point3d multiply3d(Matrix3d &R, cv::Point3d &point) {
+Point3d multiply3d(Matrix3d &R, Point3d &point) {
 	cv::Point3d ret;
 	ret.x = R.row(0)[0] * point.x + R.row(0)[1] * point.y + R.row(0)[2] * point.z;
 	ret.y = R.row(1)[0] * point.x + R.row(1)[1] * point.y + R.row(1)[2] * point.z;
@@ -379,19 +380,54 @@ cv::Point3d multiply3d(Matrix3d &R, cv::Point3d &point) {
 	return ret;
 }
 
-cv::Point2f normalize(cv::Point2f &p) {
+Point2f normalize(Point2f &p) {
 	double norm = sqrt(pow(p.x, 2) + pow(p.y, 2));
 	return cv::Point2f(p.x / norm, p.y / norm);
 }
-cv::Point2d normalize(cv::Point2d &p) {
+Point2d normalize(Point2d &p) {
 	double norm = sqrt(pow(p.x, 2) + pow(p.y, 2));
 	return cv::Point2d(p.x / norm, p.y / norm);
 }
-cv::Point3f normalize(cv::Point3f &p) {
+Point3f normalize(Point3f &p) {
 	double norm = sqrt(pow(p.x, 2) + pow(p.y, 2) + pow(p.z,2));
 	return cv::Point3f(p.x / norm, p.y / norm, p.z/norm);
 }
-cv::Point3d normalize(cv::Point3d &p) {
+Point3d normalize(Point3d &p) {
 	double norm = sqrt(pow(p.x, 2) + pow(p.y, 2) + pow(p.z, 2));
 	return cv::Point3d(p.x / norm, p.y / norm, p.z / norm);
+}
+
+/// <summary>
+/// Return the point with max x value in "vec" set
+/// vec must be nonempty
+/// </summary>
+/// <param name="vec"></param>
+/// <returns></returns>
+Point2f* findMaxXInVec(vector<Point2f> &vec) {
+	Point2f *max = &vec[0];
+	for (int i = 1; i < vec.size(); i++)
+		if (max->x < vec[i].x)
+			max = &vec[i];
+	return max;
+}
+Point2f* findMaxYInVec(vector<Point2f> &vec) {
+	Point2f *max = &vec[0];;
+	for (int i = 1; i < vec.size(); i++)
+		if (max->y < vec[i].y)
+			max = &vec[i];
+	return max;
+}
+Point2f* findMinXInVec(vector<Point2f> &vec) {
+	Point2f *min = &vec[0];;
+	for (int i = 1; i < vec.size(); i++)
+		if (min->x > vec[i].x)
+			min = &vec[i];
+	return min;
+}
+Point2f* findMinYInVec(vector<Point2f> &vec) {
+	Point2f *min = &vec[0];;
+	for (int i = 1; i < vec.size(); i++)
+		if (min->y > vec[i].y)
+			min = &vec[i];
+	return min;
 }

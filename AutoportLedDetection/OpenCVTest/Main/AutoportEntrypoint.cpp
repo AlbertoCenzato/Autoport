@@ -14,8 +14,7 @@ using namespace cv;
 void run() {
 
 	string path = "C:\\Users\\alber\\OneDrive\\Documenti\\Universita\\Progetto Autoport\\Sensori\\foto\\Primo laboratorio\\";
-	string imgName = path + "p7d500a30.bmp";
-
+	
 	//---Color filtering----
 	int iLowH = 80;
 	int iHighH = 110;
@@ -25,22 +24,38 @@ void run() {
 
 	int iLowV = 50;
 	int iHighV = 150;
+	
+	string imgName = path + "p7d600a30.bmp";
+	Mat img = imread(imgName, ImreadModes::IMREAD_COLOR);
 
 	Scalar low =  Scalar(iLowH, iLowS, iLowV);
 	Scalar high = Scalar(iHighH, iHighS, iHighV);
 	int tolerance = 20;
+	Rect regionOfInterest(0, 0, img.cols, img.rows);
 
-	for (int i = 600; i > 0; i = i - 100) {
+	for (int i = 500; i > 100; i=i-100) {
 		
-		string imgName = path + "p7d" + to_string(i) + "a30.bmp";
-		Mat img = imread(imgName, ImreadModes::IMREAD_COLOR);
+		// Crop the full image to that image contained by the rectangle myROI
+		// Note that this doesn't copy the data
+		img = img(regionOfInterest);
+		namedWindow("Original", WINDOW_NORMAL);
+		imshow("Original", img); //show the original image
+
+
+		//downsampling 
+		//pyrDown(img, img);
+		//pyrDown(img, img);
 		Mat imageThresholded;
 		
 		//Convert the captured frame from BGR to HSV
+		int64 start = getTickCount();
 		cvtColor(img, img, COLOR_BGR2HSV);
+		std::cout << "\nTime elapsed in RGB->HSV convertion: " << (getTickCount() - start) / getTickFrequency() << "s";
 
 		//color filtering
+		start = getTickCount();
 		imageThresholded = filterByColor(img, low, high);
+		std::cout << "\nTime elapsed in color filtering: " << (getTickCount() - start) / getTickFrequency() << "s";
 
 		//double totalTime = (((double)getTickCount()) - start) / getTickFrequency();
 
@@ -61,14 +76,13 @@ void run() {
 		params.minCircularity = 0.5;
 		params.maxCircularity = 1;
 
+		start = getTickCount();
 		vector<Point2f> ledPoints = findBlobs(imageThresholded, params);
+		std::cout << "\nTime elapsed in blob detection: " << (getTickCount() - start) / getTickFrequency() << "s";
 
 		for (int i = 0; i < ledPoints.size(); i++) {
 			std::cout << "\nPoint " << i + 1 << ": x[" << ledPoints[i].x << "] y[" << ledPoints[i].y << "]";
 		}
-
-		namedWindow("Original", WINDOW_NORMAL);
-		imshow("Original", img); //show the original image
 
 		waitKey(25);
 
@@ -85,7 +99,17 @@ void run() {
 		low  = Scalar(minH - tolerance, minS - tolerance, minV - tolerance);
 		high = Scalar(maxH + tolerance, maxS + tolerance, maxV + tolerance);
 
+		start = getTickCount();
 		vector<Point2f> keyPoints = patternMirko(ledPoints, imageThresholded, 10);
+		std::cout << "\nTime elapsed in pattern analysis: " << (getTickCount() - start) / getTickFrequency() << "s";
+
+		Point2f *maxX = findMaxXInVec(keyPoints);
+		Point2f *maxY = findMaxYInVec(keyPoints);
+		Point2f *minX = findMinXInVec(keyPoints);
+		Point2f *minY = findMinYInVec(keyPoints);
+
+		regionOfInterest = Rect(minX->x - 100, minY->y - 100, maxX->x - minX->x + 200, maxY->y - minY->y + 200);
+
 		Matrix<double, 3, 4> realPoints;
 		realPoints << -50, -50, 30, -30,  //1, 3, 7, 5
 			-30, 20, -20, -10,
@@ -108,6 +132,9 @@ void run() {
 		cameraSystemPoints << p1t, p2t, p3t, p4t;
 		Matrix<double, 3, 4> ret = p3p_solver(realPoints, cameraSystemPoints);
 		printMatrix(ret, 3, 4);
+
+		imgName = path + "p7d" + to_string(i) + "a30.bmp";
+		img = imread(imgName, ImreadModes::IMREAD_COLOR);
 
 	}
 	getchar();

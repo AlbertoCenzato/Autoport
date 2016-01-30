@@ -800,7 +800,7 @@ vector<Point2f> patternMirko(vector<Point2f> &points, Mat &image, int tolerance)
 		string s = convert.str();
 		drawDetectedLed(image, ledPattern[i], s);
 	}
-	waitKey(100000);
+	waitKey(1);
 
 	return ledPattern;
 }
