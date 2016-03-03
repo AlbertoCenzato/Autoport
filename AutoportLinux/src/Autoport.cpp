@@ -117,10 +117,10 @@ int main() {
 			vector<Point2f> keyPoints = ImgAnalysis::patternMirko(ledPoints, imageThresholded, 10);
 			std::cout << "\nTime elapsed in pattern analysis: " << (getTickCount() - start) / getTickFrequency() << "s";
 
-			Point2f *maxX = findMaxXInVec(keyPoints);
-			Point2f *maxY = findMaxYInVec(keyPoints);
-			Point2f *minX = findMinXInVec(keyPoints);
-			Point2f *minY = findMinYInVec(keyPoints);
+			Point2f *maxX = GenPurpFunc::findMaxXInVec(keyPoints);
+			Point2f *maxY = GenPurpFunc::findMaxYInVec(keyPoints);
+			Point2f *minX = GenPurpFunc::findMinXInVec(keyPoints);
+			Point2f *minY = GenPurpFunc::findMinYInVec(keyPoints);
 
 			regionOfInterest = Rect(minX->x - 100, minY->y - 100, maxX->x - minX->x + 200, maxY->y - minY->y + 200);
 
@@ -144,8 +144,8 @@ int main() {
 			p4t.normalize();
 			Matrix<double, 3, 4> cameraSystemPoints;
 			cameraSystemPoints << p1t, p2t, p3t, p4t;
-			Matrix<double, 3, 4> ret = p3p_solver(realPoints, cameraSystemPoints);
-			printMatrix(ret, 3, 4);
+			Matrix<double, 3, 4> ret = GenPurpFunc::p3p_solver(realPoints, cameraSystemPoints);
+			GenPurpFunc::printMatrix(ret, 3, 4);
 
 			imgName = path + "p7d" + to_string(i) + "a30.bmp";
 			img = imread(imgName, ImreadModes::IMREAD_COLOR);
