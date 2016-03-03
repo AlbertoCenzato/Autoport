@@ -11,8 +11,8 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include "ImgAnalysisFunctions.h"
 #include "Functions.h"
+#include "ImgAnalysis.h"
 #include "Simulations.h"
 
 using namespace std;
@@ -61,7 +61,7 @@ int main() {
 
 			//color filtering
 			start = getTickCount();
-			imageThresholded = filterByColor(img, low, high);
+			imageThresholded = ImgAnalysis::filterByColor(img, low, high);
 			std::cout << "\nTime elapsed in color filtering: " << (getTickCount() - start) / getTickFrequency() << "s";
 
 			//double totalTime = (((double)getTickCount()) - start) / getTickFrequency();
@@ -84,7 +84,7 @@ int main() {
 			params.maxCircularity = 1;
 
 			start = getTickCount();
-			vector<Point2f> ledPoints = findBlobs(imageThresholded, params);
+			vector<Point2f> ledPoints = ImgAnalysis::findBlobs(imageThresholded, params);
 			std::cout << "\nTime elapsed in blob detection: " << (getTickCount() - start) / getTickFrequency() << "s";
 			int ledPointsLength = ledPoints.size();
 			for (int i = 0; i < ledPointsLength; i++) {
@@ -114,7 +114,7 @@ int main() {
 			high = Scalar(maxH + tolerance, maxS + tolerance, maxV + tolerance);
 
 			start = getTickCount();
-			vector<Point2f> keyPoints = patternMirko(ledPoints, imageThresholded, 10);
+			vector<Point2f> keyPoints = ImgAnalysis::patternMirko(ledPoints, imageThresholded, 10);
 			std::cout << "\nTime elapsed in pattern analysis: " << (getTickCount() - start) / getTickFrequency() << "s";
 
 			Point2f *maxX = findMaxXInVec(keyPoints);
