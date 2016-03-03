@@ -1,3 +1,5 @@
+//Copyright (c) 2016 Alberto Cenzato. All rights reserved.
+
 #include <iostream>
 #include <set>
 #include <opencv2/highgui/highgui.hpp>

@@ -2,7 +2,7 @@
 // Name        : Autoport.cpp
 // Author      : Alberto Cenzato
 // Version     : 2.0
-// Copyright   : Your copyright notice
+// Copyright   : Copyright (c) 2016 Alberto Cenzato. All rights reserved.
 // Description : Image analysis software for Autoport project
 //============================================================================
 

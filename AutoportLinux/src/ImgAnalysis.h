@@ -1,4 +1,5 @@
-//#include <math.h>
+//Copyright (c) 2016 Alberto Cenzato. All rights reserved.
+
 #include <opencv2/features2d/features2d.hpp>
 
 namespace ImgAnalysis {

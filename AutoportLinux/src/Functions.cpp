@@ -1,3 +1,5 @@
+//Copyright (c) 2016 Alberto Cenzato. All rights reserved.
+
 #include <stdlib.h>
 #include <chrono>
 #include <Eigen/Dense>

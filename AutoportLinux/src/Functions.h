@@ -1,4 +1,5 @@
-//#pragma once
+//Copyright (c) 2016 Alberto Cenzato. All rights reserved.
+
 #include <opencv2/opencv.hpp>
 #include <Eigen/Dense>
 
