@@ -273,9 +273,9 @@ using namespace cv;
 			double Pz_6 = points[6].z;
 			double Pz_7 = points[7].z;
 
-			double vx = v[0];
-			double vy = v[1];
-			double vz = v[2];
+			//double vx = v[0];
+			//double vy = v[1];
+			//double vz = v[2];
 
 			//precomputation of frequently used expressions
 			double cosPcosY     = cosPitch*cosYaw;
@@ -333,7 +333,7 @@ using namespace cv;
 		dynVar(5) = variables(5);
 
 		//walking inside the world of black magic...
-		int ret = levMarq.minimize(dynVar);
+		levMarq.minimize(dynVar);
 		variables = dynVar;
 
 		auto end = chrono::high_resolution_clock::now();
@@ -406,28 +406,28 @@ using namespace cv;
 	/// <returns></returns>
 	Point2f* findMaxXInVec(vector<Point2f> &vec) {
 		Point2f *max = &vec[0];
-		for (int i = 1; i < vec.size(); i++)
+		for (uint i = 1; i < vec.size(); i++)
 			if (max->x < vec[i].x)
 				max = &vec[i];
 		return max;
 	}
 	Point2f* findMaxYInVec(vector<Point2f> &vec) {
 		Point2f *max = &vec[0];;
-		for (int i = 1; i < vec.size(); i++)
+		for (uint i = 1; i < vec.size(); i++)
 			if (max->y < vec[i].y)
 				max = &vec[i];
 		return max;
 	}
 	Point2f* findMinXInVec(vector<Point2f> &vec) {
 		Point2f *min = &vec[0];;
-		for (int i = 1; i < vec.size(); i++)
+		for (uint i = 1; i < vec.size(); i++)
 			if (min->x > vec[i].x)
 				min = &vec[i];
 		return min;
 	}
 	Point2f* findMinYInVec(vector<Point2f> &vec) {
 		Point2f *min = &vec[0];;
-		for (int i = 1; i < vec.size(); i++)
+		for (uint i = 1; i < vec.size(); i++)
 			if (min->y > vec[i].y)
 				min = &vec[i];
 		return min;
