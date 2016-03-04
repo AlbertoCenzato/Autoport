@@ -6,8 +6,9 @@
 #include <Eigen/Dense>
 #include <unsupported/Eigen/NonLinearOptimization>
 #include <unsupported/Eigen/NumericalDiff>
+
+#include "GenPurpFunc.h"
 #include "P3p.h"
-#include "Functions.h"
 
 using namespace Eigen;
 using namespace cv;

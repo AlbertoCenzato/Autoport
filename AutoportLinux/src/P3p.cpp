@@ -51,9 +51,9 @@
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 
-#include "Functions.h"
 #include "P3p.h"
 #include <chrono>
+#include "GenPurpFunc.h"
 
 
 using Eigen::Matrix3d;
