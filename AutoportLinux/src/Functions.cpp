@@ -12,23 +12,8 @@ using namespace std;
 using namespace Eigen;
 using namespace cv;
 
-	namespace GenPurpFunc {
-	void printMatrix(MatrixXd, int, int);
+namespace GenPurpFunc {
 
-	/* This function finds the angles (in RADIANS) of the yaw - pitch - roll sequence
-	R1(gamma)*R2(beta)*R3(alpha) from the direction cosine matrix
-	Q - direction cosine matrix
-	yaw - yaw angle(rad)
-	pitch - pitch angle(rad)
-	roll - roll angle(rad) */
-	void dcm_to_ypr(Matrix3d &R, double* ypr) {
-		ypr[0] = atan2((float)R(0, 1) , (float)R(0, 0));
-		ypr[1] = asin((float)-R(0, 2));
-		ypr[2] = atan2((float)R(1, 2) , (float)R(2, 2));
-		ypr[0] = 180 * ypr[0] / M_PI;
-		ypr[1] = 180 * ypr[1] / M_PI;
-		ypr[2] = 180 * ypr[2] / M_PI;
-	}
 
 
 	/* Function che risolve il p3p con il metodo di Laurent Kneip
@@ -344,92 +329,4 @@ using namespace cv;
 		return total;
 	}
 
-	void printMatrix(MatrixXd mtrx, int n, int m) {
-		for (int i = 0; i < n; i++) {
-			printf("\n");
-			for (int j = 0; j < m; j++) {
-				printf("%f ", mtrx(i, j));
-			}
-		}
-		printf("\n");
-	}
-
-	Point2f multiply2f(Matrix2d &R, Point2f &point) {
-		Point2f ret;
-		ret.x = R.row(0)[0] * point.x + R.row(0)[1] * point.y;
-		ret.y = R.row(1)[0] * point.x + R.row(1)[1] * point.y;
-		return ret;
-	}
-	Point2d multiply2d(Matrix2d &R, Point2d &point) {
-		Point2d ret;
-		ret.x = R.row(0)[0] * point.x + R.row(0)[1] * point.y;
-		ret.y = R.row(1)[0] * point.x + R.row(1)[1] * point.y;
-		return ret;
-	}
-	Point3f multiply3f(Matrix3d &R, Point3f &point) {
-		Point3f ret;
-		ret.x = R.row(0)[0] * point.x + R.row(0)[1] * point.y + R.row(0)[2] * point.z;
-		ret.y = R.row(1)[0] * point.x + R.row(1)[1] * point.y + R.row(1)[2] * point.z;
-		ret.z = R.row(2)[0] * point.x + R.row(2)[1] * point.y + R.row(2)[2] * point.z;
-		return ret;
-	}
-	Point3d multiply3d(Matrix3d &R, Point3d &point) {
-		Point3d ret;
-		ret.x = R.row(0)[0] * point.x + R.row(0)[1] * point.y + R.row(0)[2] * point.z;
-		ret.y = R.row(1)[0] * point.x + R.row(1)[1] * point.y + R.row(1)[2] * point.z;
-		ret.z = R.row(2)[0] * point.x + R.row(2)[1] * point.y + R.row(2)[2] * point.z;
-		return ret;
-	}
-	
-	Point2f normalize(Point2f &p) {
-		double norm = sqrt(pow(p.x, 2) + pow(p.y, 2));
-		return Point2f(p.x / norm, p.y / norm);
-	}
-	Point2d normalize(Point2d &p) {
-		double norm = sqrt(pow(p.x, 2) + pow(p.y, 2));
-		return Point2d(p.x / norm, p.y / norm);
-	}
-	Point3f normalize(Point3f &p) {
-		double norm = sqrt(pow(p.x, 2) + pow(p.y, 2) + pow(p.z,2));
-		return Point3f(p.x / norm, p.y / norm, p.z/norm);
-	}
-	Point3d normalize(Point3d &p) {
-		double norm = sqrt(pow(p.x, 2) + pow(p.y, 2) + pow(p.z, 2));
-		return Point3d(p.x / norm, p.y / norm, p.z / norm);
-	}
-	
-	/// <summary>
-	/// Return the point with max x value in "vec" set
-	/// vec must be nonempty
-	/// </summary>
-	/// <param name="vec"></param>
-	/// <returns></returns>
-	Point2f* findMaxXInVec(vector<Point2f> &vec) {
-		Point2f *max = &vec[0];
-		for (uint i = 1; i < vec.size(); i++)
-			if (max->x < vec[i].x)
-				max = &vec[i];
-		return max;
-	}
-	Point2f* findMaxYInVec(vector<Point2f> &vec) {
-		Point2f *max = &vec[0];;
-		for (uint i = 1; i < vec.size(); i++)
-			if (max->y < vec[i].y)
-				max = &vec[i];
-		return max;
-	}
-	Point2f* findMinXInVec(vector<Point2f> &vec) {
-		Point2f *min = &vec[0];;
-		for (uint i = 1; i < vec.size(); i++)
-			if (min->x > vec[i].x)
-				min = &vec[i];
-		return min;
-	}
-	Point2f* findMinYInVec(vector<Point2f> &vec) {
-		Point2f *min = &vec[0];;
-		for (uint i = 1; i < vec.size(); i++)
-			if (min->y > vec[i].y)
-				min = &vec[i];
-		return min;
-	}
 }
