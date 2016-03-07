@@ -24,20 +24,20 @@ int main() {
 	string path = "/home/alberto/Pictures/foto/primo_laboratorio/";
 
 	//---Color filtering----
-		int iLowH = 80;
-		int iHighH = 110;
+		int lowH = 80;
+		int highH = 110;
 
-		int iLowS = 100;
-		int iHighS = 200;
+		int lowS = 100;
+		int highS = 200;
 
-		int iLowV = 50;
-		int iHighV = 150;
+		int lowV = 50;
+		int highV = 150;
 
 		string imgName = path + "p7d600a30.bmp";
 		Mat img = imread(imgName, IMREAD_COLOR);
 
-		Scalar low =  Scalar(iLowH, iLowS, iLowV);
-		Scalar high = Scalar(iHighH, iHighS, iHighV);
+		Scalar low =  Scalar(lowH, lowS, lowV);
+		Scalar high = Scalar(highH, highS, highV);
 		int tolerance = 20;
 		Rect regionOfInterest(0, 0, img.cols, img.rows);
 
