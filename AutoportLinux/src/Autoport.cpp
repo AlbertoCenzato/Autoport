@@ -24,7 +24,7 @@ int main() {
 	string path = "/home/alberto/Pictures/foto/primo_laboratorio/";
 
 	//---Color filtering----
-		int iLowH = 80;
+		int32_t iLowH = 80;
 		int iHighH = 110;
 
 		int iLowS = 100;
