@@ -5,13 +5,14 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/features2d/features2d.hpp>
+#include "ImgAnalysis.h"
 
 using namespace cv;
 using namespace std;
 
 namespace ImgAnalysis {
 
-	//---Private structs---
+	//--- Structs ---
 	struct Distance {
 		float dist = 0;
 		Point2f *point1;
@@ -27,27 +28,15 @@ namespace ImgAnalysis {
 		bool operator() (const Point2f &p1, const Point2f &p2) const { return p1.x < p2.x; }
 	};
 
-	//---Function declaration---
-	inline float myDistance(cv::Point2f &, cv::Point2f &);
-	inline void drawDetectedLed(Mat &, Point2f &, string &);
-	inline Point2f centroid(vector<Point2f> &);
-
 	//---Function definitions---
 
-	/// <summary>
-	/// Processes the input image filtering out (black, #000000) all colors which are not in the inteval [min,max],
-	/// the others are set to white (#FFFFFF)
-	/// </summary>
-	/// <param name="img">The Mat object (HSV color space) containing the image to process</param>
-	/// <param name="min">The lower bound specified in the HSV color space</param>
-	/// <param name="max">The upper bound specified in the HSV color space</param>
-	/// <returns>Black and white image as a Mat object</returns>
+	// Processes the input image filtering out (black, #000000) all colors which are not in
+	// the inteval [min,max], the others are set to white (#FFFFFF).
+	// @img: the Mat object (HSV color space) containing the image to process.
+	// @min: the lower bound specified in the HSV color space.
+	// @max: the upper bound specified in the HSV color space.
+	// return: black and white image as a Mat object.
 	Mat filterByColor(Mat &img, Scalar &min, Scalar &max) {
-
-		//int64 start = getTickCount();
-
-
-	//	std::cout << "\nTime elapsed in RGB->HSV convertion: " << (getTickCount() - start) / getTickFrequency() << "s    MA SIAMO SICURI CHE SIA IN SECONDI???";
 
 		//Threshold the image
 		Mat imgThresholded;
@@ -64,24 +53,22 @@ namespace ImgAnalysis {
 		return imgThresholded;
 	}
 
-	/// <summary>
-	/// Finds all color blobs that fit the specified paramethers and removes blobs which distance from the centroid
-	/// of the blob set is grater than 2*meanDistance
-	/// </summary>
-	/// <param name="image">Image to analyze</param>
-	/// <param name="blobParam">Paramethers to fit</param>
-	/// <returns>A vector of Point2f containing centroids cohordinates of detected blobs</returns>
-	vector<Point2f> findBlobs(Mat &image, SimpleBlobDetector::Params &blobParam) {
+	// Finds all color blobs that fit the specified paramethers and removes blobs which
+	// distance from the centroid of the blob set is grater than 2*meanDistance.
+	// @img: image to analyze.
+	// <param name="blobParam">Paramethers to fit</param>
+	// <returns>A vector of Point2f containing centroids cohordinates of detected blobs</returns>
+	vector<Point2f> findBlobs(Mat &img, SimpleBlobDetector::Params &blobParam) {
 		Ptr<SimpleBlobDetector> featureDetector = SimpleBlobDetector::create(blobParam);
 		vector<KeyPoint> keypoints;
 
-		featureDetector->detect(image, keypoints);  //TODO: use a mask (see detect method description) to improve performances
+		featureDetector->detect(img, keypoints);  //TODO: use a mask (see detect method description) to improve performances
 
 		// Draw detected blobs as red circles.
 		// DrawMatchesFlags::DRAW_RICH_KEYPOINTS flag ensures the size of the circle corresponds to the size of blob
-		drawKeypoints(image, keypoints, image, Scalar(0, 0, 255), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+		drawKeypoints(img, keypoints, img, Scalar(0, 0, 255), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 		namedWindow("Thresholded Image", WINDOW_NORMAL);
-		imshow("Thresholded Image", image); //show the thresholded image
+		imshow("Thresholded Image", img); //show the thresholded img
 
 		vector<Point2f> points;
 		KeyPoint::convert(keypoints, points);
@@ -92,7 +79,7 @@ namespace ImgAnalysis {
 		float meanDist = 0;
 		float distances[20];
 		for (int i = 0; i < points.size(); i++) {
-			float dist = myDistance(centr, points[i]);
+			float dist = distancePointToPoint(centr, points[i]);
 			meanDist += dist;
 			distances[i] = dist;
 		}
@@ -109,7 +96,7 @@ namespace ImgAnalysis {
 		//draws detected points
 		for (int i = 0; i < points.size(); i++) {
 			Point2f p = points[i];
-			circle(image, p, 10, Scalar(0, 255, 0), 3);
+			circle(img, p, 10, Scalar(0, 255, 0), 3);
 		}
 
 		return points;
@@ -183,7 +170,7 @@ namespace ImgAnalysis {
 				if (i != j) {
 					d.point1 = &keyPoints[i];
 					d.point2 = j;
-					d.dist = myDistance(*d.point1, keyPoints[j]);
+					d.dist = distancePointToPoint(*d.point1, keyPoints[j]);
 					distances[i].insert(d);
 				}
 			}
@@ -410,7 +397,7 @@ namespace ImgAnalysis {
 				if (j != i) {
 					d.point1 = &keyPoints[i];
 					d.point2 = j;
-					d.dist = myDistance(*d.point1, keyPoints[j]);
+					d.dist = distancePointToPoint(*d.point1, keyPoints[j]);
 					distances[i].insert(d);
 				}
 			}
@@ -689,7 +676,7 @@ namespace ImgAnalysis {
 		for (int j = 0; j < 4; j++)
 			for (int k = 0; k < 4; k++)
 				if (k != j) {
-					float dist = myDistance(massCenter[j], massCenter[k]);
+					float dist = distancePointToPoint(massCenter[j], massCenter[k]);
 					if ( dist < minDist) {
 						secondMinDist[0] = maxMinCouples[0][0];
 						secondMinDist[1] = maxMinCouples[0][1];
@@ -749,7 +736,7 @@ namespace ImgAnalysis {
 			for (int i = 0; i < 3; i++) {
 				for (int j = 0; j < 3; j++) {
 					if (i != j) {
-						double dist = myDistance(alignedSet[i], alignedSet[j]);
+						double dist = distancePointToPoint(alignedSet[i], alignedSet[j]);
 						if (dist < minDist) {
 							minDist = dist;
 							minIndx[0] = i;
@@ -810,9 +797,4 @@ namespace ImgAnalysis {
 
 		return ledPattern;
 	}
-
-
-	//---Private functions---
-
-
 }

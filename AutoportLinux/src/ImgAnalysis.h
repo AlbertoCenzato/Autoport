@@ -2,22 +2,24 @@
 
 #include <opencv2/features2d/features2d.hpp>
 
+using namespace std;
+using namespace cv;
+
 namespace ImgAnalysis {
-	//---Callback functions for sliders in GUI---
-	extern inline void tbColorCallback(int, void*);
-	extern inline void tbBlobCallback(int, void*);
 
-	//---Functions---
-	cv::Mat filterByColor(cv::Mat &, cv::Scalar &, cv::Scalar &);
-	std::vector<cv::Point2f> findBlobs(cv::Mat &, cv::SimpleBlobDetector::Params &);
-	extern std::vector<cv::Point2f> imgLedDetection(cv::Mat &,cv::Mat &);
+	//--- Functions ---
 
-	extern std::vector<cv::Point2f> pattern1(std::vector<cv::Point2f>&, cv::Mat&);
-	extern std::vector<cv::Point2f> pattern3(std::vector<cv::Point2f>&, cv::Mat&);
-	extern std::vector<cv::Point2f> patternMirko(std::vector<cv::Point2f>&, cv::Mat&, int tolerance);
+	Mat filterByColor(Mat &, Scalar &, Scalar &);
+	vector<Point2f> findBlobs(Mat &, SimpleBlobDetector::Params &);
+	vector<Point2f> imgLedDetection(Mat &,Mat &);
 
-	//---Inline functions---
-	inline float myDistance(Point2f &p1, Point2f &p2) {
+	vector<Point2f> pattern1(vector<Point2f>&, Mat&);
+	vector<Point2f> pattern3(vector<Point2f>&, Mat&);
+	vector<Point2f> patternMirko(vector<Point2f>&, Mat&, int tolerance);
+
+	//--- Inline functions ---
+
+	inline float distancePointToPoint(Point2f &p1, Point2f &p2) {
 		return sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2));
 	}
 
@@ -30,7 +32,7 @@ namespace ImgAnalysis {
 	inline Point2f centroid(vector<Point2f> &points) {
 		float x = 0;
 		float y = 0;
-		for (int i = 0; i < points.size(); i++) {
+		for (uint i = 0; i < points.size(); i++) {
 			Point2f p = points[i];
 			x += p.x;
 			y += p.y;

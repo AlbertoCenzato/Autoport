@@ -49,7 +49,6 @@ int main() {
 			namedWindow("Original", WINDOW_NORMAL);
 			imshow("Original", img); //show the original image
 
-
 			//downsampling
 			//pyrDown(img, img);
 			//pyrDown(img, img);
