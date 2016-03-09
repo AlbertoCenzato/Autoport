@@ -12,6 +12,22 @@ using namespace std;
 
 namespace ImgAnalysis {
 
+	//--- Structs ---
+
+	struct Distance {
+		float dist = 0;
+		Point2f *point1;
+		//KeyPoint *keyPoint2;
+		int point2;
+	};
+
+	struct lessDist : binary_function <Distance, Distance, bool> {
+		bool operator() (const Distance &d1, const Distance &d2) const { return d1.dist < d2.dist; }
+	};
+
+	struct orderByX : binary_function <Point2f, Point2f, bool> {
+		bool operator() (const Point2f &p1, const Point2f &p2) const { return p1.x < p2.x; }
+	};
 
 	//---Function definitions---
 
@@ -23,7 +39,7 @@ namespace ImgAnalysis {
 	// returns: black and white image as a Mat object.
 	Mat filterByColor(Mat &img, Scalar &min, Scalar &max) {
 
-		//Threshold the image
+		// Sets to white all colors in the threshold inteval [min,max] and to black the others
 		Mat imgThresholded;
 		inRange(img, min, max, imgThresholded);
 
@@ -44,6 +60,7 @@ namespace ImgAnalysis {
 	// @blobParam: paramethers to fit.
 	// returns: a vector of Point2f containing centroids cohordinates of detected blobs.
 	vector<Point2f> findBlobs(Mat &img, SimpleBlobDetector::Params &blobParam) {
+
 		Ptr<SimpleBlobDetector> featureDetector = SimpleBlobDetector::create(blobParam);
 		vector<KeyPoint> keypoints;
 
@@ -63,7 +80,7 @@ namespace ImgAnalysis {
 		Point2f centr = centroid(points);
 		float meanDist = 0;
 		float distances[20];
-		for (int i = 0; i < points.size(); i++) {
+		for (uint i = 0; i < points.size(); i++) {
 			float dist = distancePointToPoint(centr, points[i]);
 			meanDist += dist;
 			distances[i] = dist;
@@ -71,7 +88,7 @@ namespace ImgAnalysis {
 		meanDist = meanDist / points.size();
 
 		// removes points
-		for (int i = 0; i < points.size(); i++) {
+		for (uint i = 0; i < points.size(); i++) {
 			if (distances[i] > 2 * meanDist) {
 				points[i] = points[points.size() - 1];
 				points.erase(--points.end());
@@ -79,7 +96,7 @@ namespace ImgAnalysis {
 		}
 
 		//draws detected points
-		for (int i = 0; i < points.size(); i++) {
+		for (uint i = 0; i < points.size(); i++) {
 			Point2f p = points[i];
 			circle(img, p, 10, Scalar(0, 255, 0), 3);
 		}
@@ -87,18 +104,22 @@ namespace ImgAnalysis {
 		return points;
 	}
 
-	//led recognition algorithm
-	vector<Point2f> pattern1(vector<Point2f> &keyPoints, Mat &image) {
+	// Led recognition algorithm. Gives a number to every led using the numbering convention
+	// in patterns' file (see "Sensori" folder in dropbox).
+	// @points: vector of Point2f of the leds' blob centroid.
+	// @img: image used to visualize identified leds' position and number
+	//returns: vector of Point2f ordered with the numbering convention
+	vector<Point2f> pattern1(vector<Point2f> &points, Mat &img) {
 
 		//compute the distances between points
-		set<Distance, lessDist> distances[12];
+		set<Distance, lessDist> distances[12];	//TODO: dynamic allocation using the free store
 		Distance d;
-		for (uint i = 0; i < 12; i++)	{
+		for (int i = 0; i < 12; i++)	{
 			for (int j = 0; j < 12; j++) {
 				if (i != j) {
-					d.point1 = &keyPoints[i];
+					d.point1 = &points[i];
 					d.point2 = j;
-					d.dist = distancePointToPoint(*d.point1, keyPoints[j]);
+					d.dist = distancePointToPoint(*d.point1, points[j]);
 					distances[i].insert(d);
 				}
 			}
@@ -130,12 +151,6 @@ namespace ImgAnalysis {
 
 		set<Distance, lessDist> patternPoints[12];
 
-		/*
-		KeyPoint *minKP1 = (*(distances[minIndx].begin())).keyPoint1;
-		KeyPoint *minKP2 = (*(distances[minIndx].begin())).keyPoint2;
-		KeyPoint *maxKP1 = (*(++(distances[maxIndx].rend()))).keyPoint1;
-		KeyPoint *maxKP2 = (*(++(distances[maxIndx].rend()))).keyPoint2;
-		*/
 		int minKP1 = minIndx;
 		int minKP2 = (*(distances[minIndx].begin())).point2;
 		int maxKP1 = maxIndx;
@@ -190,11 +205,11 @@ namespace ImgAnalysis {
 		}
 	
 		string s = "9";
-		drawDetectedLed(image, *(*patternPoints[8].begin()).point1, s);
+		drawDetectedLed(img, *(*patternPoints[8].begin()).point1, s);
 		s = "11";
-		drawDetectedLed(image, *(*patternPoints[10].begin()).point1, s);
+		drawDetectedLed(img, *(*patternPoints[10].begin()).point1, s);
 		s = "12";
-		drawDetectedLed(image, *(*patternPoints[11].begin()).point1, s);
+		drawDetectedLed(img, *(*patternPoints[11].begin()).point1, s);
 	
 		//LED 10, 6
 		set<Distance,lessDist>::reverse_iterator riter = patternPoints[10].rbegin();
@@ -204,14 +219,14 @@ namespace ImgAnalysis {
 		patternPoints[9] = distances[kp1];
 		distances[kp1] = set<Distance, lessDist>();
 		s = "10";
-		drawDetectedLed(image, *(*patternPoints[9].begin()).point1, s);
+		drawDetectedLed(img, *(*patternPoints[9].begin()).point1, s);
 		kp1 = (*++riter).point2;
 		if (kp1 == prevPos[8] || kp1 == prevPos[9])
 			kp1 = (*++riter).point2;
 		patternPoints[5] = distances[kp1];
 		distances[kp1] = set<Distance, lessDist>();
 		s = "6";
-		drawDetectedLed(image, *(*patternPoints[5].begin()).point1, s);
+		drawDetectedLed(img, *(*patternPoints[5].begin()).point1, s);
 
 		//LED 1 e 2
 		set<Distance, lessDist>::iterator iter1 = patternPoints[5].begin();
@@ -240,9 +255,9 @@ namespace ImgAnalysis {
 			}
 		}
 		s = "1";
-		drawDetectedLed(image, *(*patternPoints[0].begin()).point1, s);
+		drawDetectedLed(img, *(*patternPoints[0].begin()).point1, s);
 		s = "2";
-		drawDetectedLed(image, *(*patternPoints[1].begin()).point1, s);
+		drawDetectedLed(img, *(*patternPoints[1].begin()).point1, s);
 
 		//led 3
 		set<Distance, lessDist>::iterator iter = patternPoints[1].begin();
@@ -253,7 +268,7 @@ namespace ImgAnalysis {
 		prevPos[2] = kp1;
 		distances[kp1] = set<Distance, lessDist>();
 		s = "3";
-		drawDetectedLed(image, *(*patternPoints[2].begin()).point1, s);
+		drawDetectedLed(img, *(*patternPoints[2].begin()).point1, s);
 
 		//led 7
 		iter = patternPoints[9].begin();
@@ -264,7 +279,7 @@ namespace ImgAnalysis {
 		prevPos[6] = kp1;
 		distances[kp1] = set<Distance, lessDist>();
 		s = "7";
-		drawDetectedLed(image, *(*patternPoints[6].begin()).point1, s);
+		drawDetectedLed(img, *(*patternPoints[6].begin()).point1, s);
 
 		//led 4
 		iter = patternPoints[6].begin();
@@ -275,7 +290,7 @@ namespace ImgAnalysis {
 		prevPos[3] = kp1;
 		distances[kp1] = set<Distance, lessDist>();
 		s = "4";
-		drawDetectedLed(image, *(*patternPoints[3].begin()).point1, s);
+		drawDetectedLed(img, *(*patternPoints[3].begin()).point1, s);
 
 		//led 5 e 8
 		int fiveAndEight[2];
@@ -306,26 +321,31 @@ namespace ImgAnalysis {
 			}
 		}
 		s = "5";
-		drawDetectedLed(image, finalKeyPoints[4], s);
+		drawDetectedLed(img, finalKeyPoints[4], s);
 		s = "8";
-		drawDetectedLed(image, finalKeyPoints[7], s);
+		drawDetectedLed(img, finalKeyPoints[7], s);
 
 		return finalKeyPoints;
 	}
 	
-	//led recognition algorithm
+	// Led recognition algorithm. Gives a number to every led using the numbering convention
+	// in patterns' file (see "Sensori" folder in dropbox).
+	// @points: vector of Point2f of the leds' blob centroid.
+	// @img: image used to visualize identified leds' position and number
+	//returns: vector of Point2f ordered with the numbering convention
+
 	//THE LED PATTERN HAS AN ERROR!
-	vector<Point2f> pattern3(vector<Point2f> &keyPoints, Mat &image) {
+	vector<Point2f> pattern3(vector<Point2f> &points, Mat &image) {
 
 		//compute the distances between points
 		set<Distance, lessDist> distances[12];
 		Distance d;
-		for (uint i = 0; i < 12; i++)	{
+		for (int i = 0; i < 12; i++)	{
 			for (int j = 0; j < 12; j++) {
 				if (j != i) {
-					d.point1 = &keyPoints[i];
+					d.point1 = &points[i];
 					d.point2 = j;
-					d.dist = distancePointToPoint(*d.point1, keyPoints[j]);
+					d.dist = distancePointToPoint(*d.point1, points[j]);
 					distances[i].insert(d);
 				}
 			}
@@ -524,17 +544,16 @@ namespace ImgAnalysis {
 		return finalKeyPoints;
 	}
 	
-	/// <summary>
-	/// Interesting algorithm, for the moment works only if all leds are detected
-	/// </summary>
-	/// <param name="points">vector containig Point2f of the cohordinate of identified leds in the image</param>
-	/// <param name="image">Mat containing thresholded image with identified leds</param>
-	/// <param name="tolerance">tolerance in the alignement (in pixels)</param>
-	/// <returns>vector of Point2f in pattern-aware order</returns>
-	///
+	// Led recognition algorithm. Gives a number to every led using the numbering convention
+	// in patterns' file (see "Sensori" folder in dropbox).
+	// @points: vector of Point2f of the leds' blob centroid.
+	// @img: image used to visualize identified leds' position and number.
+	// @tolerance: tolerance in the alignement (in pixels).
+	//returns: vector of Point2f ordered with the numbering convention
+
 	/// TODO: use a quadtree data structure to drastically improve performances
 	/// TODO: throw an exception if there are problems
-	vector<Point2f> patternMirko(vector<Point2f> &points, Mat &image, int tolerance) {
+	vector<Point2f> patternMirko(vector<Point2f> &points, Mat &img, int tolerance) {
 
 		int numOfPoints = points.size();
 		int setNumber = 0;			//number of aligned sets found;
@@ -561,8 +580,8 @@ namespace ImgAnalysis {
 							float distance = abs(p3->y - (m*(p3->x) + q)) / sqrt(1 + pow(m, 2));
 							if (distance < tolerance) {
 
-								line(image, *p1, *p2, Scalar(0, 0, 255));
-								imshow("Thresholded Image", image);
+								line(img, *p1, *p2, Scalar(0, 0, 255));
+								imshow("Thresholded Image", img);
 								waitKey(1);
 								std::cout << "\nvalid set";
 
@@ -719,28 +738,11 @@ namespace ImgAnalysis {
 			ostringstream convert;
 			convert << i;
 			string s = convert.str();
-			drawDetectedLed(image, ledPattern[i], s);
+			drawDetectedLed(img, ledPattern[i], s);
 		}
 		waitKey(1);
 
 		return ledPattern;
 	}
-
-	//--- Structs ---
-
-	struct Distance {
-		float dist = 0;
-		Point2f *point1;
-		//KeyPoint *keyPoint2;
-		int point2;
-	};
-
-	struct lessDist : binary_function <Distance, Distance, bool> {
-		bool operator() (const Distance &d1, const Distance &d2) const { return d1.dist < d2.dist; }
-	};
-
-	struct orderByX : binary_function <Point2f, Point2f, bool> {
-		bool operator() (const Point2f &p1, const Point2f &p2) const { return p1.x < p2.x; }
-	};
 
 }
