@@ -12,21 +12,6 @@ using namespace std;
 
 namespace ImgAnalysis {
 
-	//--- Structs ---
-	struct Distance {
-		float dist = 0;
-		Point2f *point1;
-		//KeyPoint *keyPoint2;
-		int point2;
-	};
-
-	struct lessDist : binary_function <Distance, Distance, bool> {
-		bool operator() (const Distance &d1, const Distance &d2) const { return d1.dist < d2.dist; }
-	};
-
-	struct orderByX : binary_function <Point2f, Point2f, bool> {
-		bool operator() (const Point2f &p1, const Point2f &p2) const { return p1.x < p2.x; }
-	};
 
 	//---Function definitions---
 
@@ -35,7 +20,7 @@ namespace ImgAnalysis {
 	// @img: the Mat object (HSV color space) containing the image to process.
 	// @min: the lower bound specified in the HSV color space.
 	// @max: the upper bound specified in the HSV color space.
-	// return: black and white image as a Mat object.
+	// returns: black and white image as a Mat object.
 	Mat filterByColor(Mat &img, Scalar &min, Scalar &max) {
 
 		//Threshold the image
@@ -53,11 +38,11 @@ namespace ImgAnalysis {
 		return imgThresholded;
 	}
 
-	// Finds all color blobs that fit the specified paramethers and removes blobs which
-	// distance from the centroid of the blob set is grater than 2*meanDistance.
+	// Finds all color blobs that fit the specified paramethers. Blobs which distance
+	// from the centroid of the blob set is grater than 2*meanDistance are ignored.
 	// @img: image to analyze.
-	// <param name="blobParam">Paramethers to fit</param>
-	// <returns>A vector of Point2f containing centroids cohordinates of detected blobs</returns>
+	// @blobParam: paramethers to fit.
+	// returns: a vector of Point2f containing centroids cohordinates of detected blobs.
 	vector<Point2f> findBlobs(Mat &img, SimpleBlobDetector::Params &blobParam) {
 		Ptr<SimpleBlobDetector> featureDetector = SimpleBlobDetector::create(blobParam);
 		vector<KeyPoint> keypoints;
@@ -102,63 +87,6 @@ namespace ImgAnalysis {
 		return points;
 	}
 
-	//simple image analysis, with color filtering
-	vector<Point2f> imgLedDetection(Mat &img, Mat &imgThresholded)
-	{
-		//---Color filtering----
-		int iLowH = 80;
-		int iHighH = 110;
-
-		int iLowS = 0;
-		int iHighS = 255;
-
-		int iLowV = 0;
-		int iHighV = 255;
-
-		int64 start = getTickCount();
-
-		//Convert the captured frame from BGR to HSV
-		//Mat imgHSV;
-		cvtColor(img, img, COLOR_BGR2HSV);
-
-		Scalar min = Scalar(iLowH, iLowS, iLowV);
-		Scalar max = Scalar(iHighH, iHighS, iHighV);
-		imgThresholded = filterByColor(img, min, max);
-
-		double totalTime = (((double)getTickCount()) - start)/getTickFrequency();
-
-		//---Blob detection---
-
-		SimpleBlobDetector::Params params;
-		params.filterByColor = true;
-		params.blobColor = 255;
-		params.filterByInertia = true;
-		params.minInertiaRatio = 0.5;
-		params.maxInertiaRatio = 1;
-		params.filterByArea = true;
-		params.minArea = 50;
-		params.maxArea = 700;
-		params.filterByConvexity = true;
-		params.minConvexity = 0.5;
-		params.maxConvexity = 1;
-		params.filterByCircularity = true;
-		params.minCircularity = 0.5;
-		params.maxCircularity = 1;
-
-		vector<Point2f> points = findBlobs(imgThresholded, params);
-
-		for (int i = 0; i < points.size(); i++) {
-			std::cout << "\nPoint " << i + 1 << ": x[" << points[i].x << "] y[" << points[i].y << "]";
-		}
-
-		namedWindow("Original", WINDOW_NORMAL);
-		imshow("Original", img); //show the original image
-
-		waitKey(25);
-
-		return points;
-	}
-	
 	//led recognition algorithm
 	vector<Point2f> pattern1(vector<Point2f> &keyPoints, Mat &image) {
 
@@ -797,4 +725,22 @@ namespace ImgAnalysis {
 
 		return ledPattern;
 	}
+
+	//--- Structs ---
+
+	struct Distance {
+		float dist = 0;
+		Point2f *point1;
+		//KeyPoint *keyPoint2;
+		int point2;
+	};
+
+	struct lessDist : binary_function <Distance, Distance, bool> {
+		bool operator() (const Distance &d1, const Distance &d2) const { return d1.dist < d2.dist; }
+	};
+
+	struct orderByX : binary_function <Point2f, Point2f, bool> {
+		bool operator() (const Point2f &p1, const Point2f &p2) const { return p1.x < p2.x; }
+	};
+
 }

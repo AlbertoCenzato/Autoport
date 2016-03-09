@@ -11,7 +11,6 @@ namespace ImgAnalysis {
 
 	Mat filterByColor(Mat &, Scalar &, Scalar &);
 	vector<Point2f> findBlobs(Mat &, SimpleBlobDetector::Params &);
-	vector<Point2f> imgLedDetection(Mat &,Mat &);
 
 	vector<Point2f> pattern1(vector<Point2f>&, Mat&);
 	vector<Point2f> pattern3(vector<Point2f>&, Mat&);
