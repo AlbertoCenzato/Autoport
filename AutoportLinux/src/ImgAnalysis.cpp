@@ -76,8 +76,8 @@ vector<Point2f> ImgAnalysis::evaluate() {
 	return ledPoints;
 }
 
-void ImgAnalysis::setTolerance(int tol) {
-	tolerance = tol;
+void ImgAnalysis::setTolerance(int toler) {
+	tolerance = toler;
 }
 
 void ImgAnalysis::setImage(Mat &image) {
