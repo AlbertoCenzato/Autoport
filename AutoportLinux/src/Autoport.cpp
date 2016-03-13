@@ -22,7 +22,8 @@ using namespace cv;
 int main() {
 
 	string path = "/home/alberto/Pictures/foto/primo_laboratorio/";
-
+	string imgName = path + "p7d600a30.bmp";
+	
 	//---Color filtering----
 		int lowH = 80;
 		int highH = 110;
@@ -32,8 +33,7 @@ int main() {
 
 		int lowV = 50;
 		int highV = 150;
-
-		string imgName = path + "p7d600a30.bmp";
+		
 		Mat img = imread(imgName, IMREAD_COLOR);
 
 		Scalar low =  Scalar(lowH, lowS, lowV);
