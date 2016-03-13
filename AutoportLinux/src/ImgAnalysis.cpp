@@ -29,10 +29,10 @@ namespace ImgAnalysis {
 		bool operator() (const Point2f &p1, const Point2f &p2) const { return p1.x < p2.x; }
 	};
 
-	//---Function definitions---
+	//--- Functions ---
 
-	// Processes the input image filtering out (black, #000000) all colors which are not in
-	// the inteval [min,max], the others are set to white (#FFFFFF).
+	// Processes the input image filtering out (black) all colors which are not in
+	// the inteval [min,max], the others are set to white.
 	// @img: the Mat object (HSV color space) containing the image to process.
 	// @min: the lower bound specified in the HSV color space.
 	// @max: the upper bound specified in the HSV color space.
@@ -64,6 +64,7 @@ namespace ImgAnalysis {
 		Ptr<SimpleBlobDetector> featureDetector = SimpleBlobDetector::create(blobParam);
 		vector<KeyPoint> keypoints;
 
+		//finds the centroids of blobs
 		featureDetector->detect(img, keypoints);  //TODO: use a mask (see detect method description) to improve performances
 
 		// Draw detected blobs as red circles.
