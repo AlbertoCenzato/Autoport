@@ -6,6 +6,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/features2d/features2d.hpp>
 #include "ImgAnalysis.h"
+#include "GenPurpFunc.h"
 
 using namespace cv;
 using namespace std;
@@ -29,6 +30,59 @@ struct orderByX : binary_function <Point2f, Point2f, bool> {
 
 //--- Functions ---
 
+
+
+vector<Point2f> ImgAnalysis::evaluate() {
+
+	// Crop the full image to that image contained by the rectangle myROI
+	// Note that this doesn't copy the data
+	*img = (*img)(regionOfInterest);
+
+	Mat imageThresholded = filterByColor(*img, low, high);
+	vector<Point2f> ledPoints = findBlobs(imageThresholded, params);
+	ledPoints = patternMirko(ledPoints, imageThresholded, 10);
+
+	int ledPointsLength = ledPoints.size();
+	for (int i = 0; i < ledPointsLength; i++) {
+		std::cout << "\nPoint " << i + 1 << ": x[" << ledPoints[i].x << "] y[" << ledPoints[i].y << "]";
+	}
+
+	int maxH = 0;
+	int maxS = 0;
+	int maxV = 0;
+	int minH = 255;
+	int minS = 255;
+	int minV = 255;
+
+	for (int i = 0; i < ledPointsLength; i++) {
+		Point2f p = ledPoints[i];
+		Vec3b color = img->at<Vec3b>(p);
+		if (color[0] > maxH)	maxH = color[0];
+		if (color[1] > maxS)	maxS = color[1];
+		if (color[2] > maxV)	maxV = color[2];
+		if (color[0] < minH)	minH = color[0];
+		if (color[1] < minS)	minS = color[1];
+		if (color[2] < minV)	minV = color[2];
+	}
+	low  = Scalar(minH - tolerance, minS - tolerance, minV - tolerance);
+	high = Scalar(maxH + tolerance, maxS + tolerance, maxV + tolerance);
+
+	Point2f *maxX = GenPurpFunc::findMaxXInVec(ledPoints);
+	Point2f *maxY = GenPurpFunc::findMaxYInVec(ledPoints);
+	Point2f *minX = GenPurpFunc::findMinXInVec(ledPoints);
+	Point2f *minY = GenPurpFunc::findMinYInVec(ledPoints);
+	regionOfInterest = Rect(minX->x - 100, minY->y - 100, maxX->x - minX->x + 200, maxY->y - minY->y + 200);
+
+	return ledPoints;
+}
+
+void ImgAnalysis::setTolerance(int tol) {
+	tolerance = tol;
+}
+
+void ImgAnalysis::setImage(Mat &image) {
+	img = &image;
+}
 // Processes the input image (in HSV color space) filtering out (setting to black)
 // all colors which are not in the inteval [min,max], the others are set to white.
 // @img: the Mat object (HSV color space) containing the image to process.

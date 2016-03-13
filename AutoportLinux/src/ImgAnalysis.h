@@ -14,8 +14,27 @@ using namespace cv;
 
 class ImgAnalysis {
 
+	Mat *img;
+	Rect regionOfInterest;
+	Scalar low;
+	Scalar high;
+	SimpleBlobDetector::Params params;
+	int tolerance;
+
 public:
 
+	ImgAnalysis(Mat &image, Scalar startingLow, Scalar startingHigh, SimpleBlobDetector::Params startingParameters, int tol = 20) {
+		img = &image;
+		regionOfInterest = Rect(0, 0, img->cols, img->rows);
+		low = startingLow;
+		high = startingHigh;
+		params = startingParameters;
+		tolerance = tol;
+	}
+
+	vector<Point2f> evaluate();
+	void setTolerance(int);
+	void setImage(Mat &image);
 	static Mat filterByColor(Mat &img, Scalar &, Scalar &);
 	static vector<Point2f> findBlobs(Mat &img, SimpleBlobDetector::Params &);
 	static vector<Point2f> pattern1(vector<Point2f> &, Mat &);
