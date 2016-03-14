@@ -16,25 +16,43 @@ class ImgAnalysis {
 
 	Mat *img;
 	Rect regionOfInterest;
+	Scalar startingLow;
+	Scalar startingHigh;
 	Scalar low;
 	Scalar high;
 	SimpleBlobDetector::Params params;
+	SimpleBlobDetector::Params startingParams;
+	static const int TOL = 20;
 	int tolerance;
 
 public:
 
-	ImgAnalysis(Mat &image, Scalar startingLow, Scalar startingHigh, SimpleBlobDetector::Params startingParameters, int tol = 20) {
+	ImgAnalysis(Mat &image, Scalar startingLow, Scalar startingHigh, SimpleBlobDetector::Params startingParameters, int tol = TOL) {
 		img = &image;
 		regionOfInterest = Rect(0, 0, img->cols, img->rows);
-		low = startingLow;
+		this->startingLow  = startingLow;
+		this->startingHigh = startingHigh;
+		low  = startingLow;
 		high = startingHigh;
+		startingParams = startingParameters;
 		params = startingParameters;
 		tolerance = tol;
 	}
 
 	vector<Point2f> evaluate();
-	void setTolerance(int);
-	void setImage(Mat &image);
+	inline void ImgAnalysis::setTolerance(int tol) {
+		tolerance = tol;
+	}
+	inline void ImgAnalysis::setImage(Mat &image) {
+		img = &image;
+	}
+	inline void ImgAnalysis::clearAll() {
+		regionOfInterest = Rect(0, 0, img->cols, img->rows);
+		tolerance = TOL;
+		low = startingLow;
+		high = startingHigh;
+		params = startingParams;
+	}
 	static Mat filterByColor(Mat &img, Scalar &, Scalar &);
 	static vector<Point2f> findBlobs(Mat &img, SimpleBlobDetector::Params &);
 	static vector<Point2f> pattern1(vector<Point2f> &, Mat &);

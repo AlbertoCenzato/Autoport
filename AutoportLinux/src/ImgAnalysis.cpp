@@ -31,10 +31,10 @@ struct orderByX : binary_function <Point2f, Point2f, bool> {
 //--- Functions ---
 
 
-
+//TODO: make the function accept a pointer to a pattern analysis function
 vector<Point2f> ImgAnalysis::evaluate() {
 
-	// Crop the full image to that image contained by the rectangle myROI
+	// Crop the full image according to the region of interest
 	// Note that this doesn't copy the data
 	*img = (*img)(regionOfInterest);
 
@@ -76,13 +76,7 @@ vector<Point2f> ImgAnalysis::evaluate() {
 	return ledPoints;
 }
 
-void ImgAnalysis::setTolerance(int toler) {
-	tolerance = toler;
-}
 
-void ImgAnalysis::setImage(Mat &image) {
-	img = &image;
-}
 // Processes the input image (in HSV color space) filtering out (setting to black)
 // all colors which are not in the inteval [min,max], the others are set to white.
 // @img: the Mat object (HSV color space) containing the image to process.
