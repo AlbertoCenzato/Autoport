@@ -14,7 +14,7 @@ using namespace cv;
 
 class ImgAnalysis {
 
-	Mat *img;
+	Mat img;
 	Rect regionOfInterest;
 	Scalar startingLow;
 	Scalar startingHigh;
@@ -27,9 +27,9 @@ class ImgAnalysis {
 
 public:
 
-	ImgAnalysis(Mat &image, Scalar startingLow, Scalar startingHigh, SimpleBlobDetector::Params startingParameters, int tol = TOL) {
-		img = &image;
-		regionOfInterest = Rect(0, 0, img->cols, img->rows);
+	ImgAnalysis(Mat image, Scalar startingLow, Scalar startingHigh, SimpleBlobDetector::Params startingParameters, int tol = TOL) {
+		this->img = image;
+		regionOfInterest = Rect(0, 0, img.cols, img.rows);
 		this->startingLow  = startingLow;
 		this->startingHigh = startingHigh;
 		low  = startingLow;
@@ -40,14 +40,14 @@ public:
 	}
 
 	vector<Point2f> evaluate();
-	inline void ImgAnalysis::setTolerance(int tol) {
+	inline void setTolerance(int tol) {
 		tolerance = tol;
 	}
-	inline void ImgAnalysis::setImage(Mat &image) {
-		img = &image;
+	inline void setImage(Mat image) {
+		img = image;
 	}
-	inline void ImgAnalysis::clearAll() {
-		regionOfInterest = Rect(0, 0, img->cols, img->rows);
+	inline void clearAll() {
+		regionOfInterest = Rect(0, 0, img.cols, img.rows);
 		tolerance = TOL;
 		low = startingLow;
 		high = startingHigh;

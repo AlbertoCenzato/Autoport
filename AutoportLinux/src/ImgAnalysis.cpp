@@ -36,11 +36,18 @@ vector<Point2f> ImgAnalysis::evaluate() {
 
 	// Crop the full image according to the region of interest
 	// Note that this doesn't copy the data
-	*img = (*img)(regionOfInterest);
+	img = img(regionOfInterest);
+	namedWindow("Cropped image", WINDOW_NORMAL);
+	imshow("Cropped image", img);
+	waitKey(1);
 
-	Mat imageThresholded = filterByColor(*img, low, high);
-	vector<Point2f> ledPoints = findBlobs(imageThresholded, params);
-	ledPoints = patternMirko(ledPoints, imageThresholded, 10);
+	Mat imgTemp;
+	imgTemp = filterByColor(img, low, high);
+	namedWindow("Filtered image", WINDOW_NORMAL);
+	imshow("Filtered image", imgTemp);
+	waitKey(1);
+	vector<Point2f> ledPoints = findBlobs(imgTemp, params);
+	ledPoints = patternMirko(ledPoints, imgTemp, 10);
 
 	int ledPointsLength = ledPoints.size();
 	for (int i = 0; i < ledPointsLength; i++) {
@@ -56,7 +63,7 @@ vector<Point2f> ImgAnalysis::evaluate() {
 
 	for (int i = 0; i < ledPointsLength; i++) {
 		Point2f p = ledPoints[i];
-		Vec3b color = img->at<Vec3b>(p);
+		Vec3b color = img.at<Vec3b>(p);
 		if (color[0] > maxH)	maxH = color[0];
 		if (color[1] > maxS)	maxS = color[1];
 		if (color[2] > maxV)	maxV = color[2];
