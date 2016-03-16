@@ -27,8 +27,8 @@ class ImgAnalysis {
 
 public:
 
-	ImgAnalysis(Mat image, Scalar startingLow, Scalar startingHigh, SimpleBlobDetector::Params startingParameters, int tol = TOL) {
-		this->img = image;
+	ImgAnalysis(Mat &image, Scalar startingLow, Scalar startingHigh, SimpleBlobDetector::Params startingParameters, int tol = TOL) {
+		cvtColor(image,img,COLOR_BGR2HSV);
 		regionOfInterest = Rect(0, 0, img.cols, img.rows);
 		this->startingLow  = startingLow;
 		this->startingHigh = startingHigh;
@@ -44,7 +44,7 @@ public:
 		tolerance = tol;
 	}
 	inline void setImage(Mat image) {
-		img = image;
+		cvtColor(image,img,COLOR_BGR2HSV);
 	}
 	inline void clearAll() {
 		regionOfInterest = Rect(0, 0, img.cols, img.rows);
