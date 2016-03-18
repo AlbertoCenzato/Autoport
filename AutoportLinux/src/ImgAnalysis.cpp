@@ -32,26 +32,30 @@ struct orderByX : binary_function <Point2f, Point2f, bool> {
 
 
 //TODO: make the function accept a pointer to a pattern analysis function
-vector<Point2f> ImgAnalysis::evaluate() {
+vector<Point2f>* ImgAnalysis::evaluate(Mat &img) {
 
 	// Crop the full image according to the region of interest
 	// Note that this doesn't copy the data
-	img = img(regionOfInterest);
+	tempImg = img;
+	cvtColor(tempImg,tempImg,COLOR_BGR2HSV);
+	tempImg = tempImg(*regionOfInterest);
 	namedWindow("Cropped image", WINDOW_NORMAL);
-	imshow("Cropped image", img);
+	imshow("Cropped image", tempImg);
 	waitKey(1);
 
-	Mat imgTemp;
-	imgTemp = filterByColor(img, low, high);
+	filterByColor();
 	namedWindow("Filtered image", WINDOW_NORMAL);
-	imshow("Filtered image", imgTemp);
+	imshow("Filtered image", tempImg);
 	waitKey(1);
-	vector<Point2f> ledPoints = findBlobs(imgTemp, params);
-	ledPoints = patternMirko(ledPoints, imgTemp, 10);
 
-	int ledPointsLength = ledPoints.size();
+	findBlobs();
+
+	patternMirko(points, tempImg, 10);
+
+	int ledPointsLength = points->size();
 	for (int i = 0; i < ledPointsLength; i++) {
-		std::cout << "\nPoint " << i + 1 << ": x[" << ledPoints[i].x << "] y[" << ledPoints[i].y << "]";
+		Point2f point = points->at(i);
+		std::cout << "\nPoint " << i + 1 << ": x[" << point.x << "] y[" << point.y << "]";
 	}
 
 	int maxH = 0;
@@ -62,7 +66,7 @@ vector<Point2f> ImgAnalysis::evaluate() {
 	int minV = 255;
 
 	for (int i = 0; i < ledPointsLength; i++) {
-		Point2f p = ledPoints[i];
+		Point2f p = points->at(i);
 		Vec3b color = img.at<Vec3b>(p);
 		if (color[0] > maxH)	maxH = color[0];
 		if (color[1] > maxS)	maxS = color[1];
@@ -74,86 +78,11 @@ vector<Point2f> ImgAnalysis::evaluate() {
 	low  = Scalar(minH - tolerance, minS - tolerance, minV - tolerance);
 	high = Scalar(maxH + tolerance, maxS + tolerance, maxV + tolerance);
 
-	Point2f *maxX = GenPurpFunc::findMaxXInVec(ledPoints);
-	Point2f *maxY = GenPurpFunc::findMaxYInVec(ledPoints);
-	Point2f *minX = GenPurpFunc::findMinXInVec(ledPoints);
-	Point2f *minY = GenPurpFunc::findMinYInVec(ledPoints);
-	regionOfInterest = Rect(minX->x - 100, minY->y - 100, maxX->x - minX->x + 200, maxY->y - minY->y + 200);
-
-	return ledPoints;
-}
-
-
-// Processes the input image (in HSV color space) filtering out (setting to black)
-// all colors which are not in the inteval [min,max], the others are set to white.
-// @img: the Mat object (HSV color space) containing the image to process.
-// @min: the lower bound specified in the HSV color space.
-// @max: the upper bound specified in the HSV color space.
-// returns: black and white image as a Mat object.
-Mat ImgAnalysis::filterByColor(Mat &img, Scalar &min, Scalar &max) {
-
-	Mat imgFilteredByColor;
-	// Sets to white all colors in the threshold inteval [min,max] and to black the others
-	inRange(img, min, max, imgFilteredByColor);
-
-	//morphological opening (remove small objects from the foreground)
-	erode(imgFilteredByColor, imgFilteredByColor, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
-	dilate(imgFilteredByColor, imgFilteredByColor, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
-
-	//morphological closing (fill small holes in the foreground)
-	dilate(imgFilteredByColor, imgFilteredByColor, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
-	erode(imgFilteredByColor, imgFilteredByColor, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
-
-	return imgFilteredByColor;
-}
-
-// Finds all color blobs that fit the specified paramethers. Blobs which distance
-// from the centroid of the blob set is grater than 2*meanDistance are ignored.
-// @img: image to analyze.
-// @blobParam: paramethers to fit.
-// returns: a vector of Point2f containing centroids cohordinates of detected blobs.
-vector<Point2f> ImgAnalysis::findBlobs(Mat &img, SimpleBlobDetector::Params &blobParam) {
-
-	Ptr<SimpleBlobDetector> featureDetector = SimpleBlobDetector::create(blobParam);
-	vector<KeyPoint> keypoints;
-
-	//finds the centroids of blobs
-	featureDetector->detect(img, keypoints);  //TODO: use a mask (see detect method description) to improve performances
-
-	// Draw detected blobs as red circles.
-	// DrawMatchesFlags::DRAW_RICH_KEYPOINTS flag ensures the size of the circle corresponds to the size of blob
-	drawKeypoints(img, keypoints, img, Scalar(0, 0, 255), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
-	namedWindow("Thresholded Image", WINDOW_NORMAL);
-	imshow("Thresholded Image", img); //show the thresholded img
-
-	vector<Point2f> points;
-	KeyPoint::convert(keypoints, points);
-
-	// Removes points too far from the centroid of the detected points set
-	// computes the mean distance from the centroid
-	Point2f centr = centroid(points);
-	float meanDist = 0;
-	float distances[20];
-	for (uint i = 0; i < points.size(); i++) {
-		float dist = distancePointToPoint(centr, points[i]);
-		meanDist += dist;
-		distances[i] = dist;
-	}
-	meanDist = meanDist / points.size();
-
-	// removes points
-	for (uint i = 0; i < points.size(); i++) {
-		if (distances[i] > 2 * meanDist) {
-			points[i] = points[points.size() - 1];
-			points.erase(--points.end());
-		}
-	}
-
-	//draws detected points
-	for (uint i = 0; i < points.size(); i++) {
-		Point2f p = points[i];
-		circle(img, p, 10, Scalar(0, 255, 0), 3);
-	}
+	Point2f *maxX = GenPurpFunc::findMaxXInVec(*points);
+	Point2f *maxY = GenPurpFunc::findMaxYInVec(*points);
+	Point2f *minX = GenPurpFunc::findMinXInVec(*points);
+	Point2f *minY = GenPurpFunc::findMinYInVec(*points);
+	regionOfInterest = new Rect(minX->x - 100, minY->y - 100, maxX->x - minX->x + 200, maxY->y - minY->y + 200);
 
 	return points;
 }
@@ -164,6 +93,8 @@ vector<Point2f> ImgAnalysis::findBlobs(Mat &img, SimpleBlobDetector::Params &blo
 // @points: vector of Point2f of the leds' blob centroid.
 // @img: image used to visualize identified leds' position and number
 //returns: vector of Point2f ordered with the numbering convention
+
+/*
 vector<Point2f> ImgAnalysis::pattern1(vector<Point2f> &points, Mat &img) {
 
 	//compute the distances between points
@@ -382,6 +313,7 @@ vector<Point2f> ImgAnalysis::pattern1(vector<Point2f> &points, Mat &img) {
 
 	return finalKeyPoints;
 }
+*/
 
 // Led recognition algorithm. Gives a number to every led using the numbering convention
 // in patterns' file (see "Sensori" folder in dropbox).
@@ -390,6 +322,7 @@ vector<Point2f> ImgAnalysis::pattern1(vector<Point2f> &points, Mat &img) {
 //returns: vector of Point2f ordered with the numbering convention
 
 //THE LED PATTERN HAS AN ERROR!
+/*
 vector<Point2f> ImgAnalysis::pattern3(vector<Point2f> &points, Mat &image) {
 
 	//compute the distances between points
@@ -433,12 +366,12 @@ vector<Point2f> ImgAnalysis::pattern3(vector<Point2f> &points, Mat &image) {
 
 	set<Distance, lessDist> patternPoints[12];
 
-	/*
-		KeyPoint *minKP1 = (*(distances[minIndx].begin())).keyPoint1;
-		KeyPoint *minKP2 = (*(distances[minIndx].begin())).keyPoint2;
-		KeyPoint *maxKP1 = (*(++(distances[maxIndx].rend()))).keyPoint1;
-		KeyPoint *maxKP2 = (*(++(distances[maxIndx].rend()))).keyPoint2;
-	 */
+
+	//	KeyPoint *minKP1 = (*(distances[minIndx].begin())).keyPoint1;
+	//	KeyPoint *minKP2 = (*(distances[minIndx].begin())).keyPoint2;
+	//	KeyPoint *maxKP1 = (*(++(distances[maxIndx].rend()))).keyPoint1;
+	//	KeyPoint *maxKP2 = (*(++(distances[maxIndx].rend()))).keyPoint2;
+
 	int minKP1 = minIndx;
 	int minKP2 = (*(distances[minIndx].begin())).point2;
 	int maxKP1 = maxIndx;
@@ -598,6 +531,7 @@ vector<Point2f> ImgAnalysis::pattern3(vector<Point2f> &points, Mat &image) {
 
 	return finalKeyPoints;
 }
+*/
 
 // Led recognition algorithm. Gives a number to every led using the numbering convention
 // in patterns' file (see "Sensori" folder in dropbox).
@@ -608,20 +542,20 @@ vector<Point2f> ImgAnalysis::pattern3(vector<Point2f> &points, Mat &image) {
 
 /// TODO: use a quadtree data structure to drastically improve performances
 /// TODO: throw an exception if there are problems
-vector<Point2f> ImgAnalysis::patternMirko(vector<Point2f> &points, Mat &img, int tolerance) {
+vector<Point2f>* ImgAnalysis::patternMirko(vector<Point2f> *points, Mat &img, int tolerance) {
 
-	int numOfPoints = points.size();
+	int numOfPoints = points->size();
 	int setNumber = 0;			//number of aligned sets found;
 
-	vector<Point2f> alignedPoints[4];	//TODO: use an array of vectors of POINTERS to Point2f
-	long alignedPointsHash[4];
+	vector<Point2f> *alignedPoints = new vector<Point2f>[4];	//TODO: use an array of vectors of POINTERS to Point2f
+	long alignedPointsHash[4] = {0L,0L,0L,0L};
 
 	//look for the 4 sets of 3 aligned points
 	for (int i = 0; i < numOfPoints; i++) {
-		Point2f *p1 = &points[i];
+		Point2f *p1 = &(points->at(i));
 		//for each couple of points...
 		for (int j = 0; j < numOfPoints; j++) {
-			Point2f *p2 = &points[j];
+			Point2f *p2 = &(points->at(j));
 			if (p1 != p2) {
 				//... compute the equation of the line laying on p1 and p2...
 				float dx = p1->x - p2->x;
@@ -630,7 +564,7 @@ vector<Point2f> ImgAnalysis::patternMirko(vector<Point2f> &points, Mat &img, int
 
 				//... and look for another point that satisfies the equation
 				for (int k = 0; k < numOfPoints; k++) {
-					Point2f *p3 = &points[k];
+					Point2f *p3 = &(points->at(k));
 					if (p3 != p1 && p3 != p2) {		//TODO: manage strange cases like +INF, -INF, NAN
 						float distance = abs(p3->y - (m*(p3->x) + q)) / sqrt(1 + pow(m, 2));
 						if (distance < tolerance) {
@@ -678,7 +612,7 @@ vector<Point2f> ImgAnalysis::patternMirko(vector<Point2f> &points, Mat &img, int
 	for (int j = 0; j < 4; j++)
 		for (int k = 0; k < 4; k++)
 			if (k != j) {
-				float dist = distancePointToPoint(massCenter[j], massCenter[k]);
+				float dist = distancePointToPoint(massCenter[j],massCenter[k]);
 				if ( dist < minDist) {
 					secondMinDist[0] = maxMinCouples[0][0];
 					secondMinDist[1] = maxMinCouples[0][1];
@@ -729,7 +663,7 @@ vector<Point2f> ImgAnalysis::patternMirko(vector<Point2f> &points, Mat &img, int
 
 
 
-	vector<Point2f> ledPattern = vector<Point2f>(8);
+	vector<Point2f> *ledPattern = new vector<Point2f>(8);
 	int count = 0;
 	for (int i = 0; i < 2; i++) {
 		double minDist = INT_MAX, maxDist = 0;
@@ -753,38 +687,38 @@ vector<Point2f> ImgAnalysis::patternMirko(vector<Point2f> &points, Mat &img, int
 			}
 		}
 		if (minIndx[0] == maxIndx[0]) {
-			ledPattern[count++] = alignedSet[minIndx[0]];
-			ledPattern[count++] = alignedSet[minIndx[1]];
-			ledPattern[count++] = alignedSet[maxIndx[1]];
+			ledPattern->at(count++) = alignedSet[minIndx[0]];
+			ledPattern->at(count++) = alignedSet[minIndx[1]];
+			ledPattern->at(count++) = alignedSet[maxIndx[1]];
 		}
 		else if (minIndx[0] == maxIndx[1]) {
-			ledPattern[count++] = alignedSet[minIndx[0]];
-			ledPattern[count++] = alignedSet[minIndx[1]];
-			ledPattern[count++] = alignedSet[maxIndx[0]];
+			ledPattern->at(count++) = alignedSet[minIndx[0]];
+			ledPattern->at(count++) = alignedSet[minIndx[1]];
+			ledPattern->at(count++) = alignedSet[maxIndx[0]];
 		}
 		else if (minIndx[1] == maxIndx[0]) {
-			ledPattern[count++] = alignedSet[minIndx[1]];
-			ledPattern[count++] = alignedSet[minIndx[0]];
-			ledPattern[count++] = alignedSet[maxIndx[1]];
+			ledPattern->at(count++) = alignedSet[minIndx[1]];
+			ledPattern->at(count++) = alignedSet[minIndx[0]];
+			ledPattern->at(count++) = alignedSet[maxIndx[1]];
 		}
 		else {
-			ledPattern[count++] = alignedSet[minIndx[1]];
-			ledPattern[count++] = alignedSet[minIndx[0]];
-			ledPattern[count++] = alignedSet[maxIndx[0]];
+			ledPattern->at(count++) = alignedSet[minIndx[1]];
+			ledPattern->at(count++) = alignedSet[minIndx[0]];
+			ledPattern->at(count++) = alignedSet[maxIndx[0]];
 		}
 	}
 
 	for (int i = 0; i < 3; i++) {
 		Point2f *p = &alignedPoints[lines[2]][i];
-		if (p->x != ledPattern[0].x && p->y != ledPattern[0].y && p->x != ledPattern[3].x && p->y != ledPattern[3].y) {
-			ledPattern[6] = *p;
+		if (p->x != ledPattern->at(0).x && p->y != ledPattern->at(0).y && p->x != ledPattern->at(3).x && p->y != ledPattern->at(3).y) {
+			ledPattern->at(6) = *p;
 			break;
 		}
 	}
 	for (int i = 0; i < 3; i++) {
 		Point2f *p = &alignedPoints[lines[3]][i];
-		if (p->x != ledPattern[2].x && p->y != ledPattern[2].y && p->x != ledPattern[5].x && p->y != ledPattern[5].y) {
-			ledPattern[7] = *p;
+		if (p->x != ledPattern->at(2).x && p->y != ledPattern->at(2).y && p->x != ledPattern->at(5).x && p->y != ledPattern->at(5).y) {
+			ledPattern->at(7) = *p;
 			break;
 		}
 	}
@@ -793,9 +727,11 @@ vector<Point2f> ImgAnalysis::patternMirko(vector<Point2f> &points, Mat &img, int
 		ostringstream convert;
 		convert << i;
 		string s = convert.str();
-		drawDetectedLed(img, ledPattern[i], s);
+		drawDetectedLed(img, ledPattern->at(i), s);
 	}
 	waitKey(1);
+
+	delete alignedPoints;
 
 	return ledPattern;
 }

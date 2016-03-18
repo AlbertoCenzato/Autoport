@@ -14,10 +14,11 @@ using namespace Eigen;
 
 class PoseEstimation {
 
-	Matrix<float,3,Dynamic> realWorldPoints;
+	Matrix<float,3,Eigen::Dynamic> realWorldPoints;
 	vector<Point2f> lastSeenPoints;
 	int tolerance;
 	static const int TOL = 5;
+
 
 
 public:
