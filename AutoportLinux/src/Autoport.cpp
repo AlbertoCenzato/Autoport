@@ -35,14 +35,63 @@ int main() {
 		int highV = 150;
 		
 		Mat img = imread(imgName, IMREAD_COLOR);
-
 		Scalar low =  Scalar(lowH, lowS, lowV);
 		Scalar high = Scalar(highH, highS, highV);
 		int tolerance = 20;
 		Rect regionOfInterest(0, 0, img.cols, img.rows);
 
+		SimpleBlobDetector::Params startingParameters;
+		startingParameters.filterByColor = true;
+		startingParameters.blobColor = 255;
+		startingParameters.filterByInertia = true;
+		startingParameters.minInertiaRatio = 0.3;
+		startingParameters.maxInertiaRatio = 1;
+		startingParameters.filterByArea = true;
+		startingParameters.minArea = 50;
+		startingParameters.maxArea = 700;
+		startingParameters.filterByConvexity = true;
+		startingParameters.minConvexity = 0.5;
+		startingParameters.maxConvexity = 1;
+		startingParameters.filterByCircularity = true;
+		startingParameters.minCircularity = 0.5;
+		startingParameters.maxCircularity = 1;
+
+		ImgAnalysis imgAnalyzer = ImgAnalysis(low, high, startingParameters, tolerance);
 		for (int i = 500; i > 100; i=i-100) {
 
+			vector<Point2f> *ledPoints = imgAnalyzer.evaluate(img);
+
+			Matrix<double, 3, 4> realPoints;
+			realPoints << -50, -50, 30, -30,  //1, 3, 7, 5
+							-30, 20, -20, -10,
+							0, 0, 20, 0;
+			double focale = 3.46031; //[mm]
+			Point2f point = ledPoints->at(0);
+			Vector3d p1 = { 1.4 / 1000 * point.x, 1.4 / 1000 * point.y, focale };
+			point = ledPoints->at(2);
+			Vector3d p2 = { 1.4 / 1000 * point.x, 1.4 / 1000 * point.y, focale };
+			point = ledPoints->at(6);
+			Vector3d p3 = { 1.4 / 1000 * point.x, 1.4 / 1000 * point.y, focale };
+			point = ledPoints->at(4);
+			Vector3d p4 = { 1.4 / 1000 * point.x, 1.4 / 1000 * point.y, focale };
+
+			Vector3d translation = { 1.4 / 1000 * 2592 / 2, 1.4 / 1000 * 1944 / 2, 0 };
+			Vector3d p1t = (translation - p1);
+			Vector3d p2t = (translation - p2);
+			Vector3d p3t = (translation - p3);
+			Vector3d p4t = (translation - p4);
+			p1t.normalize();
+			p2t.normalize();
+			p3t.normalize();
+			p4t.normalize();
+			Matrix<double, 3, 4> cameraSystemPoints;
+			cameraSystemPoints << p1t, p2t, p3t, p4t;
+			Matrix<double, 3, 4> ret = GenPurpFunc::p3p_solver(realPoints, cameraSystemPoints);
+			GenPurpFunc::printMatrix(ret, 3, 4);
+
+			imgName = path + "p7d" + to_string(i) + "a30.bmp";
+			img = imread(imgName, ImreadModes::IMREAD_COLOR);
+			/*
 			// Crop the full image to that image contained by the rectangle myROI
 			// Note that this doesn't copy the data
 			img = img(regionOfInterest);
@@ -150,6 +199,7 @@ int main() {
 			imgName = path + "p7d" + to_string(i) + "a30.bmp";
 			img = imread(imgName, ImreadModes::IMREAD_COLOR);
 
+			*/
 		}
 		getchar();
 		return 0;

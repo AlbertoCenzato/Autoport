@@ -14,7 +14,7 @@ using namespace cv;
 
 class ImgAnalysis {
 
-	Mat tempImg;
+	Mat *tempImg;
 	Rect *regionOfInterest;
 	Scalar startingLow;
 	Scalar startingHigh;
@@ -68,15 +68,15 @@ private:
 	void filterByColor() {
 
 		// Sets to white all colors in the threshold inteval [min,max] and to black the others
-		inRange(tempImg, low, high, tempImg);
+		inRange(*tempImg, low, high, *tempImg);
 
 		//morphological opening (remove small objects from the foreground)
-		erode (tempImg, tempImg, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
-		dilate(tempImg, tempImg, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+		erode (*tempImg, *tempImg, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+		dilate(*tempImg, *tempImg, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
 
 		//morphological closing (fill small holes in the foreground)
-		dilate(tempImg, tempImg, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
-		erode (tempImg, tempImg, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+		dilate(*tempImg, *tempImg, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+		erode (*tempImg, *tempImg, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
 
 		return;
 	}
@@ -92,14 +92,14 @@ private:
 		vector<KeyPoint> *keyPoints = new vector<KeyPoint>();
 
 		//finds the centroids of blobs
-		featureDetector->detect(tempImg, *keyPoints);  //TODO: use a mask (see detect method description) to improve performances
+		featureDetector->detect(*tempImg, *keyPoints);  //TODO: use a mask (see detect method description) to improve performances
 
 		points = new vector<Point2f>(keyPoints->size());
 		// Draw detected blobs as red circles.
 		// DrawMatchesFlags::DRAW_RICH_KEYPOINTS flag ensures the size of the circle corresponds to the size of blob
-		drawKeypoints(tempImg, *keyPoints, tempImg, Scalar(0, 0, 255), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+		drawKeypoints(*tempImg, *keyPoints, *tempImg, Scalar(0, 0, 255), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 		namedWindow("Thresholded Image", WINDOW_NORMAL);
-		imshow("Thresholded Image", tempImg); //show the thresholded img
+		imshow("Thresholded Image", *tempImg); //show the thresholded img
 
 		KeyPoint::convert(*keyPoints, *points);
 		delete keyPoints;
@@ -128,7 +128,7 @@ private:
 		//draws detected points
 		for (uint i = 0; i < size; i++) {
 			Point2f p = points->at(i);
-			circle(tempImg, p, 10, Scalar(0, 255, 0), 3);
+			circle(*tempImg, p, 10, Scalar(0, 255, 0), 3);
 		}
 
 		return;

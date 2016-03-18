@@ -7,6 +7,7 @@
 #include <unsupported/Eigen/NonLinearOptimization>
 #include <opencv2/opencv.hpp>
 #include "P3p.h"
+#include "GenPurpFunc.h"
 
 using namespace std;
 using namespace Eigen;
