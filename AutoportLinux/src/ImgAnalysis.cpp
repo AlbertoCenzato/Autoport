@@ -37,10 +37,9 @@ vector<Point2f>* ImgAnalysis::evaluate(Mat &img) {
 	// Crop the full image according to the region of interest
 	// Note that this doesn't copy the data
 	tempImg = new Mat(img.rows,img.cols,img.depth());
-	cvtColor(img,*tempImg,COLOR_BGR2HSV);
-	tempImg->rowRange(regionOfInterest->y,regionOfInterest->y + regionOfInterest->height);
-	tempImg->colRange(regionOfInterest->x,regionOfInterest->x + regionOfInterest->width);
+	img = img(*regionOfInterest);
 	//*tempImg = (*tempImg)(*regionOfInterest);
+	cvtColor(img,*tempImg,COLOR_BGR2HSV);
 	namedWindow("Cropped image", WINDOW_NORMAL);
 	imshow("Cropped image", *tempImg);
 	waitKey(1);
