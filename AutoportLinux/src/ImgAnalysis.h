@@ -20,27 +20,36 @@ class ImgAnalysis {
 	Scalar startingHigh;
 	Scalar low;
 	Scalar high;
-	SimpleBlobDetector::Params params;
-	SimpleBlobDetector::Params startingParams;
+	SimpleBlobDetector::Params *params;
+	SimpleBlobDetector::Params *startingParams;
 	static const int TOL = 20;
 	int tolerance;
 	vector<Point2f> *points;
 
 public:
 
-	ImgAnalysis(Scalar startingLow, Scalar startingHigh, SimpleBlobDetector::Params startingParameters, int tol = TOL, Rect *regionOfInterest = NULL) {
+	ImgAnalysis(Scalar startingLow, Scalar startingHigh, SimpleBlobDetector::Params *startingParameters, int tol = TOL, Rect *regionOfInterest = NULL) {
 		this->regionOfInterest = regionOfInterest;
 		this->startingLow  = startingLow;
 		this->startingHigh = startingHigh;
 		low  = startingLow;
 		high = startingHigh;
-		startingParams = startingParameters;
-		params = startingParameters;
+		startingParams = new SimpleBlobDetector::Params(*startingParameters);
+		params = startingParams;
 		tolerance = tol;
 		points = NULL;
 	}
 
-	~ImgAnalysis() {}
+	~ImgAnalysis() {
+		delete regionOfInterest;
+		if(params != startingParams) {
+			delete params;
+			delete startingParams;
+		}
+		else delete params;
+		delete points;
+		delete tempImg;
+	}
 
 	vector<Point2f>* evaluate(Mat &img);
 	inline void setTolerance(int tol) {
@@ -88,7 +97,7 @@ private:
 	// returns: a vector of Point2f containing centroids cohordinates of detected blobs.
 	void findBlobs() {
 
-		Ptr<SimpleBlobDetector> featureDetector = SimpleBlobDetector::create(params);
+		Ptr<SimpleBlobDetector> featureDetector = SimpleBlobDetector::create(*params);
 		vector<KeyPoint> *keyPoints = new vector<KeyPoint>();
 
 		//finds the centroids of blobs
@@ -118,13 +127,14 @@ private:
 		meanDist = meanDist / size;
 
 		// removes points
-		for (uint i = 0; i < size; i++) {
+		for (uint i = 0; i < points->size(); i++) {
 			if (distances[i] > 2 * meanDist) {
 				points->at(i) = points->at(size - 1);
 				points->erase(--points->end());
 			}
 		}
 
+		size = points->size();
 		//draws detected points
 		for (uint i = 0; i < size; i++) {
 			Point2f p = points->at(i);

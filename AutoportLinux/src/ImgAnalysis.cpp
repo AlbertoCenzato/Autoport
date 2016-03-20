@@ -50,6 +50,7 @@ vector<Point2f>* ImgAnalysis::evaluate(Mat &img) {
 	imshow("Filtered image", *tempImg);
 	waitKey(1);
 
+	delete points;
 	findBlobs();
 
 	patternMirko(points, *tempImg, 10);
@@ -59,6 +60,8 @@ vector<Point2f>* ImgAnalysis::evaluate(Mat &img) {
 		Point2f point = points->at(i);
 		std::cout << "\nPoint " << i + 1 << ": x[" << point.x << "] y[" << point.y << "]";
 	}
+
+	delete tempImg;
 
 	int maxH = 0;
 	int maxS = 0;
@@ -589,8 +592,8 @@ vector<Point2f>* ImgAnalysis::patternMirko(vector<Point2f> *points, Mat &img, in
 								alignedPoints[setNumber].push_back(*p2);
 								alignedPoints[setNumber++].push_back(*p3);
 								std::cout << "\nAligned set " << setNumber - 1 << ": p1[" << p1->x << "," << p1->y << "]"
-										<< " p2[" << p2->x << "," << p2->y << "]"
-										<< " p3[" << p3->x << "," << p3->y << "]";
+										  	  	  	  	  	  	  	  	  	   << " p2["  << p2->x << "," << p2->y << "]"
+																			   << " p3["  << p3->x << "," << p3->y << "]";
 							}
 						}
 					}
@@ -733,7 +736,7 @@ vector<Point2f>* ImgAnalysis::patternMirko(vector<Point2f> *points, Mat &img, in
 	}
 	waitKey(1);
 
-	delete alignedPoints;
+	delete [] alignedPoints;
 
 	return ledPattern;
 }

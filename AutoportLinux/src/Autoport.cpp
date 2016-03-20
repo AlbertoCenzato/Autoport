@@ -56,7 +56,7 @@ int main() {
 		startingParameters.minCircularity = 0.5;
 		startingParameters.maxCircularity = 1;
 
-		ImgAnalysis imgAnalyzer = ImgAnalysis(low, high, startingParameters, tolerance);
+		ImgAnalysis imgAnalyzer = ImgAnalysis(low, high, &startingParameters, tolerance);
 		for (int i = 500; i > 100; i=i-100) {
 
 			vector<Point2f> *ledPoints = imgAnalyzer.evaluate(img);
