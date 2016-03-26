@@ -46,6 +46,12 @@ namespace GenPurpFunc {
 		printf("\n");
 	}
 
+	inline void printPointVector(const vector<Point2f> &vect) {
+		uint size = vect.size();
+		for(uint i = 0; i < size; i++)
+			cout << "Point " << i+1 << ": [" << vect.at(i).x << ", " << vect.at(i).y << "]";
+	}
+
 	inline Point2f multiply2f(Matrix2d &R, Point2f &point) {
 		Point2f ret;
 		ret.x = R.row(0)[0] * point.x + R.row(0)[1] * point.y;
@@ -118,4 +124,5 @@ namespace GenPurpFunc {
 				min = &vec[i];
 		return min;
 	}
+
 }

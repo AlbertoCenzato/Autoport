@@ -36,24 +36,30 @@ vector<Point2f>* ImgAnalysis::evaluate(Mat &img) {
 
 	// Crop the full image according to the region of interest
 	// Note that this doesn't copy the data
-	tempImg = new Mat(img.rows,img.cols,img.depth());
 	if(regionOfInterest != NULL)
 		img = img(*regionOfInterest);
-	//*tempImg = (*tempImg)(*regionOfInterest);
+
+	tempImg = new Mat(img.rows,img.cols,img.depth());
+
+	//change color space: from BGR to HSV;
 	cvtColor(img,*tempImg,COLOR_BGR2HSV);
 	namedWindow("Cropped image", WINDOW_NORMAL);
 	imshow("Cropped image", *tempImg);
 	waitKey(1);
 
+	//filter the color according to this->low and this->high tolerances
 	filterByColor();
 	namedWindow("Filtered image", WINDOW_NORMAL);
 	imshow("Filtered image", *tempImg);
 	waitKey(1);
 
 	delete points;
+	//put in this->points detected blobs that satisfy this->params tolerance
 	findBlobs();
 
+	//order this->points accordingly to the led pattern numbering
 	patternMirko(points, *tempImg, 10);
+
 
 	int ledPointsLength = points->size();
 	for (int i = 0; i < ledPointsLength; i++) {
