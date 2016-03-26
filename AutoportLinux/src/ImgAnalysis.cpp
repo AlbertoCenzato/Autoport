@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <set>
+#include <chrono>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/features2d/features2d.hpp>
@@ -42,24 +43,36 @@ vector<Point2f>* ImgAnalysis::evaluate(Mat &img) {
 	tempImg = new Mat(img.rows,img.cols,img.depth());
 
 	//change color space: from BGR to HSV;
+
+	auto begin = std::chrono::high_resolution_clock::now();
 	cvtColor(img,*tempImg,COLOR_BGR2HSV);
+	auto end = std::chrono::high_resolution_clock::now();
+	cout << "\nConvert color: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
 	namedWindow("Cropped image", WINDOW_NORMAL);
 	imshow("Cropped image", *tempImg);
 	waitKey(1);
 
 	//filter the color according to this->low and this->high tolerances
+	begin = std::chrono::high_resolution_clock::now();
 	filterByColor();
+	end = std::chrono::high_resolution_clock::now();
+	cout << "\nFilter color: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
 	namedWindow("Filtered image", WINDOW_NORMAL);
 	imshow("Filtered image", *tempImg);
 	waitKey(1);
 
 	delete points;
 	//put in this->points detected blobs that satisfy this->params tolerance
+	begin = std::chrono::high_resolution_clock::now();
 	findBlobs();
+	end = std::chrono::high_resolution_clock::now();
+	cout << "\nFind blobs: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
 
 	//order this->points accordingly to the led pattern numbering
+	begin = std::chrono::high_resolution_clock::now();
 	patternMirko(points, *tempImg, 10);
-
+	end = std::chrono::high_resolution_clock::now();
+	cout << "\nPattern: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
 
 	int ledPointsLength = points->size();
 	for (int i = 0; i < ledPointsLength; i++) {
