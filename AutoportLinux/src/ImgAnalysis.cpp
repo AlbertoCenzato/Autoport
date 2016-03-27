@@ -45,7 +45,8 @@ vector<Point2f>* ImgAnalysis::evaluate(Mat &img) {
 	//change color space: from BGR to HSV;
 
 	auto begin = std::chrono::high_resolution_clock::now();
-	cvtColor(img,*tempImg,COLOR_BGR2HSV);
+	if(isRed)	cvtColor(img,*tempImg,COLOR_RGB2HSV);
+	else		cvtColor(img,*tempImg,COLOR_BGR2HSV);
 	auto end = std::chrono::high_resolution_clock::now();
 	cout << "\nConvert color: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
 	namedWindow("Cropped image", WINDOW_NORMAL);
@@ -59,7 +60,8 @@ vector<Point2f>* ImgAnalysis::evaluate(Mat &img) {
 	cout << "\nFilter color: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
 	namedWindow("Filtered image", WINDOW_NORMAL);
 	imshow("Filtered image", *tempImg);
-	waitKey(1);
+	waitKey(1000);
+	imwrite("/home/alberto/Pictures/foto/output/filterByColor.jpg",*tempImg);
 
 	delete points;
 	//put in this->points detected blobs that satisfy this->params tolerance
@@ -67,12 +69,14 @@ vector<Point2f>* ImgAnalysis::evaluate(Mat &img) {
 	findBlobs();
 	end = std::chrono::high_resolution_clock::now();
 	cout << "\nFind blobs: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
+	imwrite("/home/alberto/Pictures/foto/output/findBlobs.jpg",*tempImg);
 
 	//order this->points accordingly to the led pattern numbering
 	begin = std::chrono::high_resolution_clock::now();
 	patternMirko(points, *tempImg, 10);
 	end = std::chrono::high_resolution_clock::now();
 	cout << "\nPattern: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
+	imwrite("/home/alberto/Pictures/foto/output/patternMirko.jpg",*tempImg);
 
 	int ledPointsLength = points->size();
 	for (int i = 0; i < ledPointsLength; i++) {
