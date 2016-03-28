@@ -21,43 +21,43 @@ using namespace cv;
 
 int main() {
 
-	string path = "/home/alberto/Pictures/foto/primo_laboratorio/";
-	string imgName = path + "p7d600a30.bmp";
+	string path = "/home/alberto/Pictures/foto/secondo_laboratorio/";
+	string imgName = path + "1ms170cm.jpg";
 	
 	//---Color filtering----
-		int lowH = 80;
-		int highH = 110;
+		int lowH = 105;
+		int highH = 135;
 
-		int lowS = 100;
-		int highS = 200;
+		int lowS = 150;//100;
+		int highS = 255;//200;
 
-		int lowV = 50;
-		int highV = 150;
+		int lowV = 0;//50;
+		int highV = 255;//150;
 		
 		Mat img = imread(imgName, IMREAD_COLOR);
 		Scalar low =  Scalar(lowH, lowS, lowV);
 		Scalar high = Scalar(highH, highS, highV);
-		int tolerance = 20;
+		int tolerance = 10;
 		Rect regionOfInterest(0, 0, img.cols, img.rows);
 
 		SimpleBlobDetector::Params startingParameters;
 		startingParameters.filterByColor = true;
 		startingParameters.blobColor = 255;
-		startingParameters.filterByInertia = true;
+		startingParameters.filterByInertia = false;
 		startingParameters.minInertiaRatio = 0.3;
 		startingParameters.maxInertiaRatio = 1;
 		startingParameters.filterByArea = true;
-		startingParameters.minArea = 50;
-		startingParameters.maxArea = 700;
-		startingParameters.filterByConvexity = true;
-		startingParameters.minConvexity = 0.5;
+		startingParameters.minArea = 30;
+		startingParameters.maxArea = 1000;
+		startingParameters.filterByConvexity = false;
+		startingParameters.minConvexity = 0.2;
 		startingParameters.maxConvexity = 1;
-		startingParameters.filterByCircularity = true;
-		startingParameters.minCircularity = 0.5;
+		startingParameters.filterByCircularity = false;
+		startingParameters.minCircularity = 0.2;
 		startingParameters.maxCircularity = 1;
 
-		ImgAnalysis imgAnalyzer = ImgAnalysis(low, high, &startingParameters, tolerance);
-		for (int i = 500; i > 100; i=i-100) {
+		ImgAnalysis imgAnalyzer = ImgAnalysis(low, high, startingParameters, LedColor::RED, tolerance);
+		for (int i = 0; i < 4; i++) {
 
 			vector<Point2f> *ledPoints = imgAnalyzer.evaluate(img);
 
@@ -89,7 +89,20 @@ int main() {
 			Matrix<double, 3, 4> ret = GenPurpFunc::p3p_solver(realPoints, cameraSystemPoints);
 			GenPurpFunc::printMatrix(ret, 3, 4);
 
-			imgName = path + "p7d" + to_string(i) + "a30.bmp";
+			switch (i) {
+				case 0:
+					imgName = path + "1ms100cm0deg.jpg";
+					break;
+				case 1:
+					imgName = path + "01ms50cm0deg.jpg";
+					break;
+				case 2:
+					imgName = path + "1ms30cm0deg.jpg";
+					break;
+				case 3:
+					imgName = path + "1ms15cm0deg.jpg";
+					break;
+			}
 			img = imread(imgName, ImreadModes::IMREAD_COLOR);
 			/*
 			// Crop the full image to that image contained by the rectangle myROI
@@ -204,3 +217,4 @@ int main() {
 		getchar();
 		return 0;
 }
+

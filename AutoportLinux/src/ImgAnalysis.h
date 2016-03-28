@@ -12,56 +12,48 @@ using namespace cv;
 #ifndef IMGANALYSIS_H
 #define IMGANALISIS_H
 
+enum LedColor {
+	RED,
+	BLUE
+};
+
 class ImgAnalysis {
 
 	Mat *tempImg;
 	Rect *regionOfInterest;
-	Scalar startingLow;
-	Scalar startingHigh;
 	Scalar low;
 	Scalar high;
-	SimpleBlobDetector::Params *params;
-	SimpleBlobDetector::Params *startingParams;
+	//SimpleBlobDetector::Params *params;
 	static const int TOL = 20;
 	int tolerance;
 	vector<Point2f> *points;
+	Ptr<SimpleBlobDetector> featureDetector;
+	LedColor ledColor;
 
 public:
 
-	ImgAnalysis(Scalar startingLow, Scalar startingHigh, SimpleBlobDetector::Params *startingParameters, int tol = TOL, Rect *regionOfInterest = NULL) {
+	ImgAnalysis(Scalar &low, Scalar &high, const SimpleBlobDetector::Params &params, LedColor ledColor, int tol = TOL, Rect *regionOfInterest = NULL) {
 		this->regionOfInterest = regionOfInterest;
-		this->startingLow  = startingLow;
-		this->startingHigh = startingHigh;
-		low  = startingLow;
-		high = startingHigh;
-		startingParams = new SimpleBlobDetector::Params(*startingParameters);
-		params = startingParams;
+		this->low  = low;
+		this->high = high;
+		this->featureDetector = SimpleBlobDetector::create(params);
+		this->ledColor = ledColor;
 		tolerance = tol;
 		points = NULL;
+		tempImg = NULL;
 	}
 
 	~ImgAnalysis() {
-		delete regionOfInterest;
-		if(params != startingParams) {
-			delete params;
-			delete startingParams;
-		}
-		else delete params;
 		delete points;
 		delete tempImg;
+		//TODO: delete also featureDetector??
 	}
 
 	vector<Point2f>* evaluate(Mat &img);
 	inline void setTolerance(int tol) {
 		tolerance = tol;
 	}
-	inline void clearAll() {
-		regionOfInterest = NULL;
-		tolerance = TOL;
-		low = startingLow;
-		high = startingHigh;
-		params = startingParams;
-	}
+
 	static vector<Point2f> pattern1(vector<Point2f> &, Mat &);
 	static vector<Point2f> pattern3(vector<Point2f> &, Mat &);
 	static vector<Point2f>* patternMirko(vector<Point2f> *, Mat &, int);
@@ -97,8 +89,7 @@ private:
 	// returns: a vector of Point2f containing centroids cohordinates of detected blobs.
 	void findBlobs() {
 
-		Ptr<SimpleBlobDetector> featureDetector = SimpleBlobDetector::create(*params);
-		vector<KeyPoint> *keyPoints = new vector<KeyPoint>();
+		vector<KeyPoint> *keyPoints = new vector<KeyPoint>(5);
 
 		//finds the centroids of blobs
 		featureDetector->detect(*tempImg, *keyPoints);  //TODO: use a mask (see detect method description) to improve performances
@@ -113,12 +104,12 @@ private:
 		KeyPoint::convert(*keyPoints, *points);
 		delete keyPoints;
 
-		// Removes points too far from the centroid of the detected points set
-		// computes the mean distance from the centroid
+		// Remove points too far from the centroid of the detected points set
+		// compute the mean distance from the centroid
 		Point2f centr = centroid(*points);
 		float meanDist = 0;
-		float distances[20];
 		uint size = points->size();
+		float *distances = new float[size];
 		for (uint i = 0; i < size; i++) {
 			float dist = distancePointToPoint(centr, points->at(i));
 			meanDist += dist;
@@ -126,13 +117,18 @@ private:
 		}
 		meanDist = meanDist / size;
 
-		// removes points
-		for (uint i = 0; i < points->size(); i++) {
+		// remove points
+		size = points->size();
+		for (uint i = 0; i < size; ) {
 			if (distances[i] > 2 * meanDist) {
 				points->at(i) = points->at(size - 1);
+				distances[i] = distances[size - 1];
 				points->erase(--points->end());
 			}
+			else i++;
+			size = points->size();
 		}
+		delete[] distances;
 
 		size = points->size();
 		//draws detected points

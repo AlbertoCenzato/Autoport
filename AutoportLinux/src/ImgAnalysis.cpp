@@ -45,8 +45,9 @@ vector<Point2f>* ImgAnalysis::evaluate(Mat &img) {
 	//change color space: from BGR to HSV;
 
 	auto begin = std::chrono::high_resolution_clock::now();
-	if(isRed)	cvtColor(img,*tempImg,COLOR_RGB2HSV);
-	else		cvtColor(img,*tempImg,COLOR_BGR2HSV);
+	if(ledColor == LedColor::RED)	cvtColor(img,*tempImg,COLOR_RGB2HSV);
+	else							cvtColor(img,*tempImg,COLOR_BGR2HSV);
+
 	auto end = std::chrono::high_resolution_clock::now();
 	cout << "\nConvert color: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
 	namedWindow("Cropped image", WINDOW_NORMAL);
