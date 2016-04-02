@@ -65,14 +65,14 @@ public:
 private:
 
 	// Processes the input image (in HSV color space) filtering out (setting to black)
-	// all colors which are not in the inteval [min,max], the others are set to white.
+	// all colors which are not in the interval [min,max], the others are set to white.
 	// @img: the Mat object (HSV color space) containing the image to process.
 	// @min: the lower bound specified in the HSV color space.
 	// @max: the upper bound specified in the HSV color space.
 	// returns: black and white image as a Mat object.
 	void filterByColor() {
 
-		// Sets to white all colors in the threshold inteval [min,max] and to black the others
+		// Sets to white all colors in the threshold interval [min,max] and to black the others
 		inRange(*tempImg, low, high, *tempImg);
 
 		//morphological opening (remove small objects from the foreground)
@@ -86,11 +86,11 @@ private:
 		return;
 	}
 
-	// Finds all color blobs that fit the specified paramethers. Blobs which distance
+	// Finds all color blobs that fit the specified parameters. Blobs which distance
 	// from the centroid of the blob set is grater than 2*meanDistance are ignored.
 	// @img: image to analyze.
-	// @blobParam: paramethers to fit.
-	// returns: a vector of Point2f containing centroids cohordinates of detected blobs.
+	// @blobParam: parameters to fit.
+	// returns: a vector of Point2f containing centroids coordinates of detected blobs.
 	void findBlobs() {
 
 		vector<KeyPoint> *keyPoints = new vector<KeyPoint>(5);
