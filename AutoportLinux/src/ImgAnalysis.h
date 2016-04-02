@@ -24,21 +24,25 @@ class ImgAnalysis {
 	Scalar low;
 	Scalar high;
 	//SimpleBlobDetector::Params *params;
-	static const int TOL = 20;
-	int tolerance;
+	static const int COLOR_TOLERANCE = 20;
+	int colorTolerance;
+	static const int ROI_TOLERANCE = 100;
+	int ROItolerance;	//region of interest cropping tolerance [px]
 	vector<Point2f> *points;
 	Ptr<SimpleBlobDetector> featureDetector;
 	LedColor ledColor;
 
 public:
 
-	ImgAnalysis(Scalar &low, Scalar &high, const SimpleBlobDetector::Params &params, LedColor ledColor, int tol = TOL, Rect *regionOfInterest = NULL) {
+	ImgAnalysis(Scalar &low, Scalar &high, const SimpleBlobDetector::Params &params, LedColor ledColor,
+				int colorTolerance = COLOR_TOLERANCE, int ROItolerance = ROI_TOLERANCE, Rect *regionOfInterest = NULL) {
 		this->regionOfInterest = regionOfInterest;
 		this->low  = low;
 		this->high = high;
 		this->featureDetector = SimpleBlobDetector::create(params);
 		this->ledColor = ledColor;
-		tolerance = tol;
+		this->colorTolerance = colorTolerance;
+		this->ROItolerance = ROItolerance;
 		points = NULL;
 		tempImg = NULL;
 	}
@@ -50,8 +54,8 @@ public:
 	}
 
 	vector<Point2f>* evaluate(Mat &img);
-	inline void setTolerance(int tol) {
-		tolerance = tol;
+	inline void setTolerance(int colorTolerance) {
+		this->colorTolerance = colorTolerance;
 	}
 
 	static vector<Point2f> pattern1(vector<Point2f> &, Mat &);

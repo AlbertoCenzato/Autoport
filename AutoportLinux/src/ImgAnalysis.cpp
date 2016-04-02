@@ -43,10 +43,15 @@ vector<Point2f>* ImgAnalysis::evaluate(Mat &img) {
 	tempImg = new Mat(img.rows,img.cols,img.depth());
 
 	//change color space: from BGR to HSV;
-
 	auto begin = std::chrono::high_resolution_clock::now();
-	if(ledColor == LedColor::RED)	cvtColor(img,*tempImg,COLOR_RGB2HSV);
-	else							cvtColor(img,*tempImg,COLOR_BGR2HSV);
+	if(ledColor == LedColor::RED)	{
+		int test = 0;
+		cvtColor(img,*tempImg,COLOR_RGB2HSV);
+	}
+	else {
+		int test = 1;
+		cvtColor(img,*tempImg,COLOR_BGR2HSV);
+	}
 
 	auto end = std::chrono::high_resolution_clock::now();
 	cout << "\nConvert color: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
@@ -104,14 +109,15 @@ vector<Point2f>* ImgAnalysis::evaluate(Mat &img) {
 		if (color[1] < minS)	minS = color[1];
 		if (color[2] < minV)	minV = color[2];
 	}
-	low  = Scalar(minH - tolerance, minS - tolerance, minV - tolerance);
-	high = Scalar(maxH + tolerance, maxS + tolerance, maxV + tolerance);
+	low  = Scalar(minH - colorTolerance, minS - colorTolerance, minV - colorTolerance);
+	high = Scalar(maxH + colorTolerance, maxS + colorTolerance, maxV + colorTolerance);
 
 	Point2f *maxX = GenPurpFunc::findMaxXInVec(*points);
 	Point2f *maxY = GenPurpFunc::findMaxYInVec(*points);
 	Point2f *minX = GenPurpFunc::findMinXInVec(*points);
 	Point2f *minY = GenPurpFunc::findMinYInVec(*points);
-	regionOfInterest = new Rect(minX->x - 100, minY->y - 100, maxX->x - minX->x + 200, maxY->y - minY->y + 200);
+	if(regionOfInterest != NULL) delete regionOfInterest;
+	regionOfInterest = new Rect(minX->x - ROItolerance, minY->y - ROItolerance, maxX->x - minX->x + 2*ROItolerance, maxY->y - minY->y + 2*ROItolerance);
 
 	return points;
 }
