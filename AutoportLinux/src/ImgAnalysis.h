@@ -19,18 +19,17 @@ enum LedColor {
 
 class ImgAnalysis {
 
-	Mat *tempImg;
 	Rect *regionOfInterest;
 	Scalar low;
 	Scalar high;
-	//SimpleBlobDetector::Params *params;
 	static const int COLOR_TOLERANCE = 20;
 	int colorTolerance;
 	static const int ROI_TOLERANCE = 100;
 	int ROItolerance;	//region of interest cropping tolerance [px]
-	vector<Point2f> *points;
+	vector<KeyPoint> *keyPoints;
+	vector<Point2f>  *ledPoints;
 	Ptr<SimpleBlobDetector> featureDetector;
-	LedColor ledColor;
+	int colorConversion;
 
 public:
 
@@ -40,27 +39,23 @@ public:
 		this->low  = low;
 		this->high = high;
 		this->featureDetector = SimpleBlobDetector::create(params);
-		this->ledColor = ledColor;
+		if(ledColor == LedColor::RED) colorConversion = COLOR_RGB2HSV;
+		else						  colorConversion = COLOR_BGR2HSV;
 		this->colorTolerance = colorTolerance;
 		this->ROItolerance = ROItolerance;
-		points = NULL;
-		tempImg = NULL;
+		keyPoints = NULL;
 	}
 
 	~ImgAnalysis() {
-		delete points;
-		delete tempImg;
+		delete keyPoints;
 		//TODO: delete also featureDetector??
 	}
 
 	vector<Point2f>* evaluate(Mat &img);
-	inline void setTolerance(int colorTolerance) {
-		this->colorTolerance = colorTolerance;
-	}
 
 	static vector<Point2f> pattern1(vector<Point2f> &, Mat &);
 	static vector<Point2f> pattern3(vector<Point2f> &, Mat &);
-	static vector<Point2f>* patternMirko(vector<Point2f> *, Mat &, int);
+	static vector<KeyPoint>* patternMirko(vector<KeyPoint> *, Mat &, int);
 
 private:
 
@@ -70,18 +65,18 @@ private:
 	// @min: the lower bound specified in the HSV color space.
 	// @max: the upper bound specified in the HSV color space.
 	// returns: black and white image as a Mat object.
-	void filterByColor() {
+	void filterByColor(Mat *hsvImg, Mat *colorFilteredImg) {
 
 		// Sets to white all colors in the threshold interval [min,max] and to black the others
-		inRange(*tempImg, low, high, *tempImg);
+		inRange(*hsvImg, low, high, *colorFilteredImg);
 
 		//morphological opening (remove small objects from the foreground)
-		erode (*tempImg, *tempImg, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
-		dilate(*tempImg, *tempImg, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+		erode (*colorFilteredImg, *colorFilteredImg, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+		dilate(*colorFilteredImg, *colorFilteredImg, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
 
 		//morphological closing (fill small holes in the foreground)
-		dilate(*tempImg, *tempImg, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
-		erode (*tempImg, *tempImg, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+		dilate(*colorFilteredImg, *colorFilteredImg, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+		erode (*colorFilteredImg, *colorFilteredImg, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
 
 		return;
 	}
@@ -91,54 +86,55 @@ private:
 	// @img: image to analyze.
 	// @blobParam: parameters to fit.
 	// returns: a vector of Point2f containing centroids coordinates of detected blobs.
-	void findBlobs() {
+	void findBlobs(Mat *colorFilteredImg) {
 
-		vector<KeyPoint> *keyPoints = new vector<KeyPoint>(5);
+		int oldSize = keyPoints->size();
+		delete keyPoints;
+		keyPoints = new vector<KeyPoint>(2*oldSize);
 
 		//finds the centroids of blobs
-		featureDetector->detect(*tempImg, *keyPoints);  //TODO: use a mask (see detect method description) to improve performances
+		featureDetector->detect(*colorFilteredImg, *keyPoints);
 
-		points = new vector<Point2f>(keyPoints->size());
+		//delete ledPoints;
+		//ledPoints = new vector<Point2f>(keyPoints->size());
+		
 		// Draw detected blobs as red circles.
-		// DrawMatchesFlags::DRAW_RICH_KEYPOINTS flag ensures the size of the circle corresponds to the size of blob
-		drawKeypoints(*tempImg, *keyPoints, *tempImg, Scalar(0, 0, 255), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+		drawKeypoints(*colorFilteredImg, *keyPoints, *colorFilteredImg, Scalar(0, 0, 255), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 		namedWindow("Thresholded Image", WINDOW_NORMAL);
-		imshow("Thresholded Image", *tempImg); //show the thresholded img
+		imshow("Thresholded Image", *colorFilteredImg); //show the thresholded img
 
-		KeyPoint::convert(*keyPoints, *points);
-		delete keyPoints;
-
+		//KeyPoint::convert(*keyPoints, *ledPoints);
 		// Remove points too far from the centroid of the detected points set
 		// compute the mean distance from the centroid
-		Point2f centr = centroid(*points);
+		Point2f centr = centroid(*keyPoints);
 		float meanDist = 0;
-		uint size = points->size();
+		uint size = keyPoints->size();
 		float *distances = new float[size];
 		for (uint i = 0; i < size; i++) {
-			float dist = distancePointToPoint(centr, points->at(i));
+			float dist = distancePointToPoint(centr, keyPoints->at(i).pt);
 			meanDist += dist;
 			distances[i] = dist;
 		}
 		meanDist = meanDist / size;
 
 		// remove points
-		size = points->size();
+		//size = ledPoints->size();
 		for (uint i = 0; i < size; ) {
 			if (distances[i] > 2 * meanDist) {
-				points->at(i) = points->at(size - 1);
+				keyPoints->at(i) = keyPoints->at(size - 1);
 				distances[i] = distances[size - 1];
-				points->erase(--points->end());
+				keyPoints->erase(--keyPoints->end());
 			}
 			else i++;
-			size = points->size();
+			size = keyPoints->size();
 		}
 		delete[] distances;
 
-		size = points->size();
+		//size = ledPoints->size();
 		//draws detected points
 		for (uint i = 0; i < size; i++) {
-			Point2f p = points->at(i);
-			circle(*tempImg, p, 10, Scalar(0, 255, 0), 3);
+			Point2f p = keyPoints->at(i).pt;
+			circle(*colorFilteredImg, p, 10, Scalar(0, 255, 0), 3);
 		}
 
 		return;
@@ -154,6 +150,17 @@ private:
 		waitKey(25);
 	}
 
+	static inline Point2f centroid(const vector<KeyPoint> &points) {
+		float x = 0;
+		float y = 0;
+		uint size = points.size();
+		for (uint i = 0; i < size; i++) {
+			Point2f p = points.at(i).pt;
+			x += p.x;
+			y += p.y;
+		}
+		return Point2f(x/size, y/size);
+	}
 	static inline Point2f centroid(const vector<Point2f> &points) {
 		float x = 0;
 		float y = 0;

@@ -49,7 +49,12 @@ namespace GenPurpFunc {
 	inline void printPointVector(const vector<Point2f> &vect) {
 		uint size = vect.size();
 		for(uint i = 0; i < size; i++)
-			cout << "Point " << i+1 << ": [" << vect.at(i).x << ", " << vect.at(i).y << "]";
+			cout << "\nPoint " << i+1 << ": [" << vect.at(i).x << ", " << vect.at(i).y << "]";
+	}
+	inline void printPointVector(const vector<KeyPoint> &vect) {
+		uint size = vect.size();
+		for(uint i = 0; i < size; i++)
+			cout << "\nPoint " << i+1 << ": [" << vect.at(i).pt.x << ", " << vect.at(i).pt.y << "]";
 	}
 
 	inline Point2f multiply2f(Matrix2d &R, Point2f &point) {
@@ -125,4 +130,32 @@ namespace GenPurpFunc {
 		return min;
 	}
 
+	inline Point2f* findMaxXInVec(vector<KeyPoint> &vec) {
+		KeyPoint *max = &vec[0];
+		for (uint i = 1; i < vec.size(); i++)
+			if (max->pt.x < vec[i].pt.x)
+				max = &vec[i];
+		return &(max->pt);
+	}
+	inline Point2f* findMaxYInVec(vector<KeyPoint> &vec) {
+		KeyPoint *max = &vec[0];;
+		for (uint i = 1; i < vec.size(); i++)
+			if (max->pt.y < vec[i].pt.y)
+				max = &vec[i];
+		return &(max->pt);
+	}
+	inline Point2f* findMinXInVec(vector<KeyPoint> &vec) {
+		KeyPoint *min = &vec[0];;
+		for (uint i = 1; i < vec.size(); i++)
+			if (min->pt.x > vec[i].pt.x)
+				min = &vec[i];
+		return &(min->pt);
+	}
+	inline Point2f* findMinYInVec(vector<KeyPoint> &vec) {
+		KeyPoint *min = &vec[0];;
+		for (uint i = 1; i < vec.size(); i++)
+			if (min->pt.y > vec[i].pt.y)
+				min = &vec[i];
+		return &(min->pt);
+	}
 }
