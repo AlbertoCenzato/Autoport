@@ -14,7 +14,7 @@
 
 #include "GenPurpFunc.h"
 #include "ImgAnalysis.h"
-#include "Simulations.h"
+//#include "Simulations.h"
 
 using namespace std;
 using namespace cv;
@@ -35,31 +35,34 @@ int main() {
 		int highV = 255;//150;
 		
 		Mat img = imread(imgName, IMREAD_COLOR);
+		imwrite("/home/alberto/Pictures/foto/output/originalImage.jpg",img);
 		Scalar low =  Scalar(lowH, lowS, lowV);
 		Scalar high = Scalar(highH, highS, highV);
-		int tolerance = 10;
-		Rect regionOfInterest(0, 0, img.cols, img.rows);
+		int colorTolerance = 60;
+		int ROItolerance = 500;
+		int sizeTolerance = 300;
 
-		SimpleBlobDetector::Params startingParameters;
-		startingParameters.filterByColor = true;
-		startingParameters.blobColor = 255;
-		startingParameters.filterByInertia = false;
-		startingParameters.minInertiaRatio = 0.3;
-		startingParameters.maxInertiaRatio = 1;
-		startingParameters.filterByArea = true;
-		startingParameters.minArea = 30;
-		startingParameters.maxArea = 1000;
-		startingParameters.filterByConvexity = false;
-		startingParameters.minConvexity = 0.2;
-		startingParameters.maxConvexity = 1;
-		startingParameters.filterByCircularity = false;
-		startingParameters.minCircularity = 0.2;
-		startingParameters.maxCircularity = 1;
+		SimpleBlobDetector::Params startParam;
+		startParam.filterByColor = true;
+		startParam.blobColor = 255;
+		startParam.filterByInertia = false;
+		startParam.minInertiaRatio = 0.3;
+		startParam.maxInertiaRatio = 1;
+		startParam.filterByArea = true;
+		startParam.minArea = 30;
+		startParam.maxArea = 1000;
+		startParam.filterByConvexity = false;
+		startParam.minConvexity = 0.2;
+		startParam.maxConvexity = 1;
+		startParam.filterByCircularity = false;
+		startParam.minCircularity = 0.2;
+		startParam.maxCircularity = 1;
 
-		ImgAnalysis imgAnalyzer = ImgAnalysis(low, high, startingParameters, LedColor::RED, tolerance);
-		for (int i = 0; i < 4; i++) {
+		ImgAnalysis *imgAnalyzer = new ImgAnalysis(low, high, startParam, LedColor::RED);
+		imgAnalyzer->setColorTolerance(colorTolerance)->setROItolerance(ROItolerance)->setSizeTolerance(sizeTolerance);
+		for (int i = 0; i < 3; i++) {
 
-			vector<Point2f> *ledPoints = imgAnalyzer.evaluate(img);
+			vector<Point2f> *ledPoints = imgAnalyzer->evaluate(img);
 
 			Matrix<double, 3, 4> realPoints;
 			realPoints << -50, -50, 30, -30,  //1, 3, 7, 5
@@ -103,7 +106,8 @@ int main() {
 					imgName = path + "1ms15cm0deg.jpg";
 					break;
 			}
-			img = imread(imgName, ImreadModes::IMREAD_COLOR);
+			img = imread(imgName, IMREAD_COLOR);
+			imwrite("/home/alberto/Pictures/foto/output/originalImage.jpg",img);
 			/*
 			// Crop the full image to that image contained by the rectangle myROI
 			// Note that this doesn't copy the data

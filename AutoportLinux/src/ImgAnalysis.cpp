@@ -106,11 +106,25 @@ vector<Point2f>* ImgAnalysis::evaluate(Mat &image) {
 	delete regionOfInterest;
 	regionOfInterest = new Rect(minX->x - ROItolerance, minY->y - ROItolerance, maxX->x - minX->x + 2*ROItolerance, maxY->y - minY->y + 2*ROItolerance);
 
+	delete ledPoints;
+	ledPoints = new vector<Point2f>(keyPoints->size());
 	KeyPoint::convert(*keyPoints, *ledPoints);
 
 	return ledPoints;
 }
 
+ImgAnalysis* ImgAnalysis::setROItolerance(int ROItolerance) {
+	this->ROItolerance = ROItolerance;
+	return this;
+}
+ImgAnalysis* ImgAnalysis::setColorTolerance(int colorTolerance) {
+	this->colorTolerance = colorTolerance;
+	return this;
+}
+ImgAnalysis* ImgAnalysis::setSizeTolerance(int sizeTolerance) {
+	this->sizeTolerance = sizeTolerance;
+	return this;
+}
 
 // Led recognition algorithm. Gives a number to every led using the numbering convention
 // in patterns' file (see "Sensori" folder in dropbox).

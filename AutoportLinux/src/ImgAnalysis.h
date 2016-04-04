@@ -26,32 +26,39 @@ class ImgAnalysis {
 	int colorTolerance;
 	static const int ROI_TOLERANCE = 100;
 	int ROItolerance;	//region of interest cropping tolerance [px]
+	static const int SIZE_TOLERANCE = 20;
+	int sizeTolerance;
 	vector<KeyPoint> *keyPoints;
 	vector<Point2f>  *ledPoints;
-	Ptr<SimpleBlobDetector> featureDetector;
+	SimpleBlobDetector::Params params;
 	int colorConversion;
 
 public:
 
-	ImgAnalysis(Scalar &low, Scalar &high, const SimpleBlobDetector::Params &params, LedColor ledColor,
-				int colorTolerance = COLOR_TOLERANCE, int ROItolerance = ROI_TOLERANCE, Rect *regionOfInterest = NULL) {
+	ImgAnalysis(const Scalar &low, const Scalar &high, const SimpleBlobDetector::Params &params, LedColor ledColor, Rect *regionOfInterest = NULL) {
 		this->regionOfInterest = regionOfInterest;
 		this->low  = low;
 		this->high = high;
-		this->featureDetector = SimpleBlobDetector::create(params);
+		this->params = params;
+		this->params.filterByArea = true;
 		if(ledColor == LedColor::RED) colorConversion = COLOR_RGB2HSV;
 		else						  colorConversion = COLOR_BGR2HSV;
-		this->colorTolerance = colorTolerance;
-		this->ROItolerance = ROItolerance;
+		this->colorTolerance = COLOR_TOLERANCE;
+		this->ROItolerance = ROI_TOLERANCE;
 		keyPoints = NULL;
+		ledPoints = NULL;
 	}
 
 	~ImgAnalysis() {
 		delete keyPoints;
+		delete ledPoints;
 		//TODO: delete also featureDetector??
 	}
 
-	vector<Point2f>* evaluate(Mat &img);
+	vector<Point2f>* evaluate(Mat &);
+	ImgAnalysis* setROItolerance(int);
+	ImgAnalysis* setColorTolerance(int);
+	ImgAnalysis* setSizeTolerance(int);
 
 	static vector<Point2f> pattern1(vector<Point2f> &, Mat &);
 	static vector<Point2f> pattern3(vector<Point2f> &, Mat &);
@@ -88,11 +95,26 @@ private:
 	// returns: a vector of Point2f containing centroids coordinates of detected blobs.
 	void findBlobs(Mat *colorFilteredImg) {
 
-		int oldSize = keyPoints->size();
-		delete keyPoints;
-		keyPoints = new vector<KeyPoint>(2*oldSize);
+		int length = 10;
+		if(keyPoints != NULL) {
+			length = keyPoints->size();
+			int minSize = INT_MAX;
+			int maxSize = INT_MIN;
+			for(int i = 0; i < length; i++) {
+				int size = keyPoints->at(i).size;
+				if(size < minSize) minSize = size;
+				if(size > maxSize) maxSize = size;
+			}
+			params.maxArea = maxSize + sizeTolerance;
+			minSize = minSize - sizeTolerance;
+			params.minArea = minSize > 0 ? minSize : 0;
+			delete keyPoints;
+		}
+		keyPoints = new vector<KeyPoint>(2*length);
 
 		//finds the centroids of blobs
+
+		Ptr<SimpleBlobDetector> featureDetector = SimpleBlobDetector::create(params);
 		featureDetector->detect(*colorFilteredImg, *keyPoints);
 
 		//delete ledPoints;
