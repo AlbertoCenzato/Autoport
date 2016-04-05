@@ -19,10 +19,15 @@
 using namespace std;
 using namespace cv;
 
+string resourcesPath;
+
 int main() {
 
-	string path = "/home/alberto/Pictures/foto/secondo_laboratorio/";
-	string imgName = path + "1ms170cm.jpg";
+	const char *homeDir = getenv("HOME");
+	string homeDirectory = string(homeDir);
+
+	resourcesPath = homeDirectory + "/workspace/Autoport/Resources/";
+	string imgName = resourcesPath + "secondo_laboratorio/1ms170cm.jpg";
 	
 	//---Color filtering----
 		int lowH = 105;
@@ -35,7 +40,7 @@ int main() {
 		int highV = 255;//150;
 		
 		Mat img = imread(imgName, IMREAD_COLOR);
-		imwrite("/home/alberto/Pictures/foto/output/originalImage.jpg",img);
+		imwrite(resourcesPath + "output/originalImage.jpg",img);
 		Scalar low =  Scalar(lowH, lowS, lowV);
 		Scalar high = Scalar(highH, highS, highV);
 		int colorTolerance = 60;
@@ -94,20 +99,20 @@ int main() {
 
 			switch (i) {
 				case 0:
-					imgName = path + "1ms100cm0deg.jpg";
+					imgName = resourcesPath + "secondo_laboratorio/1ms100cm0deg.jpg";
 					break;
 				case 1:
-					imgName = path + "01ms50cm0deg.jpg";
+					imgName = resourcesPath + "secondo_laboratorio/01ms50cm0deg.jpg";
 					break;
 				case 2:
-					imgName = path + "1ms30cm0deg.jpg";
+					imgName = resourcesPath + "secondo_laboratorio/1ms30cm0deg.jpg";
 					break;
 				case 3:
-					imgName = path + "1ms15cm0deg.jpg";
+					imgName = resourcesPath + "secondo_laboratorio/1ms15cm0deg.jpg";
 					break;
 			}
 			img = imread(imgName, IMREAD_COLOR);
-			imwrite("/home/alberto/Pictures/foto/output/originalImage.jpg",img);
+			imwrite(resourcesPath + "output/originalImage.jpg",img);
 			/*
 			// Crop the full image to that image contained by the rectangle myROI
 			// Note that this doesn't copy the data

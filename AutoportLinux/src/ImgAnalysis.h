@@ -43,8 +43,9 @@ public:
 		this->params.filterByArea = true;
 		if(ledColor == LedColor::RED) colorConversion = COLOR_RGB2HSV;
 		else						  colorConversion = COLOR_BGR2HSV;
-		this->colorTolerance = COLOR_TOLERANCE;
-		this->ROItolerance = ROI_TOLERANCE;
+		colorTolerance = COLOR_TOLERANCE;
+		ROItolerance   = ROI_TOLERANCE;
+		sizeTolerance  = SIZE_TOLERANCE;
 		keyPoints = NULL;
 		ledPoints = NULL;
 	}
