@@ -45,11 +45,12 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/OpenCV/lib}&quot;"/>
 								</option>
 								<option id="gnu.cpp.link.option.libs.1388684959" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" value="opencv_core"/>
-									<listOptionValue builtIn="false" value="opencv_features2d"/>
-									<listOptionValue builtIn="false" value="opencv_highgui"/>
-									<listOptionValue builtIn="false" value="opencv_imgproc"/>
-									<listOptionValue builtIn="false" value="opencv_imgcodecs"/>
+									<listOptionValue builtIn="false" value=":libopencv_core.so.3.1.0"/>
+									<listOptionValue builtIn="false" value=":libopencv_flann.so.3.1.0"/>
+									<listOptionValue builtIn="false" value=":libopencv_highgui.so.3.1.0"/>
+									<listOptionValue builtIn="false" value=":libopencv_features2d.so.3.1.0"/>
+									<listOptionValue builtIn="false" value=":libopencv_imgproc.so.3.1.0"/>
+									<listOptionValue builtIn="false" value=":libopencv_imgcodecs.so.3.1.0"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.349911147" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
