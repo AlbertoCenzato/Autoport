@@ -32,20 +32,26 @@ class ImgAnalysis {
 	vector<Point2f>  *ledPoints;
 	SimpleBlobDetector::Params params;
 	int colorConversion;
+	function<void(vector<KeyPoint>*, Mat&, int)> patternAnalysis;
 
 public:
 
-	ImgAnalysis(const Scalar &low, const Scalar &high, const SimpleBlobDetector::Params &params, LedColor ledColor, Rect *regionOfInterest = NULL) {
+	ImgAnalysis(const Scalar &low, const Scalar &high, const SimpleBlobDetector::Params &params, LedColor ledColor, function<void(vector<KeyPoint>*, Mat&, int)> patternAnalysis, Rect *regionOfInterest = NULL) {
 		this->regionOfInterest = regionOfInterest;
 		this->low  = low;
 		this->high = high;
 		this->params = params;
 		this->params.filterByArea = true;
+
 		if(ledColor == LedColor::RED) colorConversion = COLOR_RGB2HSV;
 		else						  colorConversion = COLOR_BGR2HSV;
+
 		colorTolerance = COLOR_TOLERANCE;
 		ROItolerance   = ROI_TOLERANCE;
 		sizeTolerance  = SIZE_TOLERANCE;
+
+		this->patternAnalysis = patternAnalysis;
+
 		keyPoints = NULL;
 		ledPoints = NULL;
 	}
@@ -63,7 +69,7 @@ public:
 
 	static vector<Point2f> pattern1(vector<Point2f> &, Mat &);
 	static vector<Point2f> pattern3(vector<Point2f> &, Mat &);
-	static vector<KeyPoint>* patternMirko(vector<KeyPoint> *, Mat &, int);
+	static void patternMirko(vector<KeyPoint> *, Mat &, int);
 
 private:
 
