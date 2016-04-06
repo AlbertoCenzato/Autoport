@@ -5,6 +5,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/features2d/features2d.hpp>
+#include "GenPurpFunc.h"
 
 using namespace std;
 using namespace cv;
@@ -135,12 +136,12 @@ private:
 		//KeyPoint::convert(*keyPoints, *ledPoints);
 		// Remove points too far from the centroid of the detected points set
 		// compute the mean distance from the centroid
-		Point2f centr = centroid(*keyPoints);
+		Point2f centr = GenPurpFunc::centroid(*keyPoints);
 		float meanDist = 0;
 		uint size = keyPoints->size();
 		float *distances = new float[size];
 		for (uint i = 0; i < size; i++) {
-			float dist = distancePointToPoint(centr, keyPoints->at(i).pt);
+			float dist = GenPurpFunc::distancePointToPoint(centr, keyPoints->at(i).pt);
 			meanDist += dist;
 			distances[i] = dist;
 		}
@@ -169,38 +170,6 @@ private:
 		return;
 	}
 
-	static inline float distancePointToPoint(Point2f &p1, Point2f &p2) {
-		return sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2));
-	}
-
-	static inline void drawDetectedLed(Mat &image, const Point2f &keyPoint, const string &number) {
-		putText(image, number, keyPoint, FONT_HERSHEY_SIMPLEX, 1, Scalar(0, 0, 255),4);
-		imshow("Thresholded Image", image);
-		waitKey(25);
-	}
-
-	static inline Point2f centroid(const vector<KeyPoint> &points) {
-		float x = 0;
-		float y = 0;
-		uint size = points.size();
-		for (uint i = 0; i < size; i++) {
-			Point2f p = points.at(i).pt;
-			x += p.x;
-			y += p.y;
-		}
-		return Point2f(x/size, y/size);
-	}
-	static inline Point2f centroid(const vector<Point2f> &points) {
-		float x = 0;
-		float y = 0;
-		uint size = points.size();
-		for (uint i = 0; i < size; i++) {
-			Point2f p = points.at(i);
-			x += p.x;
-			y += p.y;
-		}
-		return Point2f(x/size, y/size);
-	}
 
 };
 

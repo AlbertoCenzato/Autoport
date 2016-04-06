@@ -14,6 +14,7 @@
 
 #include "GenPurpFunc.h"
 #include "ImgAnalysis.h"
+#include "PatternAnalysis.h"
 //#include "Simulations.h"
 
 using namespace std;
@@ -63,7 +64,7 @@ int main() {
 		startParam.minCircularity = 0.2;
 		startParam.maxCircularity = 1;
 
-		function<void(vector<KeyPoint>*, Mat&, int)> patternAnalysis = &ImgAnalysis::patternMirko;
+		function<void(vector<KeyPoint>*, Mat&, int)> patternAnalysis = &PatternAnalysis::patternMirko;
 		ImgAnalysis *imgAnalyzer = new ImgAnalysis(low, high, startParam, LedColor::RED, patternAnalysis);
 		imgAnalyzer->setColorTolerance(colorTolerance)->setROItolerance(ROItolerance)->setSizeTolerance(sizeTolerance);
 		for (int i = 0; i < 3; i++) {

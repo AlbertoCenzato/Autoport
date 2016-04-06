@@ -7,6 +7,9 @@ using namespace Eigen;
 using namespace cv;
 using namespace std;
 
+#ifndef GENPURPFUNC_H
+#define GENPURPFUNC_H
+
 namespace GenPurpFunc {
 	/* This function finds the angles (in RADIANS) of the yaw - pitch - roll sequence
 	R1(gamma)*R2(beta)*R3(alpha) from the direction cosine matrix
@@ -158,4 +161,42 @@ namespace GenPurpFunc {
 				min = &vec[i];
 		return &(min->pt);
 	}
+
+	inline float distancePointToPoint(Point2f &p1, Point2f &p2) {
+		return sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2));
+	}
+
+	inline Point2f centroid(const vector<KeyPoint> &points) {
+		float x = 0;
+		float y = 0;
+		uint size = points.size();
+		for (uint i = 0; i < size; i++) {
+			Point2f p = points.at(i).pt;
+			x += p.x;
+			y += p.y;
+		}
+		return Point2f(x/size, y/size);
+	}
+
+	inline Point2f centroid(const vector<Point2f> &points) {
+		float x = 0;
+		float y = 0;
+		uint size = points.size();
+		for (uint i = 0; i < size; i++) {
+			Point2f p = points.at(i);
+			x += p.x;
+			y += p.y;
+		}
+		return Point2f(x/size, y/size);
+	}
+
+	inline void drawDetectedLed(Mat &image, const Point2f &keyPoint, const string &number) {
+		putText(image, number, keyPoint, FONT_HERSHEY_SIMPLEX, 1, Scalar(0, 0, 255),4);
+		imshow("Thresholded Image", image);
+		waitKey(25);
+		return;
+	}
+
 }
+
+#endif
