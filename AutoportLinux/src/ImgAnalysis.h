@@ -31,18 +31,32 @@ class ImgAnalysis {
 	int sizeTolerance;
 	vector<KeyPoint> *keyPoints;
 	vector<Point2f>  *ledPoints;
-	SimpleBlobDetector::Params params;
+	SimpleBlobDetector::Params *params;
 	int colorConversion;
 	function<void(vector<KeyPoint>*, Mat&, int)> patternAnalysis;
 
 public:
 
-	ImgAnalysis(const Scalar &low, const Scalar &high, const SimpleBlobDetector::Params &params, LedColor ledColor, function<void(vector<KeyPoint>*, Mat&, int)> patternAnalysis, Rect *regionOfInterest = NULL) {
+	ImgAnalysis(const Scalar &low, const Scalar &high, LedColor ledColor, function<void(vector<KeyPoint>*, Mat&, int)> patternAnalysis, Rect *regionOfInterest = NULL) {
 		this->regionOfInterest = regionOfInterest;
 		this->low  = low;
 		this->high = high;
-		this->params = params;
-		this->params.filterByArea = true;
+
+		params = new SimpleBlobDetector::Params();
+		params->filterByColor = true;
+		params->blobColor = 255;
+		params->filterByInertia = false;
+		params->minInertiaRatio = 0.3;
+		params->maxInertiaRatio = 1;
+		params->filterByArea = true;
+		params->minArea = 30;
+		params->maxArea = 1000;
+		params->filterByConvexity = false;
+		params->minConvexity = 0.2;
+		params->maxConvexity = 1;
+		params->filterByCircularity = false;
+		params->minCircularity = 0.2;
+		params->maxCircularity = 1;
 
 		if(ledColor == LedColor::RED) colorConversion = COLOR_RGB2HSV;
 		else						  colorConversion = COLOR_BGR2HSV;
@@ -60,7 +74,7 @@ public:
 	~ImgAnalysis() {
 		delete keyPoints;
 		delete ledPoints;
-		//TODO: delete also featureDetector??
+		delete params;
 	}
 
 	vector<Point2f>* evaluate(Mat &);
@@ -113,16 +127,16 @@ private:
 				if(size < minSize) minSize = size;
 				if(size > maxSize) maxSize = size;
 			}
-			params.maxArea = maxSize + sizeTolerance;
+			params->maxArea = maxSize + sizeTolerance;
 			minSize = minSize - sizeTolerance;
-			params.minArea = minSize > 0 ? minSize : 0;
+			params->minArea = minSize > 0 ? minSize : 0;
 			delete keyPoints;
 		}
 		keyPoints = new vector<KeyPoint>(2*length);
 
 		//finds the centroids of blobs
 
-		Ptr<SimpleBlobDetector> featureDetector = SimpleBlobDetector::create(params);
+		Ptr<SimpleBlobDetector> featureDetector = SimpleBlobDetector::create(*params);
 		featureDetector->detect(*colorFilteredImg, *keyPoints);
 
 		//delete ledPoints;

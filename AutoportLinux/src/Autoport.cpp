@@ -39,15 +39,12 @@ int main() {
 	resourcesPath = homeDirectory + "/workspace/Autoport/Resources/";
 	string imgName = resourcesPath + "secondo_laboratorio/1ms170cm.jpg";
 	
-	//---Color filtering----
-	int lowH = 105;
-	int highH = 135;
 
-	int lowS = 150;//100;
-	int highS = 255;//200;
+	//--- Image analysis and position estimation test ----
 
-	int lowV = 0;//50;
-	int highV = 255;//150;
+	int lowH = 105, highH = 135;
+	int lowS = 150, highS = 255;
+	int lowV = 0,   highV = 255;
 		
 	Mat img = imread(imgName, IMREAD_COLOR);
 	imwrite(resourcesPath + "output/originalImage.jpg",img);
@@ -57,24 +54,9 @@ int main() {
 	int ROItolerance = 500;
 	int sizeTolerance = 300;
 
-	SimpleBlobDetector::Params startParam;
-	startParam.filterByColor = true;
-	startParam.blobColor = 255;
-	startParam.filterByInertia = false;
-	startParam.minInertiaRatio = 0.3;
-	startParam.maxInertiaRatio = 1;
-	startParam.filterByArea = true;
-	startParam.minArea = 30;
-	startParam.maxArea = 1000;
-	startParam.filterByConvexity = false;
-	startParam.minConvexity = 0.2;
-	startParam.maxConvexity = 1;
-	startParam.filterByCircularity = false;
-	startParam.minCircularity = 0.2;
-	startParam.maxCircularity = 1;
 
 	function<void(vector<KeyPoint>*, Mat&, int)> patternAnalysis = &PatternAnalysis::patternMirko;
-	ImgAnalysis *imgAnalyzer = new ImgAnalysis(low, high, startParam, LedColor::RED, patternAnalysis);
+	ImgAnalysis *imgAnalyzer = new ImgAnalysis(low, high, LedColor::RED, patternAnalysis);
 	imgAnalyzer->setColorTolerance(colorTolerance)
 			   ->setROItolerance  (ROItolerance  )
 			   ->setSizeTolerance (sizeTolerance );
