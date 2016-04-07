@@ -5,6 +5,15 @@
  *      Author: alberto
  */
 
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/features2d/features2d.hpp>
+#include "GenPurpFunc.h"
+#include "PatternAnalysis.h"
+
+using namespace std;
+using namespace cv;
+
 // Led recognition algorithm. Gives a number to every led using the numbering convention
 // in patterns' file (see "Sensori" folder in dropbox).
 // @points: vector of Point2f of the leds' blob centroid.
@@ -72,7 +81,7 @@ void PatternAnalysis::patternMirko(vector<KeyPoint> *points, Mat &img, int toler
 	//compute the mass center for every set
 	Point2f massCenter[4];
 	for (int i = 0; i < setNumber-1; i++) {
-		massCenter[i] = centroid(alignedPoints[i]);
+		massCenter[i] = GenPurpFunc::centroid(alignedPoints[i]);
 		std::cout << "\nMass center " << i << ": " << massCenter[i];
 	}
 
@@ -84,7 +93,7 @@ void PatternAnalysis::patternMirko(vector<KeyPoint> *points, Mat &img, int toler
 	for (int j = 0; j < 4; j++)
 		for (int k = 0; k < 4; k++)
 			if (k != j) {
-				float dist = distancePointToPoint(massCenter[j],massCenter[k]);
+				float dist = GenPurpFunc::distancePointToPoint(massCenter[j],massCenter[k]);
 				if ( dist < minDist) {
 					secondMinDist[0] = maxMinCouples[0][0];
 					secondMinDist[1] = maxMinCouples[0][1];
@@ -144,7 +153,7 @@ void PatternAnalysis::patternMirko(vector<KeyPoint> *points, Mat &img, int toler
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
 				if (i != j) {
-					double dist = distancePointToPoint(alignedSet[i].pt, alignedSet[j].pt);
+					double dist = GenPurpFunc::distancePointToPoint(alignedSet[i].pt, alignedSet[j].pt);
 					if (dist < minDist) {
 						minDist = dist;
 						minIndx[0] = i;
@@ -199,7 +208,7 @@ void PatternAnalysis::patternMirko(vector<KeyPoint> *points, Mat &img, int toler
 		ostringstream convert;
 		convert << i;
 		string s = convert.str();
-		drawDetectedLed(img, ledPattern->at(i).pt, s);
+		GenPurpFunc::drawDetectedLed(img, ledPattern->at(i).pt, s);
 	}
 	waitKey(1);
 

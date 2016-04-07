@@ -11,6 +11,7 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <unistd.h>
 
 #include "GenPurpFunc.h"
 #include "ImgAnalysis.h"
@@ -26,6 +27,14 @@ int main() {
 
 	const char *homeDir = getenv("HOME");
 	string homeDirectory = string(homeDir);
+
+	//check if the workspace name is "workspace"
+	string thisFilePath = homeDirectory + "/workspace/Autoport/src/Autoport.cpp";
+	if( access( thisFilePath.c_str(), F_OK ) == -1 ) {
+		cout << "ERRORE: DIRECTORY CORRENTE ERRATA, PROBABILMENTE IL NOME DEL WORKSPACE NON E' \"WORKSPACE\"";
+		sleep(10000);
+		return -1;
+	}
 
 	resourcesPath = homeDirectory + "/workspace/Autoport/Resources/";
 	string imgName = resourcesPath + "secondo_laboratorio/1ms170cm.jpg";
