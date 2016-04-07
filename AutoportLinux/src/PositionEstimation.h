@@ -1,18 +1,18 @@
 /*
- * PoseEstimation.h
+ * PositionEstimation.h
  *
  *  Created on: Mar 14, 2016
  *      Author: alberto
  */
 
-#ifndef POSEESTIMATION_H_
-#define POSEESTIMATION_H_
+#ifndef POSITIONESTIMATION_H_
+#define POSITIONESTIMATION_H_
 
 using namespace std;
 using namespace cv;
 using namespace Eigen;
 
-class PoseEstimation {
+class PositionEstimation {
 
 	Matrix<float,3,Eigen::Dynamic> realWorldPoints;
 	vector<Point2f> lastSeenPoints;
@@ -23,18 +23,26 @@ class PoseEstimation {
 
 public:
 
-	PoseEstimation(Matrix<float,3,Dynamic> realWorldPoints, int tolerance = TOL) {
+	PositionEstimation(Matrix<float,3,Dynamic> realWorldPoints, int tolerance = TOL) {
 		this->realWorldPoints = realWorldPoints;
 		this->tolerance = tolerance;
 	}
-	Matrix<float,3,4> evaluate(vector<Point2f>);
-	void setTolerance(int tolerance) { this->tolerance = tolerance; }
-	void clearAll();
 
+	Matrix<float,3,4> evaluate(vector<Point2f>);
+
+	inline PositionEstimation* setTolerance(int tolerance) {
+		this->tolerance = tolerance;
+		return this;
+	}
+
+	inline void clearAll() {
+
+		return;
+	}
 
 };
 
 
 
 
-#endif /* POSEESTIMATION_H_ */
+#endif /* POSITIONESTIMATION_H_ */

@@ -29,8 +29,9 @@ class ImgAnalysis {
 	int ROItolerance;	//region of interest cropping tolerance [px]
 	static const int SIZE_TOLERANCE = 20;
 	int sizeTolerance;
+	static const int SIZE_SUP_TOLERANCE = 128;
+	int sizeSupTolerance;
 	vector<KeyPoint> *keyPoints;
-	vector<Point2f>  *ledPoints;
 	SimpleBlobDetector::Params *params;
 	int colorConversion;
 	function<void(vector<KeyPoint>*, Mat&, int)> patternAnalysis;
@@ -61,30 +62,29 @@ public:
 		if(ledColor == LedColor::RED) colorConversion = COLOR_RGB2HSV;
 		else						  colorConversion = COLOR_BGR2HSV;
 
-		colorTolerance = COLOR_TOLERANCE;
-		ROItolerance   = ROI_TOLERANCE;
-		sizeTolerance  = SIZE_TOLERANCE;
+		colorTolerance   = COLOR_TOLERANCE;
+		ROItolerance     = ROI_TOLERANCE;
+		sizeTolerance    = SIZE_TOLERANCE;
+		sizeSupTolerance = SIZE_SUP_TOLERANCE;
 
 		this->patternAnalysis = patternAnalysis;
 
 		keyPoints = NULL;
-		ledPoints = NULL;
 	}
 
 	~ImgAnalysis() {
 		delete keyPoints;
-		delete ledPoints;
 		delete params;
 	}
 
-	vector<Point2f>* evaluate(Mat &);
+	bool evaluate(Mat &, vector<Point2f> *, float);
 	ImgAnalysis* setROItolerance(int);
 	ImgAnalysis* setColorTolerance(int);
 	ImgAnalysis* setSizeTolerance(int);
+	ImgAnalysis* setSizeSupTolerance(int);
 
 	static vector<Point2f> pattern1(vector<Point2f> &, Mat &);
 	static vector<Point2f> pattern3(vector<Point2f> &, Mat &);
-	static void patternMirko(vector<KeyPoint> *, Mat &, int);
 
 private:
 
@@ -117,6 +117,9 @@ private:
 	// returns: a vector of Point2f containing centroids coordinates of detected blobs.
 	void findBlobs(Mat *colorFilteredImg) {
 
+		//TODO: check this way of computing valid led sizes interval: it can lead to
+		//a degeneration of the interval amplitude continuously increasing it in presence
+		//of noise similar to leds, maybe it wold be better to use the medium value of led sizes
 		int length = 10;
 		if(keyPoints != NULL) {
 			length = keyPoints->size();

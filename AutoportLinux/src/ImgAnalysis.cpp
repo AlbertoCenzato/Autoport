@@ -35,7 +35,7 @@ struct orderByX : binary_function <Point2f, Point2f, bool> {
 
 
 //TODO: make the function accept a pointer to a pattern analysis function
-vector<Point2f>* ImgAnalysis::evaluate(Mat &image) {
+bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> *points, float downscalingFactor) {
 
 	// Crop the full image according to the region of interest
 	// Note that this doesn't copy the data
@@ -109,11 +109,15 @@ vector<Point2f>* ImgAnalysis::evaluate(Mat &image) {
 	delete regionOfInterest;
 	regionOfInterest = new Rect(minX->x - ROItolerance, minY->y - ROItolerance, maxX->x - minX->x + 2*ROItolerance, maxY->y - minY->y + 2*ROItolerance);
 
-	delete ledPoints;
-	ledPoints = new vector<Point2f>(keyPoints->size());
-	KeyPoint::convert(*keyPoints, *ledPoints);
+	KeyPoint::convert(*keyPoints, *points);
 
-	return ledPoints;
+	int averageSize = 0;
+	for (int i = 0; i < ledPointsLength; i++) {
+		averageSize += keyPoints->at(i).size;
+	}
+	averageSize = averageSize / ledPointsLength;
+
+	return averageSize > sizeSupTolerance;
 }
 
 ImgAnalysis* ImgAnalysis::setROItolerance(int ROItolerance) {
@@ -126,6 +130,10 @@ ImgAnalysis* ImgAnalysis::setColorTolerance(int colorTolerance) {
 }
 ImgAnalysis* ImgAnalysis::setSizeTolerance(int sizeTolerance) {
 	this->sizeTolerance = sizeTolerance;
+	return this;
+}
+ImgAnalysis* ImgAnalysis::setSizeSupTolerance(int sizeSupTolerance) {
+	this->sizeSupTolerance = sizeSupTolerance;
 	return this;
 }
 

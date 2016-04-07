@@ -24,15 +24,17 @@ void testImgAnalysisPositionEstimationPic() {
 	int colorTolerance = 60;
 	int ROItolerance = 500;
 	int sizeTolerance = 300;
+	int sizeSupTolerance = 128;
 
 	function<void(vector<KeyPoint>*, Mat&, int)> patternAnalysis = &PatternAnalysis::patternMirko;
 	ImgAnalysis *imgAnalyzer = new ImgAnalysis(low, high, LedColor::RED, patternAnalysis);
-	imgAnalyzer->setColorTolerance(colorTolerance)
-			   ->setROItolerance  (ROItolerance  )
-			   ->setSizeTolerance (sizeTolerance );
+	imgAnalyzer->setColorTolerance  (colorTolerance)
+			   ->setROItolerance    (ROItolerance)
+			   ->setSizeTolerance   (sizeTolerance)
+			   ->setSizeSupTolerance(sizeSupTolerance);
 
 	string imgName;
-
+	vector<Point2f> *ledPoints = new vector<Point2f>();
 	for (int i = 0; i < 3; i++) {
 
 		switch (i) {
@@ -56,7 +58,10 @@ void testImgAnalysisPositionEstimationPic() {
 		Mat img = imread(imgName, IMREAD_COLOR);
 		imwrite(resourcesPath + "output/originalImage.jpg",img);
 
-		vector<Point2f> *ledPoints = imgAnalyzer->evaluate(img);
+		int downscalingFactor = 1;
+		bool downscalingNeeded = imgAnalyzer->evaluate(img, ledPoints, downscalingFactor);
+		if(downscalingNeeded)
+			cout << "\nDownscaling needed!";
 
 		Matrix<double, 3, 4> realPoints;
 		realPoints << -50, -50, 30, -30,  //1, 3, 7, 5
@@ -87,6 +92,11 @@ void testImgAnalysisPositionEstimationPic() {
 		GenPurpFunc::printMatrix(ret, 3, 4);
 
 	}
+
+	return;
 }
 
-void testImgAnalysisVid();
+void testImgAnalysisVid() {
+
+	return;
+}
