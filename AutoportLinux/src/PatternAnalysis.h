@@ -19,6 +19,8 @@ using namespace cv;
 namespace PatternAnalysis {
 
 	void patternMirko(vector<KeyPoint>*, Mat&, int);
+
+	void ransac(vector<KeyPoint> *points, Mat &img, int tolerance);
 }
 
 

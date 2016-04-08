@@ -218,4 +218,6 @@ void PatternAnalysis::patternMirko(vector<KeyPoint> *points, Mat &img, int toler
 }
 
 
+void PatternAnalysis::ransac(vector<KeyPoint> *points, Mat &img, int tolerance) {
 
+}

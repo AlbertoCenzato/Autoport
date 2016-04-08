@@ -132,7 +132,6 @@ namespace GenPurpFunc {
 		printf("dF: ");
 		printMatrix(dF, 4, 1);
 	
-	
 		//find a better algorithm for min finding
 		double min = dF(0);
 		int index = 0;
