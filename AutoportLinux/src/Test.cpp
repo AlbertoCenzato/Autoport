@@ -63,6 +63,7 @@ void testImgAnalysisPositionEstimationPic() {
 		if(downscalingNeeded)
 			cout << "\nDownscaling needed!";
 
+		/*
 		Matrix<double, 3, 4> realPoints;
 		realPoints << -50, -50, 30, -30,  //1, 3, 7, 5
 				-30, 20, -20, -10,
@@ -90,7 +91,7 @@ void testImgAnalysisPositionEstimationPic() {
 		cameraSystemPoints << p1t, p2t, p3t, p4t;
 		Matrix<double, 3, 4> ret = GenPurpFunc::p3p_solver(realPoints, cameraSystemPoints);
 		GenPurpFunc::printMatrix(ret, 3, 4);
-
+		*/
 	}
 
 	return;

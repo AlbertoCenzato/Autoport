@@ -115,11 +115,11 @@ private:
 	// @img: image to analyze.
 	// @blobParam: parameters to fit.
 	// returns: a vector of Point2f containing centroids coordinates of detected blobs.
-	void findBlobs(Mat *colorFilteredImg) {
+	void findBlobs(Mat *colorFilteredImg, float downscalingFactor) {
 
 		//TODO: check this way of computing valid led sizes interval: it can lead to
 		//a degeneration of the interval amplitude continuously increasing it in presence
-		//of noise similar to leds, maybe it wold be better to use the medium value of led sizes
+		//of noise similar to leds, maybe it would be better to use the medium value of led sizes
 		int length = 10;
 		if(keyPoints != NULL) {
 			length = keyPoints->size();
@@ -130,9 +130,9 @@ private:
 				if(size < minSize) minSize = size;
 				if(size > maxSize) maxSize = size;
 			}
-			params->maxArea = maxSize + sizeTolerance;
+			params->maxArea = (maxSize + sizeTolerance)*downscalingFactor;
 			minSize = minSize - sizeTolerance;
-			params->minArea = minSize > 0 ? minSize : 0;
+			params->minArea = minSize > 0 ? minSize*downscalingFactor : 0;
 			delete keyPoints;
 		}
 		keyPoints = new vector<KeyPoint>(2*length);

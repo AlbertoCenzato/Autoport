@@ -14,8 +14,13 @@ using namespace Eigen;
 
 class PositionEstimation {
 
-	Matrix<float,3,Eigen::Dynamic> realWorldPoints;
-	vector<Point2f> lastSeenPoints;
+	static Matrix<float,3,4> realWorldPoints;
+	//-50, -50,  30, -30,  //1, 3, 7, 5
+	//-30,  20, -20, -10,
+	//  0,   0,  20,   0;
+
+	vector<Point2f> *points;
+	vector<Point2f> *lastSeenPoints;
 	int tolerance;
 	static const int TOL = 5;
 
@@ -23,12 +28,15 @@ class PositionEstimation {
 
 public:
 
-	PositionEstimation(Matrix<float,3,Dynamic> realWorldPoints, int tolerance = TOL) {
-		this->realWorldPoints = realWorldPoints;
+	PositionEstimation(Matrix<float,3,Dynamic> &ledPoints, int tolerance = TOL) {
+		realWorldPoints <<  -50, -50,  30, -30,  //1, 3, 7, 5
+							-30,  20, -20, -10,
+							  0,   0,  20,   0;
+
 		this->tolerance = tolerance;
 	}
 
-	Matrix<float,3,4> evaluate(vector<Point2f>);
+	Matrix<float,3,4>* evaluate(vector<Point2f>&);
 
 	inline PositionEstimation* setTolerance(int tolerance) {
 		this->tolerance = tolerance;
@@ -37,6 +45,21 @@ public:
 
 	inline void clearAll() {
 
+		return;
+	}
+
+private:
+
+	void positionEstimation() {
+
+		return;
+	}
+
+	void lowPassFilter() {
+		return;
+	}
+
+	void kalmanFilter() {
 		return;
 	}
 
