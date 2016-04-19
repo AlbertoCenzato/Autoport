@@ -20,6 +20,7 @@ using namespace Eigen;
 
 struct Position_XYZ_YPR {
 	float x, y, z, yaw, pitch, roll;
+
 };
 
 // Generic functor
