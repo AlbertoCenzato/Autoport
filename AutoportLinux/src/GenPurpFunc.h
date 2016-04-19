@@ -39,7 +39,17 @@ namespace GenPurpFunc {
 
 	extern long pinHoleFSolve(Matrix<double, 6, 1> &, double *, Point2f *, Point3f *, double focal, double d_pxl);
 
-	inline void printMatrix(MatrixXd mtrx, int n, int m) {
+
+	inline void printMatrixf(MatrixXf mtrx, int n, int m) {
+		for (int i = 0; i < n; i++) {
+			printf("\n");
+			for (int j = 0; j < m; j++) {
+				printf("%f ", mtrx(i, j));
+			}
+		}
+		printf("\n");
+	}
+	inline void printMatrixd(MatrixXd mtrx, int n, int m) {
 		for (int i = 0; i < n; i++) {
 			printf("\n");
 			for (int j = 0; j < m; j++) {

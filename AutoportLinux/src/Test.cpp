@@ -9,6 +9,7 @@
 #include "GenPurpFunc.h"
 #include "ImgAnalysis.h"
 #include "PatternAnalysis.h"
+#include "PositionEstimation.h"
 
 extern string resourcesPath;
 
@@ -33,6 +34,25 @@ void testImgAnalysisPositionEstimationPic() {
 			   ->setSizeTolerance   (sizeTolerance)
 			   ->setSizeSupTolerance(sizeSupTolerance);
 
+	Position_XYZ_YPR *initialPosition = new Position_XYZ_YPR();
+	initialPosition->x 	   = 0;
+	initialPosition->y 	   = 0;
+	initialPosition->z 	   = 170;
+	initialPosition->yaw   = 0;
+	initialPosition->pitch = 0;
+	initialPosition->roll  = 0;
+
+	vector<Point3f> *realWorldPoints = new vector<Point3f>(8);
+	realWorldPoints->at(0) = { 90, 70,0};
+	realWorldPoints->at(1) = { 90, 30,0};
+	realWorldPoints->at(2) = { 90,-90,0};
+	realWorldPoints->at(3) = { 50, 70,0};
+	realWorldPoints->at(4) = { 50, 30,0};
+	realWorldPoints->at(5) = { 50,-90,0};
+	realWorldPoints->at(6) = {-90, 70,0};
+	realWorldPoints->at(7) = {-90, 90,0};
+
+	PositionEstimation *posEstimator = new PositionEstimation(initialPosition,realWorldPoints);
 	string imgName;
 	vector<Point2f> *ledPoints = new vector<Point2f>();
 	for (int i = 0; i < 3; i++) {
@@ -63,6 +83,10 @@ void testImgAnalysisPositionEstimationPic() {
 		if(downscalingNeeded)
 			cout << "\nDownscaling needed!";
 
+		cout << "\n\nEVALUATING POSITION...";
+		Matrix<float,3,2> *position = posEstimator->evaluate(ledPoints);
+		cout << "\nCurrent position is:\n";
+		GenPurpFunc::printMatrixf(*position,3,2);
 		/*
 		Matrix<double, 3, 4> realPoints;
 		realPoints << -50, -50, 30, -30,  //1, 3, 7, 5
@@ -93,6 +117,12 @@ void testImgAnalysisPositionEstimationPic() {
 		GenPurpFunc::printMatrix(ret, 3, 4);
 		*/
 	}
+
+	delete imgAnalyzer;
+	delete initialPosition;
+	delete realWorldPoints;
+	delete posEstimator;
+	delete ledPoints;
 
 	return;
 }
