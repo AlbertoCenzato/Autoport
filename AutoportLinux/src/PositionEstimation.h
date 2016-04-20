@@ -44,7 +44,7 @@ template<typename _Scalar, int NX = Dynamic, int NY = Dynamic> struct Functor {
 };
 
 //specific functor for PinHole
-struct PinHoleEquations : Functor<double> {
+struct PinHoleEquations : Functor<float> {
 
 	vector<Point2f> *cameraSystemPoints;
 	vector<Point3f> *realWorldPoints;
@@ -52,9 +52,9 @@ struct PinHoleEquations : Functor<double> {
 	float pixelDimension;
 
 	PinHoleEquations(vector<Point2f> *cameraSystemPoints, vector<Point3f> *realWorldPoints, float focal, float pixelDimention)
-	: Functor(6,8), cameraSystemPoints(cameraSystemPoints), realWorldPoints(realWorldPoints), focal(focal), pixelDimension(pixelDimention) {}
+	: Functor(6,16), cameraSystemPoints(cameraSystemPoints), realWorldPoints(realWorldPoints), focal(focal), pixelDimension(pixelDimention) {}
 
-	int operator()(VectorXd &position, VectorXd &fvec) const {
+	int operator()(VectorXf &position, VectorXf &fvec) const {
 
 		float x 	= (float)position(0);
 		float y 	= (float)position(1);
@@ -191,18 +191,18 @@ private:
 
 	void positionEstimation() {
 
-		VectorXd &dynVar = *(new VectorXd(6));
+		VectorXf &dynVar = *(new VectorXf(6));
 		Position_XYZ_YPR *lastKnownPos = lastKnownPositions->front();
-		dynVar(0) = (double)lastKnownPos->x;
-		dynVar(1) = (double)lastKnownPos->y;
-		dynVar(2) = (double)lastKnownPos->z;
-		dynVar(3) = (double)lastKnownPos->yaw;
-		dynVar(4) = (double)lastKnownPos->pitch;
-		dynVar(5) = (double)lastKnownPos->roll;
+		dynVar(0) = lastKnownPos->x;
+		dynVar(1) = lastKnownPos->y;
+		dynVar(2) = lastKnownPos->z;
+		dynVar(3) = lastKnownPos->yaw;
+		dynVar(4) = lastKnownPos->pitch;
+		dynVar(5) = lastKnownPos->roll;
 
 		PinHoleEquations pinHoleFunctor(cameraSystemPoints, realWorldPoints, FOCAL, PIXEL_DIMENSION);
 		NumericalDiff<PinHoleEquations> numDiff(pinHoleFunctor);
-		LevenbergMarquardt<NumericalDiff<PinHoleEquations>, double> levMarq(numDiff);
+		LevenbergMarquardt<NumericalDiff<PinHoleEquations>, float> levMarq(numDiff);
 		levMarq.parameters.maxfev = 2000;
 		levMarq.parameters.xtol = 1.0e-10;
 
