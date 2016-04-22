@@ -5,4 +5,4 @@
 
 void testImgAnalysisPositionEstimationPic();
 
-void testImgAnalysisVid();
+void testPositionEstimation();

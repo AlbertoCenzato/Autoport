@@ -63,7 +63,14 @@ bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> *points, float downscalin
 	namedWindow("Filtered image", WINDOW_NORMAL);
 	imshow("Filtered image", *colorFilteredImg);
 	waitKey(1000);
-	imwrite(resourcesPath + "output/filterByColor.jpg",*colorFilteredImg);
+	try {
+		imwrite(resourcesPath + "output/filterByColor.jpg",*colorFilteredImg);
+	        }
+	        catch (cv::Exception& ex) {
+	            fprintf(stderr, "Exception converting image to PNG format: %s\n", ex.what());
+	            return 1;
+	        }
+
 
 	//put in this->points detected blobs that satisfy this->params tolerance
 	begin = std::chrono::high_resolution_clock::now();

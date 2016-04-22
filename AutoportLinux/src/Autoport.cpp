@@ -40,8 +40,8 @@ int main() {
 	resourcesPath = homeDirectory + "/workspace/Autoport/Resources/";
 
 	
+	//testPositionEstimation();
 	testImgAnalysisPositionEstimationPic();
-
 
 	getchar();
 	return 0;

@@ -203,8 +203,8 @@ private:
 		PinHoleEquations pinHoleFunctor(cameraSystemPoints, realWorldPoints, FOCAL, PIXEL_DIMENSION);
 		NumericalDiff<PinHoleEquations> numDiff(pinHoleFunctor);
 		LevenbergMarquardt<NumericalDiff<PinHoleEquations>, float> levMarq(numDiff);
-		levMarq.parameters.maxfev = 2000;
-		levMarq.parameters.xtol = 1.0e-10;
+		levMarq.parameters.maxfev = 1000;
+		levMarq.parameters.xtol = 1.0e-6;
 
 		//walking inside the world of black magic...
 		levMarq.minimize(dynVar);

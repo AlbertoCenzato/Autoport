@@ -50,8 +50,8 @@ public:
 		params->minInertiaRatio = 0.3;
 		params->maxInertiaRatio = 1;
 		params->filterByArea = true;
-		params->minArea = 30;
-		params->maxArea = 1000;
+		params->minArea = 500;
+		params->maxArea = 5000;
 		params->filterByConvexity = false;
 		params->minConvexity = 0.2;
 		params->maxConvexity = 1;
