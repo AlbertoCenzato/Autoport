@@ -126,12 +126,31 @@ struct PinHoleEquations : Functor<float> {
 		float cosRsinPsinY = cosRoll*sinPitch*sinYaw;
 		float cosPcosR     = cosPitch*cosRoll;
 		float cosRcosY	   = cosRoll*cosYaw;
-		float sinPsinRsinY = sinPitch*sinRoll*sinYaw;
 		float cosRsinY	   = cosRoll*sinYaw;
 		float cosYsinPsinR = cosYaw*sinPitch*sinRoll;
 		float cosPsinR	   = cosPitch*sinRoll;
 
 		//x equations
+		fvec(0)   = x_pxl_0 - (focal*(x - Pz_0*sinPitch + Px_0*cosPcosY + Py_0*cosPsinY))/(pixelDimension*(z + Px_0*(sinRsinY + cosRcosYsinP) - Py_0*(cosYsinR - cosRsinPsinY) + Pz_0*cosPcosR));
+		fvec(2)   = x_pxl_1 - (focal*(x - Pz_1*sinPitch + Px_1*cosPcosY + Py_1*cosPsinY))/(pixelDimension*(z + Px_1*(sinRsinY + cosRcosYsinP) - Py_1*(cosYsinR - cosRsinPsinY) + Pz_1*cosPcosR));
+		fvec(4)   = x_pxl_2 - (focal*(x - Pz_2*sinPitch + Px_2*cosPcosY + Py_2*cosPsinY))/(pixelDimension*(z + Px_2*(sinRsinY + cosRcosYsinP) - Py_2*(cosYsinR - cosRsinPsinY) + Pz_2*cosPcosR));
+		fvec(6)   = x_pxl_3 - (focal*(x - Pz_3*sinPitch + Px_3*cosPcosY + Py_3*cosPsinY))/(pixelDimension*(z + Px_3*(sinRsinY + cosRcosYsinP) - Py_3*(cosYsinR - cosRsinPsinY) + Pz_3*cosPcosR));
+		fvec(8)   = x_pxl_4 - (focal*(x - Pz_4*sinPitch + Px_4*cosPcosY + Py_4*cosPsinY))/(pixelDimension*(z + Px_4*(sinRsinY + cosRcosYsinP) - Py_4*(cosYsinR - cosRsinPsinY) + Pz_4*cosPcosR));
+		fvec(10)  = x_pxl_5 - (focal*(x - Pz_5*sinPitch + Px_5*cosPcosY + Py_5*cosPsinY))/(pixelDimension*(z + Px_5*(sinRsinY + cosRcosYsinP) - Py_5*(cosYsinR - cosRsinPsinY) + Pz_5*cosPcosR));
+		fvec(12)  = x_pxl_6 - (focal*(x - Pz_6*sinPitch + Px_6*cosPcosY + Py_6*cosPsinY))/(pixelDimension*(z + Px_6*(sinRsinY + cosRcosYsinP) - Py_6*(cosYsinR - cosRsinPsinY) + Pz_6*cosPcosR));
+		fvec(14)  = x_pxl_7 - (focal*(x - Pz_7*sinPitch + Px_7*cosPcosY + Py_7*cosPsinY))/(pixelDimension*(z + Px_7*(sinRsinY + cosRcosYsinP) - Py_7*(cosYsinR - cosRsinPsinY) + Pz_7*cosPcosR));
+
+		//y equations
+		fvec(1)   = y_pxl_0 - (focal*(y - Px_0*(cosRsinY - cosYsinPsinR) + Py_0*(cosRcosY + sinPitch*sinRsinY) + Pz_0*cosPsinR))/(pixelDimension*(z + Px_0*(sinRsinY + cosRcosYsinP) - Py_0*(cosYsinR - cosRsinPsinY) + Pz_0*cosPcosR));
+		fvec(3)   = y_pxl_1 - (focal*(y - Px_1*(cosRsinY - cosYsinPsinR) + Py_1*(cosRcosY + sinPitch*sinRsinY) + Pz_1*cosPsinR))/(pixelDimension*(z + Px_1*(sinRsinY + cosRcosYsinP) - Py_1*(cosYsinR - cosRsinPsinY) + Pz_1*cosPcosR));
+		fvec(5)   = y_pxl_2 - (focal*(y - Px_2*(cosRsinY - cosYsinPsinR) + Py_2*(cosRcosY + sinPitch*sinRsinY) + Pz_2*cosPsinR))/(pixelDimension*(z + Px_2*(sinRsinY + cosRcosYsinP) - Py_2*(cosYsinR - cosRsinPsinY) + Pz_2*cosPcosR));
+		fvec(7)   = y_pxl_3 - (focal*(y - Px_3*(cosRsinY - cosYsinPsinR) + Py_3*(cosRcosY + sinPitch*sinRsinY) + Pz_3*cosPsinR))/(pixelDimension*(z + Px_3*(sinRsinY + cosRcosYsinP) - Py_3*(cosYsinR - cosRsinPsinY) + Pz_3*cosPcosR));
+		fvec(9)   = y_pxl_4 - (focal*(y - Px_4*(cosRsinY - cosYsinPsinR) + Py_4*(cosRcosY + sinPitch*sinRsinY) + Pz_4*cosPsinR))/(pixelDimension*(z + Px_4*(sinRsinY + cosRcosYsinP) - Py_4*(cosYsinR - cosRsinPsinY) + Pz_4*cosPcosR));
+		fvec(11)  = y_pxl_5 - (focal*(y - Px_5*(cosRsinY - cosYsinPsinR) + Py_5*(cosRcosY + sinPitch*sinRsinY) + Pz_5*cosPsinR))/(pixelDimension*(z + Px_5*(sinRsinY + cosRcosYsinP) - Py_5*(cosYsinR - cosRsinPsinY) + Pz_5*cosPcosR));
+		fvec(13)  = y_pxl_6 - (focal*(y - Px_6*(cosRsinY - cosYsinPsinR) + Py_6*(cosRcosY + sinPitch*sinRsinY) + Pz_6*cosPsinR))/(pixelDimension*(z + Px_6*(sinRsinY + cosRcosYsinP) - Py_6*(cosYsinR - cosRsinPsinY) + Pz_6*cosPcosR));
+		fvec(15)  = y_pxl_7 - (focal*(y - Px_7*(cosRsinY - cosYsinPsinR) + Py_7*(cosRcosY + sinPitch*sinRsinY) + Pz_7*cosPsinR))/(pixelDimension*(z + Px_7*(sinRsinY + cosRcosYsinP) - Py_7*(cosYsinR - cosRsinPsinY) + Pz_7*cosPcosR));
+
+		/*
 		fvec(0)  = x_pxl_0 - (focal*(cosPcosY*(Px_0 + x) - sinPitch*(Pz_0 + z) + cosPsinY*(Py_0 + y))) / (pixelDimension*((Px_0 + x)*(sinRsinY + cosRcosYsinP) - (Py_0 + y)*(cosYsinR - cosRsinPsinY) + cosPcosR*(Pz_0 + z)));
 		fvec(2)  = x_pxl_1 - (focal*(cosPcosY*(Px_1 + x) - sinPitch*(Pz_1 + z) + cosPsinY*(Py_1 + y))) / (pixelDimension*((Px_1 + x)*(sinRsinY + cosRcosYsinP) - (Py_1 + y)*(cosYsinR - cosRsinPsinY) + cosPcosR*(Pz_1 + z)));
 		fvec(4)  = x_pxl_2 - (focal*(cosPcosY*(Px_2 + x) - sinPitch*(Pz_2 + z) + cosPsinY*(Py_2 + y))) / (pixelDimension*((Px_2 + x)*(sinRsinY + cosRcosYsinP) - (Py_2 + y)*(cosYsinR - cosRsinPsinY) + cosPcosR*(Pz_2 + z)));
@@ -149,7 +168,7 @@ struct PinHoleEquations : Functor<float> {
 		fvec(11) = y_pxl_5 - (focal*((Py_5 + y)*(cosRcosY + sinPsinRsinY) - (Px_5 + x)*(cosRsinY - cosYsinPsinR) + cosPsinR*(Pz_5 + z))) / (pixelDimension*((Px_5 + x)*(sinRsinY + cosRcosYsinP) - (Py_5 + y)*(cosYsinR - cosRsinPsinY) + cosPcosR*(Pz_5 + z)));
 		fvec(13) = y_pxl_6 - (focal*((Py_6 + y)*(cosRcosY + sinPsinRsinY) - (Px_6 + x)*(cosRsinY - cosYsinPsinR) + cosPsinR*(Pz_6 + z))) / (pixelDimension*((Px_6 + x)*(sinRsinY + cosRcosYsinP) - (Py_6 + y)*(cosYsinR - cosRsinPsinY) + cosPcosR*(Pz_6 + z)));
 		fvec(15) = y_pxl_7 - (focal*((Py_7 + y)*(cosRcosY + sinPsinRsinY) - (Px_7 + x)*(cosRsinY - cosYsinPsinR) + cosPsinR*(Pz_7 + z))) / (pixelDimension*((Px_7 + x)*(sinRsinY + cosRcosYsinP) - (Py_7 + y)*(cosYsinR - cosRsinPsinY) + cosPcosR*(Pz_7 + z)));
-
+		*/
 		return 1;
 	}
 

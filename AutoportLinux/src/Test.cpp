@@ -38,9 +38,9 @@ void testImgAnalysisPositionEstimationPic() {
 	initialPosition->x 	   = 0;
 	initialPosition->y 	   = 0;
 	initialPosition->z 	   = 300;
-	initialPosition->yaw   = 90;
+	initialPosition->yaw   = 0;
 	initialPosition->pitch = 0;
-	initialPosition->roll  = 180;
+	initialPosition->roll  = 0;
 
 	vector<Point3f> *realWorldPoints = new vector<Point3f>(8);
 	realWorldPoints->at(0) = { 90, 70,0};
@@ -84,9 +84,10 @@ void testImgAnalysisPositionEstimationPic() {
 			cout << "\nDownscaling needed!";
 
 		cout << "\n\nPunti traslati:";
-		Point2f trasl = Point2f(1296,972);
+		Point2f trasl = Point2f(-1296,972);
 		for(int i = 0; i < 8; i++) {
-			ledPoints->at(i) = ledPoints->at(i) - trasl;
+			ledPoints->at(i).y = -ledPoints->at(i).y;
+			ledPoints->at(i) = ledPoints->at(i) + trasl;
 			cout << "\nPunto " << i << ": [" << ledPoints->at(i).x << "," << ledPoints->at(i).y << "]";
 		}
 
