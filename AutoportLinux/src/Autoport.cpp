@@ -11,6 +11,7 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/core/ocl.hpp>
 #include <unistd.h>
 
 #include "GenPurpFunc.h"
@@ -38,6 +39,9 @@ int main() {
 	}
 
 	resourcesPath = homeDirectory + "/workspace/Autoport/Resources/";
+
+
+	ocl::setUseOpenCL(true); // enable OpenCL in the processing of UMat
 
 	
 	//testPositionEstimation();
