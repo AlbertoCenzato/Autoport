@@ -35,15 +35,15 @@ struct orderByX : binary_function <Point2f, Point2f, bool> {
 
 
 //TODO: make the function accept a pointer to a pattern analysis function
-bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> *points, float downscalingFactor) {
+bool ImgAnalysis::evaluate(UMat &image, vector<Point2f> *points, float downscalingFactor) {
 
 	// Crop the full image according to the region of interest
 	// Note that this doesn't copy the data
 	if(regionOfInterest != NULL)
 		image = image(*regionOfInterest);
 
-	Mat *hsvImg = new Mat(image.rows,image.cols,image.depth());
-	Mat *colorFilteredImg = new Mat(image.rows,image.cols,image.depth());
+	UMat *hsvImg = new UMat(image.rows,image.cols,image.depth());
+	UMat *colorFilteredImg = new UMat(image.rows,image.cols,image.depth());
 
 	//change color space: from BGR to HSV;
 	auto begin = std::chrono::high_resolution_clock::now();
@@ -63,14 +63,7 @@ bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> *points, float downscalin
 	namedWindow("Filtered image", WINDOW_NORMAL);
 	imshow("Filtered image", *colorFilteredImg);
 	waitKey(1000);
-	try {
-		imwrite(resourcesPath + "output/filterByColor.jpg",*colorFilteredImg);
-	        }
-	        catch (cv::Exception& ex) {
-	            fprintf(stderr, "Exception converting image to PNG format: %s\n", ex.what());
-	            return 1;
-	        }
-
+	imwrite(resourcesPath + "output/filterByColor.jpg",*colorFilteredImg);
 
 	//put in this->points detected blobs that satisfy this->params tolerance
 	begin = std::chrono::high_resolution_clock::now();
@@ -82,7 +75,7 @@ bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> *points, float downscalin
 
 	//order this->points accordingly to the led pattern numbering
 	begin = std::chrono::high_resolution_clock::now();
-	patternAnalysis(keyPoints, *colorFilteredImg, 10);
+	patternAnalysis->evaluate(keyPoints, *colorFilteredImg, 10);
 	end = std::chrono::high_resolution_clock::now();
 	cout << "\nPattern: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
 	imwrite(resourcesPath + "output/patternMirko.jpg",*colorFilteredImg);
@@ -97,7 +90,8 @@ bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> *points, float downscalin
 	int ledPointsLength = keyPoints->size();
 	for (int i = 0; i < ledPointsLength; i++) {
 		Point2f p = keyPoints->at(i).pt;
-		Vec3b color = hsvImg->at<Vec3b>(p);
+		//Vec3b color = hsvImg->at<Vec3b>(p);
+		Vec3b color = hsvImg->getMat(ACCESS_READ).at<Vec3b>(p);
 		if (color[0] > maxH)	maxH = color[0];
 		if (color[1] > maxS)	maxS = color[1];
 		if (color[2] > maxV)	maxV = color[2];

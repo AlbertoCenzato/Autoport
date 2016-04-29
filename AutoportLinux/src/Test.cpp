@@ -27,7 +27,7 @@ void testImgAnalysisPositionEstimationPic() {
 	int sizeTolerance = 300;
 	int sizeSupTolerance = 128;
 
-	function<void(vector<KeyPoint>*, Mat&, int)> patternAnalysis = &PatternAnalysis::patternMirko;
+	PatternAnalysis *patternAnalysis = new PatternAnalysis();
 	ImgAnalysis *imgAnalyzer = new ImgAnalysis(low, high, LedColor::RED, patternAnalysis);
 	imgAnalyzer->setColorTolerance  (colorTolerance)
 			   ->setROItolerance    (ROItolerance)
@@ -37,7 +37,7 @@ void testImgAnalysisPositionEstimationPic() {
 	Position_XYZ_YPR *initialPosition = new Position_XYZ_YPR();
 	initialPosition->x 	   = 0;
 	initialPosition->y 	   = 0;
-	initialPosition->z 	   = 300;
+	initialPosition->z 	   = 1700;
 	initialPosition->yaw   = 0;
 	initialPosition->pitch = 0;
 	initialPosition->roll  = 0;
@@ -55,7 +55,7 @@ void testImgAnalysisPositionEstimationPic() {
 	PositionEstimation *posEstimator = new PositionEstimation(initialPosition,realWorldPoints);
 	string imgName;
 	vector<Point2f> *ledPoints = new vector<Point2f>();
-	for (int i = 3; i < 4; i++) {
+	for (int i = 0; i < 4; i++) {
 
 		switch (i) {
 			case 0:
@@ -75,7 +75,8 @@ void testImgAnalysisPositionEstimationPic() {
 				break;
 		}
 
-		Mat img = imread(imgName, IMREAD_COLOR);
+		UMat img;
+		imread(imgName, IMREAD_COLOR).copyTo(img);
 		imwrite(resourcesPath + "output/originalImage.jpg",img);
 
 		int downscalingFactor = 1;
@@ -95,35 +96,6 @@ void testImgAnalysisPositionEstimationPic() {
 		Matrix<float,3,2> *position = posEstimator->evaluate(ledPoints);
 		cout << "\nCurrent position is:\n";
 		GenPurpFunc::printMatrixf(*position,3,2);
-		/*
-		Matrix<double, 3, 4> realPoints;
-		realPoints << -50, -50, 30, -30,  //1, 3, 7, 5
-				-30, 20, -20, -10,
-				0, 0, 20, 0;
-		double focale = 3.46031; //[mm]
-		Point2f point = ledPoints->at(0);
-		Vector3d p1 = { 1.4 / 1000 * point.x, 1.4 / 1000 * point.y, focale };
-		point = ledPoints->at(2);
-		Vector3d p2 = { 1.4 / 1000 * point.x, 1.4 / 1000 * point.y, focale };
-		point = ledPoints->at(6);
-		Vector3d p3 = { 1.4 / 1000 * point.x, 1.4 / 1000 * point.y, focale };
-		point = ledPoints->at(4);
-		Vector3d p4 = { 1.4 / 1000 * point.x, 1.4 / 1000 * point.y, focale };
-
-		Vector3d translation = { 1.4 / 1000 * 2592 / 2, 1.4 / 1000 * 1944 / 2, 0 };
-		Vector3d p1t = (translation - p1);
-		Vector3d p2t = (translation - p2);
-		Vector3d p3t = (translation - p3);
-		Vector3d p4t = (translation - p4);
-		p1t.normalize();
-		p2t.normalize();
-		p3t.normalize();
-		p4t.normalize();
-		Matrix<double, 3, 4> cameraSystemPoints;
-		cameraSystemPoints << p1t, p2t, p3t, p4t;
-		Matrix<double, 3, 4> ret = GenPurpFunc::p3p_solver(realPoints, cameraSystemPoints);
-		GenPurpFunc::printMatrix(ret, 3, 4);
-		*/
 	}
 
 	delete imgAnalyzer;

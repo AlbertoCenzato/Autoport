@@ -6,6 +6,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/features2d/features2d.hpp>
 #include "GenPurpFunc.h"
+#include "PatternAnalysis.h"
 
 using namespace std;
 using namespace cv;
@@ -34,11 +35,11 @@ class ImgAnalysis {
 	vector<KeyPoint> *keyPoints;
 	SimpleBlobDetector::Params *params;
 	int colorConversion;
-	function<void(vector<KeyPoint>*, Mat&, int)> patternAnalysis;
+	PatternAnalysis *patternAnalysis;
 
 public:
 
-	ImgAnalysis(const Scalar &low, const Scalar &high, LedColor ledColor, function<void(vector<KeyPoint>*, Mat&, int)> patternAnalysis, Rect *regionOfInterest = NULL) {
+	ImgAnalysis(const Scalar &low, const Scalar &high, LedColor ledColor, PatternAnalysis*, Rect *regionOfInterest = NULL) {
 		this->regionOfInterest = regionOfInterest;
 		this->low  = low;
 		this->high = high;
@@ -77,24 +78,24 @@ public:
 		delete params;
 	}
 
-	bool evaluate(Mat &, vector<Point2f> *, float);
+	bool evaluate(UMat &, vector<Point2f> *, float);
 	ImgAnalysis* setROItolerance(int);
 	ImgAnalysis* setColorTolerance(int);
 	ImgAnalysis* setSizeTolerance(int);
 	ImgAnalysis* setSizeSupTolerance(int);
 
-	static vector<Point2f> pattern1(vector<Point2f> &, Mat &);
-	static vector<Point2f> pattern3(vector<Point2f> &, Mat &);
+	static vector<Point2f> pattern1(vector<Point2f> &, UMat &);
+	static vector<Point2f> pattern3(vector<Point2f> &, UMat &);
 
 private:
 
 	// Processes the input image (in HSV color space) filtering out (setting to black)
 	// all colors which are not in the interval [min,max], the others are set to white.
-	// @img: the Mat object (HSV color space) containing the image to process.
+	// @img: the UMat object (HSV color space) containing the image to process.
 	// @min: the lower bound specified in the HSV color space.
 	// @max: the upper bound specified in the HSV color space.
-	// returns: black and white image as a Mat object.
-	void filterByColor(Mat *hsvImg, Mat *colorFilteredImg) {
+	// returns: black and white image as a UMat object.
+	void filterByColor(UMat *hsvImg, UMat *colorFilteredImg) {
 
 		// Sets to white all colors in the threshold interval [min,max] and to black the others
 		inRange(*hsvImg, low, high, *colorFilteredImg);
@@ -115,7 +116,7 @@ private:
 	// @img: image to analyze.
 	// @blobParam: parameters to fit.
 	// returns: a vector of Point2f containing centroids coordinates of detected blobs.
-	void findBlobs(Mat *colorFilteredImg, float downscalingFactor) {
+	void findBlobs(UMat *colorFilteredImg, float downscalingFactor) {
 
 		//TODO: check this way of computing valid led sizes interval: it can lead to
 		//a degeneration of the interval amplitude continuously increasing it in presence
@@ -146,9 +147,9 @@ private:
 		//ledPoints = new vector<Point2f>(keyPoints->size());
 		
 		// Draw detected blobs as red circles.
-		drawKeypoints(*colorFilteredImg, *keyPoints, *colorFilteredImg, Scalar(0, 0, 255), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
-		namedWindow("Thresholded Image", WINDOW_NORMAL);
-		imshow("Thresholded Image", *colorFilteredImg); //show the thresholded img
+		//drawKeypoints(*colorFilteredImg, *keyPoints, *colorFilteredImg, Scalar(0, 0, 255), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+		//namedWindow("Thresholded Image", WINDOW_NORMAL);
+		//imshow("Thresholded Image", *colorFilteredImg); //show the thresholded img
 
 		//KeyPoint::convert(*keyPoints, *ledPoints);
 		// Remove points too far from the centroid of the detected points set
