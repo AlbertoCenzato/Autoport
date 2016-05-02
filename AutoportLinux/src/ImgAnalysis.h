@@ -56,8 +56,8 @@ public:
 		params->filterByColor = true;
 		params->blobColor = 255;
 		params->filterByArea = true;
-		params->minArea = 10;
-		params->maxArea = 500;
+		params->minArea = 50;
+		params->maxArea = 200;
 		params->filterByInertia = false;
 		params->filterByConvexity = false;
 		params->filterByCircularity = false;
@@ -157,7 +157,6 @@ private:
 		meanDist = meanDist / size;
 
 		// remove points
-		//size = ledPoints->size();
 		for (uint i = 0; i < size; ) {
 			if (distances[i] > 2 * meanDist) {
 				ledPoints->at(i) = ledPoints->at(size - 1);
@@ -170,11 +169,11 @@ private:
 
 		cout << "ledPoints length: " << size << endl;
 
-		//size = ledPoints->size();
 		//draws detected points
 		for (uint i = 0; i < size; i++) {
 			Point2f p = ledPoints->at(i);
-			circle(*colorFilteredImg, p, 100, Scalar(0, 255, 0), 30);
+			Scalar color = Scalar(150, 150, 0);
+			circle(*colorFilteredImg, p, 30, color, 10);
 		}
 
 		float min = keyPoints->at(0).size;

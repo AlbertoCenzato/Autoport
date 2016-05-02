@@ -58,7 +58,7 @@ private:
 								//line(img, p1, p2, Scalar(0, 0, 255));
 								imshow("Thresholded Image", img);
 								waitKey(1);
-								std::cout << "\nvalid set";
+								//std::cout << "\nvalid set";
 
 								//check if the set {p1, p2, p3} has been already found
 								bool alreadyFound = false;
@@ -72,9 +72,9 @@ private:
 									alignedPoints[setNumber].push_back(*p1);
 									alignedPoints[setNumber].push_back(*p2);
 									alignedPoints[setNumber++].push_back(*p3);
-									std::cout << "\nAligned set " << setNumber - 1 << ": p1[" << p1->x << "," << p1->y << "]"
-											<< " p2["  << p2->x << "," << p2->y << "]"
-											<< " p3["  << p3->x << "," << p3->y << "]";
+									//std::cout << "\nAligned set " << setNumber - 1 << ": p1[" << p1->x << "," << p1->y << "]"
+											//<< " p2["  << p2->x << "," << p2->y << "]"
+											//<< " p3["  << p3->x << "," << p3->y << "]";
 								}
 							}
 						}
@@ -87,7 +87,7 @@ private:
 		Point2f massCenter[4];
 		for (int i = 0; i < setNumber-1; i++) {
 			massCenter[i] = GenPurpFunc::centroid(alignedPoints[i]);
-			std::cout << "\nMass center " << i << ": " << massCenter[i];
+			//std::cout << "\nMass center " << i << ": " << massCenter[i];
 		}
 
 		//order lines: 0 extern vertical, 1 intern vertical, 2 upper horizontal, 3 lower horizontal
@@ -112,8 +112,8 @@ private:
 						maxMinCouples[1][1] = k;
 					}
 				}
-		std::cout << "\nMin distance: (" << maxMinCouples[0][0] << "," << maxMinCouples[0][1] << ")";
-		std::cout << "\nMax distance: (" << maxMinCouples[1][0] << "," << maxMinCouples[1][1] << ")";
+		//std::cout << "\nMin distance: (" << maxMinCouples[0][0] << "," << maxMinCouples[0][1] << ")";
+		//std::cout << "\nMax distance: (" << maxMinCouples[1][0] << "," << maxMinCouples[1][1] << ")";
 
 		int lines[4];
 		//the line that has both min distance and second min distance is the internal vertical line, the others are assigned consequently

@@ -70,9 +70,9 @@ bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> *points, float downscalin
 	findBlobs(colorFilteredImg, downscalingFactor);
 	end = std::chrono::high_resolution_clock::now();
 	cout << "\nFind blobs: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
-	namedWindow("Blobs found", WINDOW_AUTOSIZE);
+	namedWindow("Blobs found", WINDOW_NORMAL);
 	imshow("Blobs found", *colorFilteredImg);
-	waitKey(1000);
+	waitKey(100000);
 	imwrite(resourcesPath + "output/findBlobs.jpg",*colorFilteredImg);
 
 	//order this->points accordingly to the led pattern numbering
