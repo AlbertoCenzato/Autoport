@@ -48,7 +48,6 @@ bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> *points, float downscalin
 	//change color space: from BGR to HSV;
 	auto begin = std::chrono::high_resolution_clock::now();
 	cvtColor(image,*hsvImg,colorConversion);
-
 	auto end = std::chrono::high_resolution_clock::now();
 	cout << "\nConvert color: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
 	namedWindow("Cropped image", WINDOW_NORMAL);
@@ -86,31 +85,33 @@ bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> *points, float downscalin
 
 	GenPurpFunc::printPointVector(*ledPoints);
 
-	int maxH = 0, 	maxS = 0, 	maxV = 0;
-	int minH = 255, minS = 255, minV = 255;
+	Interval<int> hue = Interval<int>();
+	hue.low  = 0;
+	hue.high = 255;
+	Interval<int> sat = Interval<int>();
+	sat.low  = 0;
+	sat.high = 255;
+	Interval<int> val = Interval<int>();
+	val.low  = 0;
+	sat.high = 255;
 
 	int ledPointsLength = ledPoints->size();
 	for (int i = 0; i < ledPointsLength; i++) {
 		Point2f p = ledPoints->at(i);
 		//Vec3b color = hsvImg->at<Vec3b>(p);
 		Vec3b color = hsvImg->at<Vec3b>(p);
-		if (color[0] > maxH)	maxH = color[0];
-		if (color[1] > maxS)	maxS = color[1];
-		if (color[2] > maxV)	maxV = color[2];
-		if (color[0] < minH)	minH = color[0];
-		if (color[1] < minS)	minS = color[1];
-		if (color[2] < minV)	minV = color[2];
+		if (color[0] > hue.high) hue.high = color[0];
+		if (color[1] > sat.high) sat.high = color[1];
+		if (color[2] > val.high) val.high = color[2];
+		if (color[0] < hue.low)	 hue.low  = color[0];
+		if (color[1] < sat.low)	 sat.low  = color[1];
+		if (color[2] < val.low)	 val.low  = color[2];
 	}
-	colorInterval->low  = Scalar(minH - colorTolerance, minS - colorTolerance, minV - colorTolerance);
-	colorInterval->high = Scalar(maxH + colorTolerance, maxS + colorTolerance, maxV + colorTolerance);
+	colorInterval->low  = Scalar(hue.low  - colorTolerance, sat.low  - colorTolerance, val.low  - colorTolerance);
+	colorInterval->high = Scalar(hue.high + colorTolerance, sat.high + colorTolerance, val.high + colorTolerance);
 	delete hsvImg;
 
-	Point2f *maxX = GenPurpFunc::findMaxXInVec(*ledPoints);
-	Point2f *maxY = GenPurpFunc::findMaxYInVec(*ledPoints);
-	Point2f *minX = GenPurpFunc::findMinXInVec(*ledPoints);
-	Point2f *minY = GenPurpFunc::findMinYInVec(*ledPoints);
-	delete regionOfInterest;
-	regionOfInterest = new Rect(minX->x - ROItolerance, minY->y - ROItolerance, maxX->x - minX->x + 2*ROItolerance, maxY->y - minY->y + 2*ROItolerance);
+	findROI();
 
 	delete points;
 	points = ledPoints;

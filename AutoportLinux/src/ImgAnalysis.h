@@ -20,22 +20,31 @@ enum LedColor {
 };
 
 template<typename varType> struct Interval{
+
+public:
 	varType low;
 	varType high;
+/*
+	template<typename varType> Interval(varType low, varType high) {
+		this->low  = low;
+		this->high = high;
+	}
+*/
 };
 
 class ImgAnalysis {
 
 	Rect *regionOfInterest;
 	Interval<Scalar> *colorInterval;
-	//Scalar high;
+
 	static const int COLOR_TOLERANCE = 20;
-	int colorTolerance;
 	static const int ROI_TOLERANCE = 100;
-	int ROItolerance;	//region of interest cropping tolerance [px]
 	static const int SIZE_TOLERANCE = 20;
-	int sizeTolerance;
 	static const int SIZE_SUP_TOLERANCE = 128;
+
+	int colorTolerance;
+	int ROItolerance;	//region of interest cropping tolerance [px]
+	int sizeTolerance;
 	int sizeSupTolerance;
 	vector<Point2f> *ledPoints;
 	SimpleBlobDetector::Params *params;
@@ -79,6 +88,7 @@ public:
 	~ImgAnalysis() {
 		delete ledPoints;
 		delete params;
+		delete colorInterval;
 	}
 
 	bool evaluate(Mat &, vector<Point2f> *, float);
@@ -86,9 +96,6 @@ public:
 	ImgAnalysis* setColorTolerance(int);
 	ImgAnalysis* setSizeTolerance(int);
 	ImgAnalysis* setSizeSupTolerance(int);
-
-	static vector<Point2f> pattern1(vector<Point2f> &, Mat &);
-	static vector<Point2f> pattern3(vector<Point2f> &, Mat &);
 
 private:
 
@@ -192,6 +199,30 @@ private:
 		return;
 	}
 
+
+	//Finds the Region Of Interest that surrounds the pattern
+	void findROI() {
+
+		Point2f *point = &ledPoints->at(0);
+		Interval<float> x = Interval<float>();
+		x.low  = point->x;
+		x.high = point->x;
+		Interval<float> y = Interval<float>();
+		y.low  = point->y;
+		y.high = point->y;
+		uint size = ledPoints->size();
+		for (uint i = 1; i < size; i++) {
+			point = &ledPoints->at(i);
+			if (point->x < x.low)	x.low  = point->x;
+			if (point->x > x.high)	x.high = point->x;
+			if (point->y < y.low)	y.low  = point->y;
+			if (point->y < y.high)	y.high = point->y;
+		}
+		delete regionOfInterest;
+		regionOfInterest = new Rect(x.low - ROItolerance, y.low - ROItolerance, x.high - x.low + 2*ROItolerance, y.high - y.low + 2*ROItolerance);
+
+		return;
+	}
 
 };
 

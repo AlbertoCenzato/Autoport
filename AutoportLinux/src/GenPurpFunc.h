@@ -143,6 +143,7 @@ namespace GenPurpFunc {
 		return min;
 	}
 
+	/*
 	inline Point2f* findMaxXInVec(vector<KeyPoint> &vec) {
 		KeyPoint *max = &vec[0];
 		for (uint i = 1; i < vec.size(); i++)
@@ -171,6 +172,7 @@ namespace GenPurpFunc {
 				min = &vec[i];
 		return &(min->pt);
 	}
+	*/
 
 	inline float distancePointToPoint(Point2f &p1, Point2f &p2) {
 		return sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2));
