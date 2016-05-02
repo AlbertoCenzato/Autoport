@@ -23,39 +23,39 @@ public:
 		oldPoints = NULL;
 	}
 
-	void evaluate(vector<KeyPoint>*, UMat&, int);
+	void evaluate(vector<Point2f>*, Mat&, int);
 
 private:
 	vector<Point2f> *oldPoints;
 
-	void patternMirko(vector<KeyPoint> *points, UMat &img, int tolerance) {
+	void patternMirko(vector<Point2f> *points, Mat &img, int tolerance) {
 
 		int numOfPoints = points->size();
 		int setNumber = 0;			//number of aligned sets found;
 
-		vector<KeyPoint> *alignedPoints = new vector<KeyPoint>[4];	//TODO: use an array of vectors of POINTERS to Point2f
+		vector<Point2f> *alignedPoints = new vector<Point2f>[4];	//TODO: use an array of vectors of POINTERS to Point2f
 		long alignedPointsHash[4] = {0L,0L,0L,0L};
 
 		//look for the 4 sets of 3 aligned points
 		for (int i = 0; i < numOfPoints; i++) {
-			KeyPoint *p1 = &(points->at(i));
+			Point2f *p1 = &(points->at(i));
 			//for each couple of points...
 			for (int j = 0; j < numOfPoints; j++) {
-				KeyPoint *p2 = &(points->at(j));
+				Point2f *p2 = &(points->at(j));
 				if (p1 != p2) {
 					//... compute the equation of the line laying on p1 and p2...
-					float dx = p1->pt.x - p2->pt.x;
-					float m = (p1->pt.y - p2->pt.y) / dx;
-					float q = p1->pt.y - m*(p1->pt.x);
+					float dx = p1->x - p2->x;
+					float m = (p1->y - p2->y) / dx;
+					float q = p1->y - m*(p1->x);
 
 					//... and look for another point that satisfies the equation
 					for (int k = 0; k < numOfPoints; k++) {
-						KeyPoint *p3 = &(points->at(k));
+						Point2f *p3 = &(points->at(k));
 						if (p3 != p1 && p3 != p2) {		//TODO: manage strange cases like +INF, -INF, NAN
-							float distance = abs(p3->pt.y - (m*(p3->pt.x) + q)) / sqrt(1 + pow(m, 2));
+							float distance = abs(p3->y - (m*(p3->x) + q)) / sqrt(1 + pow(m, 2));
 							if (distance < tolerance) {
 
-								line(img, p1->pt, p2->pt, Scalar(0, 0, 255));
+								//line(img, p1, p2, Scalar(0, 0, 255));
 								imshow("Thresholded Image", img);
 								waitKey(1);
 								std::cout << "\nvalid set";
@@ -72,9 +72,9 @@ private:
 									alignedPoints[setNumber].push_back(*p1);
 									alignedPoints[setNumber].push_back(*p2);
 									alignedPoints[setNumber++].push_back(*p3);
-									std::cout << "\nAligned set " << setNumber - 1 << ": p1[" << p1->pt.x << "," << p1->pt.y << "]"
-											<< " p2["  << p2->pt.x << "," << p2->pt.y << "]"
-											<< " p3["  << p3->pt.x << "," << p3->pt.y << "]";
+									std::cout << "\nAligned set " << setNumber - 1 << ": p1[" << p1->x << "," << p1->y << "]"
+											<< " p2["  << p2->x << "," << p2->y << "]"
+											<< " p3["  << p3->x << "," << p3->y << "]";
 								}
 							}
 						}
@@ -149,16 +149,16 @@ private:
 
 
 
-		vector<KeyPoint> *ledPattern = new vector<KeyPoint>(8);
+		vector<Point2f> *ledPattern = new vector<Point2f>(8);
 		int count = 0;
 		for (int i = 0; i < 2; i++) {
 			double minDist = INT_MAX, maxDist = 0;
 			int minIndx[2], maxIndx[2];
-			vector<KeyPoint> alignedSet = alignedPoints[lines[i]];
+			vector<Point2f> alignedSet = alignedPoints[lines[i]];
 			for (int i = 0; i < 3; i++) {
 				for (int j = 0; j < 3; j++) {
 					if (i != j) {
-						double dist = GenPurpFunc::distancePointToPoint(alignedSet[i].pt, alignedSet[j].pt);
+						double dist = GenPurpFunc::distancePointToPoint(alignedSet.at(i), alignedSet.at(j));
 						if (dist < minDist) {
 							minDist = dist;
 							minIndx[0] = i;
@@ -195,15 +195,15 @@ private:
 		}
 
 		for (int i = 0; i < 3; i++) {
-			KeyPoint *p = &(alignedPoints[lines[2]][i]);
-			if (p->pt.x != ledPattern->at(0).pt.x && p->pt.y != ledPattern->at(0).pt.y && p->pt.x != ledPattern->at(3).pt.x && p->pt.y != ledPattern->at(3).pt.y) {
+			Point2f *p = &(alignedPoints[lines[2]][i]);
+			if (p->x != ledPattern->at(0).x && p->y != ledPattern->at(0).y && p->x != ledPattern->at(3).x && p->y != ledPattern->at(3).y) {
 				ledPattern->at(6) = *p;
 				break;
 			}
 		}
 		for (int i = 0; i < 3; i++) {
-			KeyPoint *p = &(alignedPoints[lines[3]][i]);
-			if (p->pt.x != ledPattern->at(2).pt.x && p->pt.y != ledPattern->at(2).pt.y && p->pt.x != ledPattern->at(5).pt.x && p->pt.y != ledPattern->at(5).pt.y) {
+			Point2f *p = &(alignedPoints[lines[3]][i]);
+			if (p->x != ledPattern->at(2).x && p->y != ledPattern->at(2).y && p->x != ledPattern->at(5).x && p->y != ledPattern->at(5).y) {
 				ledPattern->at(7) = *p;
 				break;
 			}
@@ -213,27 +213,30 @@ private:
 			ostringstream convert;
 			convert << i;
 			string s = convert.str();
-			GenPurpFunc::drawDetectedLed(img, ledPattern->at(i).pt, s);
+			GenPurpFunc::drawDetectedLed(img, ledPattern->at(i), s);
 		}
 		waitKey(1);
+
+		delete points;
+		points = ledPattern;
 
 		delete [] alignedPoints;
 
 		return; //ledPattern;
 	}
 
-	void nearerPoints(vector<KeyPoint> *ledPoints, UMat &img, int tolerance) {
+	void nearerPoints(vector<Point2f> *ledPoints, Mat &img, int tolerance) {
 
-		vector<KeyPoint> *orderedVector = new vector<KeyPoint>(8);
+		vector<Point2f> *orderedVector = new vector<Point2f>(8);
 
 		//looking for led 6
 		Point2f *point = &(oldPoints->at(6));
 
-		float minDist = GenPurpFunc::distancePointToPoint(*point,ledPoints->at(0).pt);
+		float minDist = GenPurpFunc::distancePointToPoint(*point,ledPoints->at(0));
 		int minIndex = 0;
 		for (int i = 1; i < 8; i++) {
-			KeyPoint *keyPoint = &(ledPoints->at(i));
-			float distance = GenPurpFunc::distancePointToPoint(*point,(*keyPoint).pt);
+			Point2f *keyPoint = &(ledPoints->at(i));
+			float distance = GenPurpFunc::distancePointToPoint(*point,*keyPoint);
 			if(distance < minDist) {
 				minDist = distance;
 				minIndex = i;
@@ -247,11 +250,11 @@ private:
 		//looking for led 7
 		point = &(oldPoints->at(7));
 
-		minDist = GenPurpFunc::distancePointToPoint(*point,ledPoints->at(0).pt);
+		minDist = GenPurpFunc::distancePointToPoint(*point,ledPoints->at(0));
 		minIndex = 0;
 		for (int i = 1; i < 7; i++) {
-			KeyPoint *keyPoint = &(ledPoints->at(i));
-			float distance = GenPurpFunc::distancePointToPoint(*point,(*keyPoint).pt);
+			Point2f *keyPoint = &(ledPoints->at(i));
+			float distance = GenPurpFunc::distancePointToPoint(*point,*keyPoint);
 			if(distance < minDist) {
 				minDist = distance;
 				minIndex = i;
@@ -267,7 +270,7 @@ private:
 
 	}
 
-	void ransac(vector<KeyPoint> *points, UMat &img, int tolerance);
+	void ransac(vector<Point2f> *points, Mat &img, int tolerance);
 
 
 };

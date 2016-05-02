@@ -19,11 +19,16 @@ enum LedColor {
 	BLUE
 };
 
+template<typename varType> struct Interval{
+	varType low;
+	varType high;
+};
+
 class ImgAnalysis {
 
 	Rect *regionOfInterest;
-	Scalar low;
-	Scalar high;
+	Interval<Scalar> *colorInterval;
+	//Scalar high;
 	static const int COLOR_TOLERANCE = 20;
 	int colorTolerance;
 	static const int ROI_TOLERANCE = 100;
@@ -32,33 +37,30 @@ class ImgAnalysis {
 	int sizeTolerance;
 	static const int SIZE_SUP_TOLERANCE = 128;
 	int sizeSupTolerance;
-	vector<KeyPoint> *keyPoints;
+	vector<Point2f> *ledPoints;
 	SimpleBlobDetector::Params *params;
 	int colorConversion;
 	PatternAnalysis *patternAnalysis;
+
+	Interval<float> *oldKeyPointSizeInterval;
 
 public:
 
 	ImgAnalysis(const Scalar &low, const Scalar &high, LedColor ledColor, PatternAnalysis*, Rect *regionOfInterest = NULL) {
 		this->regionOfInterest = regionOfInterest;
-		this->low  = low;
-		this->high = high;
+		colorInterval = new Interval<Scalar>();
+		colorInterval->low  = low;
+		colorInterval->high = high;
 
 		params = new SimpleBlobDetector::Params();
 		params->filterByColor = true;
 		params->blobColor = 255;
-		params->filterByInertia = false;
-		params->minInertiaRatio = 0.3;
-		params->maxInertiaRatio = 1;
 		params->filterByArea = true;
-		params->minArea = 500;
-		params->maxArea = 5000;
+		params->minArea = 10;
+		params->maxArea = 500;
+		params->filterByInertia = false;
 		params->filterByConvexity = false;
-		params->minConvexity = 0.2;
-		params->maxConvexity = 1;
 		params->filterByCircularity = false;
-		params->minCircularity = 0.2;
-		params->maxCircularity = 1;
 
 		if(ledColor == LedColor::RED) colorConversion = COLOR_RGB2HSV;
 		else						  colorConversion = COLOR_BGR2HSV;
@@ -70,35 +72,36 @@ public:
 
 		this->patternAnalysis = patternAnalysis;
 
-		keyPoints = NULL;
+		ledPoints = NULL;
+		oldKeyPointSizeInterval = NULL;
 	}
 
 	~ImgAnalysis() {
-		delete keyPoints;
+		delete ledPoints;
 		delete params;
 	}
 
-	bool evaluate(UMat &, vector<Point2f> *, float);
+	bool evaluate(Mat &, vector<Point2f> *, float);
 	ImgAnalysis* setROItolerance(int);
 	ImgAnalysis* setColorTolerance(int);
 	ImgAnalysis* setSizeTolerance(int);
 	ImgAnalysis* setSizeSupTolerance(int);
 
-	static vector<Point2f> pattern1(vector<Point2f> &, UMat &);
-	static vector<Point2f> pattern3(vector<Point2f> &, UMat &);
+	static vector<Point2f> pattern1(vector<Point2f> &, Mat &);
+	static vector<Point2f> pattern3(vector<Point2f> &, Mat &);
 
 private:
 
 	// Processes the input image (in HSV color space) filtering out (setting to black)
 	// all colors which are not in the interval [min,max], the others are set to white.
-	// @img: the UMat object (HSV color space) containing the image to process.
+	// @img: the Mat object (HSV color space) containing the image to process.
 	// @min: the lower bound specified in the HSV color space.
 	// @max: the upper bound specified in the HSV color space.
-	// returns: black and white image as a UMat object.
-	void filterByColor(UMat *hsvImg, UMat *colorFilteredImg) {
+	// returns: black and white image as a Mat object.
+	void filterByColor(Mat *hsvImg, Mat *colorFilteredImg) {
 
 		// Sets to white all colors in the threshold interval [min,max] and to black the others
-		inRange(*hsvImg, low, high, *colorFilteredImg);
+		inRange(*hsvImg, colorInterval->low, colorInterval->high, *colorFilteredImg);
 
 		//morphological opening (remove small objects from the foreground)
 		erode (*colorFilteredImg, *colorFilteredImg, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
@@ -116,50 +119,38 @@ private:
 	// @img: image to analyze.
 	// @blobParam: parameters to fit.
 	// returns: a vector of Point2f containing centroids coordinates of detected blobs.
-	void findBlobs(UMat *colorFilteredImg, float downscalingFactor) {
+	void findBlobs(Mat *colorFilteredImg, float downscalingFactor) {
 
 		//TODO: check this way of computing valid led sizes interval: it can lead to
 		//a degeneration of the interval amplitude continuously increasing it in presence
 		//of noise similar to leds, maybe it would be better to use the medium value of led sizes
 		int length = 10;
-		if(keyPoints != NULL) {
-			length = keyPoints->size();
-			int minSize = INT_MAX;
-			int maxSize = INT_MIN;
-			for(int i = 0; i < length; i++) {
-				int size = keyPoints->at(i).size;
-				if(size < minSize) minSize = size;
-				if(size > maxSize) maxSize = size;
-			}
-			params->maxArea = (maxSize + sizeTolerance)*downscalingFactor;
-			minSize = minSize - sizeTolerance;
-			params->minArea = minSize > 0 ? minSize*downscalingFactor : 0;
-			delete keyPoints;
-		}
-		keyPoints = new vector<KeyPoint>(2*length);
 
-		//finds the centroids of blobs
+		if(oldKeyPointSizeInterval != NULL) {
+			params->maxArea = oldKeyPointSizeInterval->high;
+			params->minArea = oldKeyPointSizeInterval->low;
+		}
+		else {
+			oldKeyPointSizeInterval = new Interval<float>();
+		}
+
+		vector<KeyPoint> *keyPoints = new vector<KeyPoint>(2*length);
 
 		Ptr<SimpleBlobDetector> featureDetector = SimpleBlobDetector::create(*params);
 		featureDetector->detect(*colorFilteredImg, *keyPoints);
 
-		//delete ledPoints;
-		//ledPoints = new vector<Point2f>(keyPoints->size());
+		delete ledPoints;
+		ledPoints = new vector<Point2f>(keyPoints->size());
+		KeyPoint::convert(*keyPoints, *ledPoints);
 		
-		// Draw detected blobs as red circles.
-		//drawKeypoints(*colorFilteredImg, *keyPoints, *colorFilteredImg, Scalar(0, 0, 255), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
-		//namedWindow("Thresholded Image", WINDOW_NORMAL);
-		//imshow("Thresholded Image", *colorFilteredImg); //show the thresholded img
-
-		//KeyPoint::convert(*keyPoints, *ledPoints);
 		// Remove points too far from the centroid of the detected points set
 		// compute the mean distance from the centroid
-		Point2f centr = GenPurpFunc::centroid(*keyPoints);
+		Point2f centr = GenPurpFunc::centroid(*ledPoints);
 		float meanDist = 0;
-		uint size = keyPoints->size();
+		uint size = ledPoints->size();
 		float *distances = new float[size];
 		for (uint i = 0; i < size; i++) {
-			float dist = GenPurpFunc::distancePointToPoint(centr, keyPoints->at(i).pt);
+			float dist = GenPurpFunc::distancePointToPoint(centr, ledPoints->at(i));
 			meanDist += dist;
 			distances[i] = dist;
 		}
@@ -169,21 +160,35 @@ private:
 		//size = ledPoints->size();
 		for (uint i = 0; i < size; ) {
 			if (distances[i] > 2 * meanDist) {
-				keyPoints->at(i) = keyPoints->at(size - 1);
+				ledPoints->at(i) = ledPoints->at(size - 1);
 				distances[i] = distances[size - 1];
-				keyPoints->erase(--keyPoints->end());
+				ledPoints->erase(--ledPoints->end());
 			}
 			else i++;
-			size = keyPoints->size();
+			size = ledPoints->size();
 		}
-		delete[] distances;
+
+		cout << "ledPoints length: " << size << endl;
 
 		//size = ledPoints->size();
 		//draws detected points
 		for (uint i = 0; i < size; i++) {
-			Point2f p = keyPoints->at(i).pt;
-			circle(*colorFilteredImg, p, 10, Scalar(0, 255, 0), 3);
+			Point2f p = ledPoints->at(i);
+			circle(*colorFilteredImg, p, 100, Scalar(0, 255, 0), 30);
 		}
+
+		float min = keyPoints->at(0).size;
+		float max = min;
+		for(uint i = 1; i < keyPoints->size(); i++) {
+			float newSize = keyPoints->at(i).size;
+			if(newSize < min)	min = newSize;
+			if(newSize > max)	max = newSize;
+		}
+		oldKeyPointSizeInterval->low  = min;
+		oldKeyPointSizeInterval->high = max;
+
+		delete keyPoints;
+		delete[] distances;
 
 		return;
 	}

@@ -41,7 +41,7 @@ int main() {
 	resourcesPath = homeDirectory + "/workspace/Autoport/Resources/";
 
 
-	ocl::setUseOpenCL(true); // enable OpenCL in the processing of UMat
+	ocl::setUseOpenCL(true); // enable OpenCL in the processing of Mat
 
 	
 	//testPositionEstimation();

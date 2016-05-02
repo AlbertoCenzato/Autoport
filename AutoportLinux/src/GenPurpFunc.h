@@ -200,7 +200,7 @@ namespace GenPurpFunc {
 		return Point2f(x/size, y/size);
 	}
 
-	inline void drawDetectedLed(UMat &image, const Point2f &keyPoint, const string &number) {
+	inline void drawDetectedLed(Mat &image, const Point2f &keyPoint, const string &number) {
 		putText(image, number, keyPoint, FONT_HERSHEY_SIMPLEX, 1, Scalar(0, 0, 255),4);
 		imshow("Thresholded Image", image);
 		waitKey(25);

@@ -35,15 +35,15 @@ struct orderByX : binary_function <Point2f, Point2f, bool> {
 
 
 //TODO: make the function accept a pointer to a pattern analysis function
-bool ImgAnalysis::evaluate(UMat &image, vector<Point2f> *points, float downscalingFactor) {
+bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> *points, float downscalingFactor) {
 
 	// Crop the full image according to the region of interest
 	// Note that this doesn't copy the data
 	if(regionOfInterest != NULL)
 		image = image(*regionOfInterest);
 
-	UMat *hsvImg = new UMat(image.rows,image.cols,image.depth());
-	UMat *colorFilteredImg = new UMat(image.rows,image.cols,image.depth());
+	Mat *hsvImg = new Mat(image.rows,image.cols,image.depth());
+	Mat *colorFilteredImg = new Mat(image.rows,image.cols,image.depth());
 
 	//change color space: from BGR to HSV;
 	auto begin = std::chrono::high_resolution_clock::now();
@@ -63,35 +63,37 @@ bool ImgAnalysis::evaluate(UMat &image, vector<Point2f> *points, float downscali
 	namedWindow("Filtered image", WINDOW_NORMAL);
 	imshow("Filtered image", *colorFilteredImg);
 	waitKey(1000);
-	imwrite(resourcesPath + "output/filterByColor.jpg",*colorFilteredImg);
+	imwrite(resourcesPath + "output/filterByColor.jpg", *colorFilteredImg);
 
 	//put in this->points detected blobs that satisfy this->params tolerance
 	begin = std::chrono::high_resolution_clock::now();
 	findBlobs(colorFilteredImg, downscalingFactor);
 	end = std::chrono::high_resolution_clock::now();
 	cout << "\nFind blobs: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
-
+	namedWindow("Blobs found", WINDOW_AUTOSIZE);
+	imshow("Blobs found", *colorFilteredImg);
+	waitKey(1000);
 	imwrite(resourcesPath + "output/findBlobs.jpg",*colorFilteredImg);
 
 	//order this->points accordingly to the led pattern numbering
 	begin = std::chrono::high_resolution_clock::now();
-	patternAnalysis->evaluate(keyPoints, *colorFilteredImg, 10);
+	patternAnalysis->evaluate(ledPoints, *colorFilteredImg, 10);
 	end = std::chrono::high_resolution_clock::now();
 	cout << "\nPattern: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
 	imwrite(resourcesPath + "output/patternMirko.jpg",*colorFilteredImg);
 
 	delete colorFilteredImg;
 
-	GenPurpFunc::printPointVector(*keyPoints);
+	GenPurpFunc::printPointVector(*ledPoints);
 
 	int maxH = 0, 	maxS = 0, 	maxV = 0;
 	int minH = 255, minS = 255, minV = 255;
 
-	int ledPointsLength = keyPoints->size();
+	int ledPointsLength = ledPoints->size();
 	for (int i = 0; i < ledPointsLength; i++) {
-		Point2f p = keyPoints->at(i).pt;
+		Point2f p = ledPoints->at(i);
 		//Vec3b color = hsvImg->at<Vec3b>(p);
-		Vec3b color = hsvImg->getMat(ACCESS_READ).at<Vec3b>(p);
+		Vec3b color = hsvImg->at<Vec3b>(p);
 		if (color[0] > maxH)	maxH = color[0];
 		if (color[1] > maxS)	maxS = color[1];
 		if (color[2] > maxV)	maxV = color[2];
@@ -99,24 +101,21 @@ bool ImgAnalysis::evaluate(UMat &image, vector<Point2f> *points, float downscali
 		if (color[1] < minS)	minS = color[1];
 		if (color[2] < minV)	minV = color[2];
 	}
-	low  = Scalar(minH - colorTolerance, minS - colorTolerance, minV - colorTolerance);
-	high = Scalar(maxH + colorTolerance, maxS + colorTolerance, maxV + colorTolerance);
+	colorInterval->low  = Scalar(minH - colorTolerance, minS - colorTolerance, minV - colorTolerance);
+	colorInterval->high = Scalar(maxH + colorTolerance, maxS + colorTolerance, maxV + colorTolerance);
 	delete hsvImg;
 
-	Point2f *maxX = GenPurpFunc::findMaxXInVec(*keyPoints);
-	Point2f *maxY = GenPurpFunc::findMaxYInVec(*keyPoints);
-	Point2f *minX = GenPurpFunc::findMinXInVec(*keyPoints);
-	Point2f *minY = GenPurpFunc::findMinYInVec(*keyPoints);
+	Point2f *maxX = GenPurpFunc::findMaxXInVec(*ledPoints);
+	Point2f *maxY = GenPurpFunc::findMaxYInVec(*ledPoints);
+	Point2f *minX = GenPurpFunc::findMinXInVec(*ledPoints);
+	Point2f *minY = GenPurpFunc::findMinYInVec(*ledPoints);
 	delete regionOfInterest;
 	regionOfInterest = new Rect(minX->x - ROItolerance, minY->y - ROItolerance, maxX->x - minX->x + 2*ROItolerance, maxY->y - minY->y + 2*ROItolerance);
 
-	KeyPoint::convert(*keyPoints, *points);
+	delete points;
+	points = ledPoints;
 
-	int averageSize = 0;
-	for (int i = 0; i < ledPointsLength; i++) {
-		averageSize += keyPoints->at(i).size;
-	}
-	averageSize = averageSize / ledPointsLength;
+	int averageSize = (oldKeyPointSizeInterval->low + oldKeyPointSizeInterval->high)/2;
 
 	return averageSize > sizeSupTolerance;
 }

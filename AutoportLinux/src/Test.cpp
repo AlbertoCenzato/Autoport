@@ -75,7 +75,7 @@ void testImgAnalysisPositionEstimationPic() {
 				break;
 		}
 
-		UMat img;
+		Mat img;
 		imread(imgName, IMREAD_COLOR).copyTo(img);
 		imwrite(resourcesPath + "output/originalImage.jpg",img);
 
