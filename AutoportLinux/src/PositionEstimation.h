@@ -8,6 +8,7 @@
 #ifndef POSITIONESTIMATION_H_
 #define POSITIONESTIMATION_H_
 
+#include <memory>
 #include <list>
 #include <chrono>
 #include <Eigen/Dense>
@@ -48,12 +49,49 @@ struct PinHoleEquations : Functor<double> {
 
 	vector<Point2f> *cameraSystemPoints;
 	vector<Point3d> *realWorldPoints;
+	char usedLeds;
+	int numberOfUsedLeds;
 	double focalX;
 	double focalY;
 	double pixelDimension;
 
-	PinHoleEquations(vector<Point2f> *cameraSystemPoints, vector<Point3d> *realWorldPoints, double focalX, double focalY, double pixelDimention)
-	: Functor(6,16), cameraSystemPoints(cameraSystemPoints), realWorldPoints(realWorldPoints), focalX(focalX), focalY(focalY), pixelDimension(pixelDimention) {}
+	float *cameraSysX;
+	float *cameraSysY;
+	double *realSysX;
+	double *realSysY;
+	double *realSysZ;
+
+	PinHoleEquations(vector<Point2f> *cameraSystemPoints, vector<Point3d> *realWorldPoints, uchar usedLeds, int numberOfUsedLeds, double focalX, double focalY, double pixelDimension)
+	: Functor(6,2*numberOfUsedLeds), cameraSystemPoints(cameraSystemPoints), realWorldPoints(realWorldPoints), usedLeds(usedLeds), numberOfUsedLeds(numberOfUsedLeds), focalX(focalX), focalY(focalY), pixelDimension(pixelDimension) {
+
+
+		cameraSysX = new float[numberOfUsedLeds];
+		cameraSysY = new float[numberOfUsedLeds];
+		realSysX = new double[numberOfUsedLeds];
+		realSysY = new double[numberOfUsedLeds];
+		realSysZ = new double[numberOfUsedLeds];
+		uchar tmp = usedLeds;
+		for(int i = 0, count = 0; i < 8; i++) {
+			if((tmp & 0x80) != 0) {
+				cameraSysX[count] = cameraSystemPoints->at(i).x;
+				cameraSysY[count] = cameraSystemPoints->at(i).y;
+				realSysX[count] = realWorldPoints->at(i).x;
+				realSysY[count] = realWorldPoints->at(i).y;
+				realSysZ[count] = realWorldPoints->at(i).z;
+				cout << i << endl;
+				count++;
+			}
+			tmp = tmp << 1;
+		}
+	}
+
+	~PinHoleEquations() {
+		delete [] cameraSysX;
+		delete [] cameraSysY;
+		delete [] realSysX;
+		delete [] realSysY;
+		delete [] realSysZ;
+	}
 
 	int operator()(VectorXd &position, VectorXd &fvec) const {
 
@@ -71,7 +109,30 @@ struct PinHoleEquations : Functor<double> {
 		double cosRoll = cos(roll);
 		double sinRoll = sin(roll);
 
+		//precomputation of frequently used expressions
+		double cosPcosY     = cosPitch*cosYaw;
+		double cosPsinY     = cosPitch*sinYaw;
+		double sinRsinY     = sinRoll*sinYaw;
+		double cosRcosYsinP = cosRoll*cosYaw*sinPitch;
+		double cosYsinR	    = cosYaw*sinRoll;
+		double cosRsinPsinY = cosRoll*sinPitch*sinYaw;
+		double cosPcosR     = cosPitch*cosRoll;
+		double cosRcosY	    = cosRoll*cosYaw;
+		double cosRsinY	    = cosRoll*sinYaw;
+		double cosYsinPsinR = cosYaw*sinPitch*sinRoll;
+		double cosPsinR	    = cosPitch*sinRoll;
+
+		for(int i = 0; i < numberOfUsedLeds; i++) {
+			double Px_0 = realSysX[i];
+			double Py_0 = realSysY[i];
+			double Pz_0 = realSysZ[i];
+			fvec(i*2)     = cameraSysX[i] - (focalX*(x - Pz_0*sinPitch + Px_0*cosPcosY + Py_0*cosPsinY))/(pixelDimension*(z + Px_0*(sinRsinY + cosRcosYsinP) - Py_0*(cosYsinR - cosRsinPsinY) + Pz_0*cosPcosR));
+			fvec((i*2)+1) = cameraSysY[i] - (focalY*(y - Px_0*(cosRsinY - cosYsinPsinR) + Py_0*(cosRcosY + sinPitch*sinRsinY) + Pz_0*cosPsinR))/(pixelDimension*(z + Px_0*(sinRsinY + cosRcosYsinP) - Py_0*(cosYsinR - cosRsinPsinY) + Pz_0*cosPcosR));
+		}
+
+		/*
 		//x positions of LEDs in the image
+
 		float x_pxl_0 = cameraSystemPoints->at(0).x;
 		float x_pxl_1 = cameraSystemPoints->at(1).x;
 		float x_pxl_2 = cameraSystemPoints->at(2).x;
@@ -148,7 +209,7 @@ struct PinHoleEquations : Functor<double> {
 		fvec(11) = y_pxl_5 - (focalY*(y - Px_5*(cosRsinY - cosYsinPsinR) + Py_5*(cosRcosY + sinPitch*sinRsinY) + Pz_5*cosPsinR))/(pixelDimension*(z + Px_5*(sinRsinY + cosRcosYsinP) - Py_5*(cosYsinR - cosRsinPsinY) + Pz_5*cosPcosR));
 		fvec(13) = y_pxl_6 - (focalY*(y - Px_6*(cosRsinY - cosYsinPsinR) + Py_6*(cosRcosY + sinPitch*sinRsinY) + Pz_6*cosPsinR))/(pixelDimension*(z + Px_6*(sinRsinY + cosRcosYsinP) - Py_6*(cosYsinR - cosRsinPsinY) + Pz_6*cosPcosR));
 		fvec(15) = y_pxl_7 - (focalY*(y - Px_7*(cosRsinY - cosYsinPsinR) + Py_7*(cosRcosY + sinPitch*sinRsinY) + Pz_7*cosPsinR))/(pixelDimension*(z + Px_7*(sinRsinY + cosRcosYsinP) - Py_7*(cosYsinR - cosRsinPsinY) + Pz_7*cosPcosR));
-
+		*/
 
 
 		/*
@@ -221,10 +282,13 @@ private:
 		dynVar(4) = lastKnownPos->pitch;
 		dynVar(5) = lastKnownPos->roll;
 
-		PinHoleEquations pinHoleFunctor(cameraSystemPoints, realWorldPoints, FOCAL_X, FOCAL_Y, PIXEL_DIMENSION);
-		NumericalDiff<PinHoleEquations> numDiff(pinHoleFunctor);
+		char usedLeds = 0xAB; //1010 1011
+		int numberOfUsedLeds = 8;
+
+		PinHoleEquations *pinHoleFunctor = new PinHoleEquations(cameraSystemPoints, realWorldPoints, usedLeds, numberOfUsedLeds, FOCAL_X, FOCAL_Y, PIXEL_DIMENSION);
+		NumericalDiff<PinHoleEquations> numDiff(*pinHoleFunctor);
 		LevenbergMarquardt<NumericalDiff<PinHoleEquations>, double> levMarq(numDiff);
-		levMarq.parameters.maxfev = 1000;
+		levMarq.parameters.maxfev = 10000;
 		levMarq.parameters.xtol = 1.0e-6;
 
 		//walking inside the world of black magic...
@@ -238,6 +302,8 @@ private:
 		lastKnownPos->pitch = dynVar(4);
 		lastKnownPos->roll  = dynVar(5);
 		lastKnownPositions->push_front(lastKnownPos);
+
+		delete pinHoleFunctor;
 
 		return;
 	}
