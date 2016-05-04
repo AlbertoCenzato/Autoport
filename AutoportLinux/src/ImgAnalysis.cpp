@@ -98,7 +98,6 @@ bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> *points, float downscalin
 	int ledPointsLength = ledPoints->size();
 	for (int i = 0; i < ledPointsLength; i++) {
 		Point2f p = ledPoints->at(i);
-		//Vec3b color = hsvImg->at<Vec3b>(p);
 		Vec3b color = hsvImg->at<Vec3b>(p);
 		if (color[0] > hue.high) hue.high = color[0];
 		if (color[1] > sat.high) sat.high = color[1];

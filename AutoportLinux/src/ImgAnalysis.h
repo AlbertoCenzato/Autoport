@@ -65,8 +65,8 @@ public:
 		params->filterByColor = true;
 		params->blobColor = 255;
 		params->filterByArea = true;
-		params->minArea = 50;
-		params->maxArea = 200;
+		params->minArea = 1000;
+		params->maxArea = 5000;
 		params->filterByInertia = false;
 		params->filterByConvexity = false;
 		params->filterByCircularity = false;

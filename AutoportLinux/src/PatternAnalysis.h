@@ -16,6 +16,8 @@
 using namespace std;
 using namespace cv;
 
+extern string resourcesPath;
+
 class PatternAnalysis {
 
 public:
@@ -55,9 +57,11 @@ private:
 							float distance = abs(p3->y - (m*(p3->x) + q)) / sqrt(1 + pow(m, 2));
 							if (distance < tolerance) {
 
-								//line(img, p1, p2, Scalar(0, 0, 255));
-								imshow("Thresholded Image", img);
+								line(img, *p1, *p2, Scalar(150, 150, 0));
+								namedWindow("Detected lines", WINDOW_NORMAL);
+								imshow("Detected lines", img);
 								waitKey(1);
+								imwrite(resourcesPath + "output/detectedLines.jpg",img);
 								//std::cout << "\nvalid set";
 
 								//check if the set {p1, p2, p3} has been already found

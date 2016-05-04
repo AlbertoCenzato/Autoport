@@ -42,7 +42,7 @@ void testImgAnalysisPositionEstimationPic() {
 	initialPosition->pitch = 0;
 	initialPosition->roll  = 0;
 
-	vector<Point3f> *realWorldPoints = new vector<Point3f>(8);
+	vector<Point3d> *realWorldPoints = new vector<Point3d>(8);
 	realWorldPoints->at(0) = { 90, 70,0};
 	realWorldPoints->at(1) = { 90, 30,0};
 	realWorldPoints->at(2) = { 90,-90,0};
@@ -55,7 +55,7 @@ void testImgAnalysisPositionEstimationPic() {
 	PositionEstimation *posEstimator = new PositionEstimation(initialPosition,realWorldPoints);
 	string imgName;
 	vector<Point2f> *ledPoints = new vector<Point2f>();
-	for (int i = 0; i < 4; i++) {
+	for (int i = 3; i < 4; i++) {
 
 		switch (i) {
 			case 0:
@@ -93,9 +93,9 @@ void testImgAnalysisPositionEstimationPic() {
 		}
 
 		cout << "\n\nEVALUATING POSITION...";
-		Matrix<float,3,2> *position = posEstimator->evaluate(ledPoints);
+		Matrix<double,3,2> *position = posEstimator->evaluate(ledPoints);
 		cout << "\nCurrent position is:\n";
-		GenPurpFunc::printMatrixf(*position,3,2);
+		GenPurpFunc::printMatrixd(*position,3,2);
 	}
 
 	delete imgAnalyzer;
@@ -127,7 +127,7 @@ void testPositionEstimation() {
 		initialPos->pitch = 0;
 		initialPos->roll  = 180;
 
-		vector<Point3f> *realWorldPoints = new vector<Point3f>(8);
+		vector<Point3d> *realWorldPoints = new vector<Point3d>(8);
 		realWorldPoints->at(0) = { 90, 70,0};
 		realWorldPoints->at(1) = { 90, 30,0};
 		realWorldPoints->at(2) = { 90,-90,0};
@@ -138,9 +138,9 @@ void testPositionEstimation() {
 		realWorldPoints->at(7) = {-90, 90,0};
 
 	PositionEstimation *posEstimator = new PositionEstimation(initialPos, realWorldPoints);
-	Matrix<float,3,2> *position = posEstimator->evaluate(ledPoints);
+	Matrix<double,3,2> *position = posEstimator->evaluate(ledPoints);
 	cout << "\nCurrent position is:\n";
-	GenPurpFunc::printMatrixf(*position,3,2);
+	GenPurpFunc::printMatrixd(*position,3,2);
 
 	getchar();
 	return;

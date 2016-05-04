@@ -10,6 +10,8 @@ using namespace std;
 #ifndef GENPURPFUNC_H
 #define GENPURPFUNC_H
 
+extern string resourcesPath;
+
 namespace GenPurpFunc {
 	/* This function finds the angles (in RADIANS) of the yaw - pitch - roll sequence
 	R1(gamma)*R2(beta)*R3(alpha) from the direction cosine matrix
@@ -36,9 +38,6 @@ namespace GenPurpFunc {
 	%   C - Centro del sistema camera nel sistema di riferimento assoluto
 	%   R - Matrice di rotazione dal sistema assoluto a quello camera */
 	extern Matrix<double, 3, 4> p3p_solver(Matrix<double, 3, 4> &P, Matrix<double, 3, 4> &f);
-
-	extern long pinHoleFSolve(Matrix<double, 6, 1> &, double *, Point2f *, Point3f *, double focal, double d_pxl);
-
 
 	inline void printMatrixf(MatrixXf mtrx, int n, int m) {
 		for (int i = 0; i < n; i++) {
@@ -143,36 +142,6 @@ namespace GenPurpFunc {
 		return min;
 	}
 
-	/*
-	inline Point2f* findMaxXInVec(vector<KeyPoint> &vec) {
-		KeyPoint *max = &vec[0];
-		for (uint i = 1; i < vec.size(); i++)
-			if (max->pt.x < vec[i].pt.x)
-				max = &vec[i];
-		return &(max->pt);
-	}
-	inline Point2f* findMaxYInVec(vector<KeyPoint> &vec) {
-		KeyPoint *max = &vec[0];;
-		for (uint i = 1; i < vec.size(); i++)
-			if (max->pt.y < vec[i].pt.y)
-				max = &vec[i];
-		return &(max->pt);
-	}
-	inline Point2f* findMinXInVec(vector<KeyPoint> &vec) {
-		KeyPoint *min = &vec[0];;
-		for (uint i = 1; i < vec.size(); i++)
-			if (min->pt.x > vec[i].pt.x)
-				min = &vec[i];
-		return &(min->pt);
-	}
-	inline Point2f* findMinYInVec(vector<KeyPoint> &vec) {
-		KeyPoint *min = &vec[0];;
-		for (uint i = 1; i < vec.size(); i++)
-			if (min->pt.y > vec[i].pt.y)
-				min = &vec[i];
-		return &(min->pt);
-	}
-	*/
 
 	inline float distancePointToPoint(Point2f &p1, Point2f &p2) {
 		return sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2));
@@ -203,9 +172,11 @@ namespace GenPurpFunc {
 	}
 
 	inline void drawDetectedLed(Mat &image, const Point2f &keyPoint, const string &number) {
-		putText(image, number, keyPoint, FONT_HERSHEY_SIMPLEX, 1, Scalar(0, 0, 255),4);
-		imshow("Thresholded Image", image);
+		putText(image, number, keyPoint, FONT_HERSHEY_SIMPLEX, 1, Scalar(150, 150, 0),4);
+		namedWindow("Detected leds", WINDOW_NORMAL);
+		imshow("Detected leds", image);
 		waitKey(25);
+		imwrite(resourcesPath + "output/detectedLeds.jpg",image);
 		return;
 	}
 

@@ -13,7 +13,7 @@ using namespace std;
 using namespace cv;
 using namespace Eigen;
 
-Matrix<float,3,2>* PositionEstimation::evaluate(vector<Point2f> *cameraSystemPoints) {
+Matrix<double,3,2>* PositionEstimation::evaluate(vector<Point2f> *cameraSystemPoints) {
 
 	this->cameraSystemPoints = cameraSystemPoints;
 	//valuto posizione con Levenberg-Marquardt
@@ -22,16 +22,15 @@ Matrix<float,3,2>* PositionEstimation::evaluate(vector<Point2f> *cameraSystemPoi
 	//filtro passa basso (opzionale)
 	lowPassFilter();
 
-
 	//Kalman
 	kalmanFilter();
 
 	if(lastKnownPositions->size() > MAX_LAST_KNOWN_POSITIONS_SIZE)
 		lastKnownPositions->pop_back();
-	Matrix<float,3,2> *position = new Matrix<float,3,2>();
-	Vector3f pos;
-	pos << lastKnownPositions->front()->x,   lastKnownPositions->front()->y,     lastKnownPositions->front()->z;
-	Vector3f angle;
+	Matrix<double,3,2> *position = new Matrix<double,3,2>();
+	Vector3d pos;
+	Vector3d angle;
+	pos   << lastKnownPositions->front()->x,   lastKnownPositions->front()->y,     lastKnownPositions->front()->z;
 	angle << lastKnownPositions->front()->yaw, lastKnownPositions->front()->pitch, lastKnownPositions->front()->roll;
 	*position << pos, angle;
 	return position;
