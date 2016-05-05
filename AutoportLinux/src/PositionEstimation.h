@@ -283,12 +283,12 @@ private:
 		dynVar(5) = lastKnownPos->roll;
 
 		char usedLeds = 0xAB; //1010 1011
-		int numberOfUsedLeds = 8;
+		int numberOfUsedLeds = 5;
 
 		PinHoleEquations *pinHoleFunctor = new PinHoleEquations(cameraSystemPoints, realWorldPoints, usedLeds, numberOfUsedLeds, FOCAL_X, FOCAL_Y, PIXEL_DIMENSION);
 		NumericalDiff<PinHoleEquations> numDiff(*pinHoleFunctor);
 		LevenbergMarquardt<NumericalDiff<PinHoleEquations>, double> levMarq(numDiff);
-		levMarq.parameters.maxfev = 10000;
+		levMarq.parameters.maxfev = 1000;
 		levMarq.parameters.xtol = 1.0e-6;
 
 		//walking inside the world of black magic...
