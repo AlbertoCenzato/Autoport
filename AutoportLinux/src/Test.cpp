@@ -34,13 +34,13 @@ void testImgAnalysisPositionEstimationPic() {
 			   ->setSizeTolerance   (sizeTolerance)
 			   ->setSizeSupTolerance(sizeSupTolerance);
 
-	Position_XYZ_YPR *initialPosition = new Position_XYZ_YPR();
-	initialPosition->x 	   = 0;
-	initialPosition->y 	   = 0;
-	initialPosition->z 	   = 1700;
-	initialPosition->yaw   = 0;
-	initialPosition->pitch = 0;
-	initialPosition->roll  = 0;
+	Position_XYZ_YPR initialPosition = Position_XYZ_YPR();
+	initialPosition.x 	   = 0;
+	initialPosition.y 	   = 0;
+	initialPosition.z 	   = 1700;
+	initialPosition.yaw   = 0;
+	initialPosition.pitch = 0;
+	initialPosition.roll  = 0;
 
 	vector<Point3d> *realWorldPoints = new vector<Point3d>(8);
 	realWorldPoints->at(0) = { 90, 70,0};
@@ -93,13 +93,12 @@ void testImgAnalysisPositionEstimationPic() {
 		}
 
 		cout << "\n\nEVALUATING POSITION...";
-		Matrix<double,3,2> *position = posEstimator->evaluate(ledPoints);
+		Matrix<double,3,2> *position = posEstimator->evaluate(*ledPoints);
 		cout << "\nCurrent position is:\n";
 		GenPurpFunc::printMatrixd(*position,3,2);
 	}
 
 	delete imgAnalyzer;
-	delete initialPosition;
 	delete realWorldPoints;
 	delete posEstimator;
 	delete ledPoints;
@@ -119,13 +118,13 @@ void testPositionEstimation() {
 	ledPoints->at(6) = {576.72, -741.49};
 	ledPoints->at(7) = {-741.5, -741.5};
 
-	Position_XYZ_YPR *initialPos = new Position_XYZ_YPR();
-		initialPos->x 	   = 0;
-		initialPos->y 	   = 0;
-		initialPos->z 	   = 300;
-		initialPos->yaw   = 90;
-		initialPos->pitch = 0;
-		initialPos->roll  = 180;
+	Position_XYZ_YPR initialPos = Position_XYZ_YPR();
+		initialPos.x 	 = 0;
+		initialPos.y 	 = 0;
+		initialPos.z 	 = 300;
+		initialPos.yaw   = 0;
+		initialPos.pitch = 0;
+		initialPos.roll  = 0;
 
 		vector<Point3d> *realWorldPoints = new vector<Point3d>(8);
 		realWorldPoints->at(0) = { 90, 70,0};
@@ -138,7 +137,7 @@ void testPositionEstimation() {
 		realWorldPoints->at(7) = {-90, 90,0};
 
 	PositionEstimation *posEstimator = new PositionEstimation(initialPos, realWorldPoints);
-	Matrix<double,3,2> *position = posEstimator->evaluate(ledPoints);
+	Matrix<double,3,2> *position = posEstimator->setPointsToEvaluate(0xAB)->evaluate(*ledPoints);
 	cout << "\nCurrent position is:\n";
 	GenPurpFunc::printMatrixd(*position,3,2);
 
