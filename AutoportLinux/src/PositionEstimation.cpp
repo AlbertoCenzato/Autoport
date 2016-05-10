@@ -16,11 +16,12 @@ using namespace Eigen;
 Matrix<double,3,2>* PositionEstimation::evaluate(vector<Point2f> &cameraSystemPoints) {
 
 	delete this->cameraSystemPoints;
-	this->cameraSystemPoints = new vector<Point2f>(numberOfUsedPoints);
+	this->cameraSystemPoints = new vector<Point2f>();
 	uchar pointsToEvaluate = this->pointsToEvaluate;
-	for(int i = 0, count = 0; i < 8; i++) {
+	for(uint i = 0; i < 8; i++) {
 		if((pointsToEvaluate & 0x80) != 0) {
-			this->cameraSystemPoints->at(count++) = cameraSystemPoints.at(i);
+			this->cameraSystemPoints->push_back(cameraSystemPoints.at(i));
+			cout << this->cameraSystemPoints->size() << endl;
 		}
 		pointsToEvaluate = pointsToEvaluate << 1;
 	}
@@ -52,15 +53,28 @@ Matrix<double,3,2>* PositionEstimation::evaluate(vector<Point2f> &cameraSystemPo
 PositionEstimation* PositionEstimation::setPointsToEvaluate(uchar pointsToEvaluate) {
 
 	this->pointsToEvaluate = pointsToEvaluate;
-	delete currRealWorldSet;
-	currRealWorldSet = new vector<Point3d>(8);
 	numberOfUsedPoints = 0;
-	for(int i = 0; i < 8; i++) {
+	for(uint i = 0; i < 8; i++) {
+		if((pointsToEvaluate & 0x80) != 0)
+			numberOfUsedPoints++;
+		pointsToEvaluate = pointsToEvaluate << 1;
+	}
+
+	pointsToEvaluate = this->pointsToEvaluate;
+	delete currRealWorldSet;
+	currRealWorldSet = new vector<Point3d>();
+	for(uint i = 0; i < 8; i++) {
 		if((pointsToEvaluate & 0x80) != 0) {
-			currRealWorldSet->at(numberOfUsedPoints++) = realWorldPoints->at(i);
+			Point3d &p = realWorldPoints->at(i);
+			currRealWorldSet->push_back(p);
 		}
 		pointsToEvaluate = pointsToEvaluate << 1;
 	}
+
+	cout << currRealWorldSet->size() << endl;
+
+	delete pinHoleFunctor;
+	pinHoleFunctor = new PinHoleEquations(*currRealWorldSet,FOCAL_X, FOCAL_Y, PIXEL_DIMENSION);
 
 	return this;
 }
