@@ -24,12 +24,6 @@ template<typename varType> struct Interval{
 public:
 	varType low;
 	varType high;
-/*
-	template<typename varType> Interval(varType low, varType high) {
-		this->low  = low;
-		this->high = high;
-	}
-*/
 };
 
 class ImgAnalysis {

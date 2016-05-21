@@ -8,7 +8,7 @@
 #ifndef POSITIONESTIMATION_H_
 #define POSITIONESTIMATION_H_
 
-#include <memory>
+//#include <memory>
 #include <list>
 #include <chrono>
 #include <Eigen/Dense>
@@ -45,11 +45,7 @@ template<typename _Scalar, int NX = Dynamic, int NY = Dynamic> struct Functor {
 };
 
 
-
-
-
 class PositionEstimation {
-
 
 	//specific functor for PinHole
 	struct PinHoleEquations : Functor<double> {

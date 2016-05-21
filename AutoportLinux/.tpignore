@@ -4,3 +4,4 @@
 \Q/Resources/output/originalImage.jpg\E
 \Q/Resources/output/patternMirko.jpg\E
 \Q/Resources/output/\E.*
+\Q/OpenCV/Raspberry/\E.*
