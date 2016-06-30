@@ -1,0 +1,6 @@
+eclipse.preferences.version=1
+environment/project/cdt.managedbuild.config.gnu.exe.release.856933436.687136697/LD_LIBRARY_PATH/delimiter=\:
+environment/project/cdt.managedbuild.config.gnu.exe.release.856933436.687136697/LD_LIBRARY_PATH/operation=replace
+environment/project/cdt.managedbuild.config.gnu.exe.release.856933436.687136697/LD_LIBRARY_PATH/value=/home/alberto/Code/raspberry/rootfs/lib/
+environment/project/cdt.managedbuild.config.gnu.exe.release.856933436.687136697/append=true
+environment/project/cdt.managedbuild.config.gnu.exe.release.856933436.687136697/appendContributed=true

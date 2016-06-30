@@ -138,7 +138,7 @@ class PositionEstimation {
 				fvec((i*2)+1) = camSysY[i] - (focalY*(y - Px_0*(cosRsinY - cosYsinPsinR) + Py_0*(cosRcosY + sinPitch*sinRsinY) + Pz_0*cosPsinR))/(pixelDimension*(z + Px_0*(sinRsinY + cosRcosYsinP) - Py_0*(cosYsinR - cosRsinPsinY) + Pz_0*cosPcosR));
 			}
 
-			return 1;
+			return 0;
 		}
 
 	};
@@ -210,7 +210,7 @@ private:
 		levMarq.parameters.xtol = 1.0e-6;
 
 		//walking inside the world of black magic...
-		levMarq.minimize(dynVar);
+		levMarq.minimize(dynVar); //levMarq.minimize(dynVar);
 
 		lastKnownPos = new Position_XYZ_YPR;
 		lastKnownPos->x 	= dynVar(0);
