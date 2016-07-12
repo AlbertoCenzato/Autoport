@@ -13,7 +13,7 @@ using namespace std;
 using namespace cv;
 using namespace Eigen;
 
-Matrix<double,3,2>* PositionEstimation::evaluate(vector<Point2f> &cameraSystemPoints) {
+void PositionEstimation::evaluate(vector<Point2f> &cameraSystemPoints, Matrix<double,3,2> &evaluatedPoints) {
 
 	delete this->cameraSystemPoints;
 	this->cameraSystemPoints = new vector<Point2f>();
@@ -37,13 +37,12 @@ Matrix<double,3,2>* PositionEstimation::evaluate(vector<Point2f> &cameraSystemPo
 
 	if(lastKnownPositions->size() > MAX_LAST_KNOWN_POSITIONS_SIZE)
 		lastKnownPositions->pop_back();
-	Matrix<double,3,2> *position = new Matrix<double,3,2>();
 	Vector3d pos;
 	Vector3d angle;
 	pos   << lastKnownPositions->front()->x,   lastKnownPositions->front()->y,     lastKnownPositions->front()->z;
 	angle << lastKnownPositions->front()->yaw, lastKnownPositions->front()->pitch, lastKnownPositions->front()->roll;
-	*position << pos, angle;
-	return position;
+	evaluatedPoints << pos, angle;
+	return;
 }
 
 

@@ -158,9 +158,9 @@ class PositionEstimation {
 
 public:
 
-	PositionEstimation(Position_XYZ_YPR &initialPosition, vector<Point3d> *realWorldPoints) {
-		this->realWorldPoints  = realWorldPoints;
-		this->currRealWorldSet = new vector<Point3d>(*realWorldPoints);
+	PositionEstimation(Position_XYZ_YPR &initialPosition, vector<Point3d> &realWorldPoints) {
+		this->realWorldPoints  = &realWorldPoints;
+		this->currRealWorldSet = new vector<Point3d>(realWorldPoints);
 		lastKnownPositions = new list<Position_XYZ_YPR*>();
 		lastKnownPositions->push_front(&initialPosition);
 		cameraSystemPoints = NULL;
@@ -176,14 +176,14 @@ public:
 		delete pinHoleFunctor;
 	}
 
-	Matrix<double,3,2>* evaluate(vector<Point2f> &);
+	void evaluate(vector<Point2f> &, Matrix<double,3,2> &evaluatedPoints);
 
 	PositionEstimation* setPointsToEvaluate(uchar pointsToEvaluate);
 
 private:
 
-	const double FOCAL_X = 3.46031d;
-	const double FOCAL_Y = 3.46031d;
+	const double FOCAL_X = 3.59;
+	const double FOCAL_Y = 3.59;
 	const double PIXEL_DIMENSION = 1.4e-3d;
 
 	void levenbergMarquardt() {

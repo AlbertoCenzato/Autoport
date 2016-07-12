@@ -35,7 +35,7 @@ struct orderByX : binary_function <Point2f, Point2f, bool> {
 
 
 //TODO: make the function accept a pointer to a pattern analysis function
-bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> *points, float downscalingFactor) {
+bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> &points, float downscalingFactor) {
 
 	// Crop the full image according to the region of interest
 	// Note that this doesn't copy the data
@@ -112,8 +112,8 @@ bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> *points, float downscalin
 
 	findROI();
 
-	delete points;
-	points = ledPoints;
+	//delete points;
+	points = *ledPoints;
 
 	int averageSize = (oldKeyPointSizeInterval->low + oldKeyPointSizeInterval->high)/2;
 

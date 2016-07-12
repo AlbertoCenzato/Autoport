@@ -49,7 +49,7 @@ class ImgAnalysis {
 
 public:
 
-	ImgAnalysis(const Scalar &low, const Scalar &high, LedColor ledColor, PatternAnalysis*, Rect *regionOfInterest = NULL) {
+	ImgAnalysis(const Scalar &low, const Scalar &high, LedColor ledColor, PatternAnalysis &patternAnalysis, Rect *regionOfInterest = NULL) {
 		this->regionOfInterest = regionOfInterest;
 		colorInterval = new Interval<Scalar>();
 		colorInterval->low  = low;
@@ -73,7 +73,7 @@ public:
 		sizeTolerance    = SIZE_TOLERANCE;
 		sizeSupTolerance = SIZE_SUP_TOLERANCE;
 
-		this->patternAnalysis = patternAnalysis;
+		this->patternAnalysis = &patternAnalysis;
 
 		ledPoints = NULL;
 		oldKeyPointSizeInterval = NULL;
@@ -85,7 +85,7 @@ public:
 		delete colorInterval;
 	}
 
-	bool evaluate(Mat &, vector<Point2f> *, float);
+	bool evaluate(Mat &, vector<Point2f> &, float);
 	ImgAnalysis* setROItolerance(int);
 	ImgAnalysis* setColorTolerance(int);
 	ImgAnalysis* setSizeTolerance(int);

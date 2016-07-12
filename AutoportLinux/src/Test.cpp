@@ -27,9 +27,9 @@ void testImgAnalysisPositionEstimationPic() {
 	int sizeTolerance = 300;
 	int sizeSupTolerance = 128;
 
-	PatternAnalysis *patternAnalysis = new PatternAnalysis();
-	ImgAnalysis *imgAnalyzer = new ImgAnalysis(low, high, LedColor::RED, patternAnalysis);
-	imgAnalyzer->setColorTolerance  (colorTolerance)
+	auto patternAnalysis = PatternAnalysis();
+	auto imgAnalyzer = ImgAnalysis(low, high, LedColor::RED, patternAnalysis);
+	imgAnalyzer. setColorTolerance  (colorTolerance)
 			   ->setROItolerance    (ROItolerance)
 			   ->setSizeTolerance   (sizeTolerance)
 			   ->setSizeSupTolerance(sizeSupTolerance);
@@ -42,20 +42,20 @@ void testImgAnalysisPositionEstimationPic() {
 	initialPosition.pitch = 0;
 	initialPosition.roll  = 0;
 
-	vector<Point3d> *realWorldPoints = new vector<Point3d>(8);
-	realWorldPoints->at(0) = { 90, 70,0};
-	realWorldPoints->at(1) = { 90, 30,0};
-	realWorldPoints->at(2) = { 90,-90,0};
-	realWorldPoints->at(3) = { 50, 70,0};
-	realWorldPoints->at(4) = { 50, 30,0};
-	realWorldPoints->at(5) = { 50,-90,0};
-	realWorldPoints->at(6) = {-90, 70,0};
-	realWorldPoints->at(7) = {-90, 90,0};
+	auto realWorldPoints = vector<Point3d>(8);
+	realWorldPoints.at(0) = { 90, 70,0};
+	realWorldPoints.at(1) = { 90, 30,0};
+	realWorldPoints.at(2) = { 90,-90,0};
+	realWorldPoints.at(3) = { 50, 70,0};
+	realWorldPoints.at(4) = { 50, 30,0};
+	realWorldPoints.at(5) = { 50,-90,0};
+	realWorldPoints.at(6) = {-90, 70,0};
+	realWorldPoints.at(7) = {-90, 90,0};
 
-	PositionEstimation *posEstimator = new PositionEstimation(initialPosition,realWorldPoints);
+	auto posEstimator = PositionEstimation(initialPosition,realWorldPoints);
 	string imgName;
-	vector<Point2f> *ledPoints = new vector<Point2f>();
-	for (int i = 3; i < 4; i++) {
+	auto ledPoints = vector<Point2f>();
+	for (int i = 0; i < 1; i++) {
 
 		switch (i) {
 			case 0:
@@ -80,28 +80,24 @@ void testImgAnalysisPositionEstimationPic() {
 		imwrite(resourcesPath + "output/originalImage.jpg",img);
 
 		int downscalingFactor = 1;
-		bool downscalingNeeded = imgAnalyzer->evaluate(img, ledPoints, downscalingFactor);
+		bool downscalingNeeded = imgAnalyzer.evaluate(img, ledPoints, downscalingFactor);
 		if(downscalingNeeded)
 			cout << "\nDownscaling needed!";
 
 		cout << "\n\nPunti traslati:";
 		Point2f trasl = Point2f(-1296,972);
 		for(int i = 0; i < 8; i++) {
-			ledPoints->at(i).y = -ledPoints->at(i).y;
-			ledPoints->at(i) = ledPoints->at(i) + trasl;
-			cout << "\nPunto " << i << ": [" << ledPoints->at(i).x << "," << ledPoints->at(i).y << "]";
+			ledPoints.at(i).y = -ledPoints.at(i).y;
+			ledPoints.at(i) = ledPoints.at(i) + trasl;
+			cout << "\nPunto " << i << ": [" << ledPoints.at(i).x << "," << ledPoints.at(i).y << "]";
 		}
 
 		cout << "\n\nEVALUATING POSITION...";
-		Matrix<double,3,2> *position = posEstimator->evaluate(*ledPoints);
+		auto position = Matrix<double,3,2>();
+		posEstimator.evaluate(ledPoints, position);
 		cout << "\nCurrent position is:\n";
-		GenPurpFunc::printMatrixd(*position,3,2);
+		GenPurpFunc::printMatrixd(position,3,2);
 	}
-
-	delete imgAnalyzer;
-	delete realWorldPoints;
-	delete posEstimator;
-	delete ledPoints;
 
 	return;
 }
@@ -126,20 +122,21 @@ void testPositionEstimation() {
 		initialPos.pitch = 0;
 		initialPos.roll  = 0;
 
-		vector<Point3d> *realWorldPoints = new vector<Point3d>(8);
-		realWorldPoints->at(0) = { 90, 70,0};
-		realWorldPoints->at(1) = { 90, 30,0};
-		realWorldPoints->at(2) = { 90,-90,0};
-		realWorldPoints->at(3) = { 50, 70,0};
-		realWorldPoints->at(4) = { 50, 30,0};
-		realWorldPoints->at(5) = { 50,-90,0};
-		realWorldPoints->at(6) = {-90, 70,0};
-		realWorldPoints->at(7) = {-90, 90,0};
+		auto realWorldPoints = vector<Point3d>(8);
+		realWorldPoints.at(0) = { 90, 70,0};
+		realWorldPoints.at(1) = { 90, 30,0};
+		realWorldPoints.at(2) = { 90,-90,0};
+		realWorldPoints.at(3) = { 50, 70,0};
+		realWorldPoints.at(4) = { 50, 30,0};
+		realWorldPoints.at(5) = { 50,-90,0};
+		realWorldPoints.at(6) = {-90, 70,0};
+		realWorldPoints.at(7) = {-90, 90,0};
 
-	PositionEstimation *posEstimator = new PositionEstimation(initialPos, realWorldPoints);
-	Matrix<double,3,2> *position = posEstimator->setPointsToEvaluate(0xAB)->evaluate(*ledPoints);
+	auto posEstimator = PositionEstimation(initialPos, realWorldPoints);
+	auto position = Matrix<double,3,2>();
+	posEstimator.setPointsToEvaluate(0xAB)->evaluate(*ledPoints, position);
 	cout << "\nCurrent position is:\n";
-	GenPurpFunc::printMatrixd(*position,3,2);
+	GenPurpFunc::printMatrixd(position,3,2);
 
 	getchar();
 	return;

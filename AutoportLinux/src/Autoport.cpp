@@ -44,7 +44,7 @@ int main() {
 	ocl::setUseOpenCL(true); // enable OpenCL in the processing of Mat
 
 	
-	testPositionEstimation();
+	testImgAnalysisPositionEstimationPic();
 	//testImgAnalysisPositionEstimationPic();
 
 	getchar();
