@@ -5,3 +5,8 @@
 \Q/Resources/output/patternMirko.jpg\E
 \Q/Resources/output/\E.*
 \Q/OpenCV/Raspberry/\E.*
+\Q/Resources/primo_laboratorio/\E.*
+\Q/Resources/secondo_laboratorio/\E.*
+\Q/Resources/terzo_laboratorio/\E.*
+\Q/OpenCV/\E.*
+\Q/Eigen/\E.*
