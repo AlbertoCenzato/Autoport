@@ -46,6 +46,7 @@ bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> &points, float downscalin
 	Mat *colorFilteredImg = new Mat(image.rows,image.cols,image.depth());
 
 	//change color space: from BGR to HSV;
+    //TODO: color conversion and filterByColor can be performed with a shader
 	auto begin = std::chrono::high_resolution_clock::now();
 	cvtColor(image,*hsvImg,colorConversion);
 	auto end = std::chrono::high_resolution_clock::now();
