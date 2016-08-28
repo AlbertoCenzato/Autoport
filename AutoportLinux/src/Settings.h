@@ -17,6 +17,9 @@ class Settings {
 public:
 
 	static const char* HEADER;
+	static const char* VALUE;
+	static const char* LOW;
+	static const char* HIGH;
 
 	static Interval<int> hue;
 	static Interval<int> saturation;

@@ -15,7 +15,11 @@
 using namespace std;
 using namespace pugi;
 
-const char*  Settings::HEADER = "AutoportXMLConfigFile";
+const char* Settings::HEADER = "AutoportXMLConfigFile";
+const char*	Settings::VALUE = "value";
+const char* Settings::LOW = "low";
+const char* Settings::HIGH = "high";
+
 Interval<int> Settings::hue 	   = Interval<int>(105,135);
 Interval<int> Settings::saturation = Interval<int>(150,255);
 Interval<int> Settings::value 	   = Interval<int>(  0,255);
@@ -53,42 +57,42 @@ bool Settings::loadConfiguration(string configFilePath) {
 	// load ImageAnalysis settings
 
 	xml_node node = imageAnalysis.child("hue");
-	int low  = node.attribute("low" ).as_int();
-	int high = node.attribute("high").as_int();
+	int low  = node.attribute(LOW).as_int();
+	int high = node.attribute(HIGH).as_int();
 	hue = Interval<int>(low, high);
 
 	node = imageAnalysis.child("saturation");
-	low  = node.attribute("low" ).as_int();
-	high = node.attribute("high").as_int();
+	low  = node.attribute(LOW).as_int();
+	high = node.attribute(HIGH).as_int();
 	saturation = Interval<int>(low, high);
 
-	node = imageAnalysis.child("value");
-	low  = node.attribute("low" ).as_int();
-	high = node.attribute("high").as_int();
+	node = imageAnalysis.child(VALUE);
+	low  = node.attribute(LOW).as_int();
+	high = node.attribute(HIGH).as_int();
 	value = Interval<int>(low, high);
 
 	node = imageAnalysis.child("color_tolerance");
-	colorTolerance = node.attribute("value" ).as_int();
+	colorTolerance = node.attribute(VALUE).as_int();
 
 	node = imageAnalysis.child("roi_tolerance");
-	ROITolerance = node.attribute("value" ).as_int();
+	ROITolerance = node.attribute(VALUE).as_int();
 
 	node = imageAnalysis.child("size_tolerance");
-	sizeTolerance = node.attribute("value" ).as_int();
+	sizeTolerance = node.attribute(VALUE).as_int();
 
 	node = imageAnalysis.child("size_sup_tolerance");
-	sizeSupTolerance = node.attribute("value" ).as_int();
+	sizeSupTolerance = node.attribute(VALUE).as_int();
 
 	// load default PositionEstimation settings
 
 	node = positionEstimation.child("focal_x");
-	focalX = node.attribute("value" ).as_double();
+	focalX = node.attribute(VALUE).as_double();
 
 	node = positionEstimation.child("focal_y");
-	focalY = node.attribute("value" ).as_double();
+	focalY = node.attribute(VALUE).as_double();
 
 	node = positionEstimation.child("pixel_dimension");
-	pixelDimension = node.attribute("value" ).as_double();
+	pixelDimension = node.attribute(VALUE).as_double();
 
 	return true;
 
