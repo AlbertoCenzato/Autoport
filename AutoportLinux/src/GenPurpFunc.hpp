@@ -7,8 +7,7 @@ using namespace Eigen;
 using namespace cv;
 using namespace std;
 
-#ifndef GENPURPFUNC_H
-#define GENPURPFUNC_H
+#pragma once
 
 extern string resourcesPath;
 
@@ -202,5 +201,3 @@ namespace GenPurpFunc {
 	}
 
 }
-
-#endif

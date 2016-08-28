@@ -1,14 +1,6 @@
-/*
- * XMLReader.h
- *
- *  Created on: Aug 20, 2016
- *      Author: alberto
- */
-
 #pragma once
 
 #include <stdlib.h>
-
 #include "GenPurpFunc.hpp"
 
 using namespace std;

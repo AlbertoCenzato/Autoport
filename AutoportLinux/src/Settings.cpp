@@ -1,10 +1,3 @@
-/*
- * XMLReader.cpp
- *
- *  Created on: Aug 20, 2016
- *      Author: alberto
- */
-
 #include "Settings.hpp"
 
 #include <stdlib.h>

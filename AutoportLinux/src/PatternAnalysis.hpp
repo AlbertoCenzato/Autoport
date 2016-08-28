@@ -5,8 +5,7 @@
  *      Author: alberto
  */
 
-#ifndef PATTERNANALYSIS_HPP_
-#define PATTERNANALYSIS_HPP_
+#pragma once
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -279,7 +278,3 @@ private:
 
 
 };
-
-
-
-#endif /* PATTERNANALYSIS_HPP_ */

@@ -5,8 +5,7 @@
  *      Author: alberto
  */
 
-#ifndef POSITIONESTIMATION_HPP_
-#define POSITIONESTIMATION_HPP_
+#pragma once
 
 //#include <memory>
 #include <list>
@@ -238,8 +237,3 @@ private:
 	}
 
 };
-
-
-
-
-#endif /* POSITIONESTIMATION_HPP_ */
