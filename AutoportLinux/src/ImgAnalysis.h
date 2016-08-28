@@ -1,40 +1,30 @@
 //Copyright (c) 2016 Alberto Cenzato. All rights reserved.
 
+#pragma once
+
 #include <iostream>
 #include <set>
+#include <string.h>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/features2d/features2d.hpp>
 #include "GenPurpFunc.h"
 #include "PatternAnalysis.h"
+#include "Settings.h"
 
 using namespace std;
 using namespace cv;
-
-#ifndef IMGANALYSIS_H
-#define IMGANALISIS_H
 
 enum LedColor {
 	RED,
 	BLUE
 };
 
-template<typename varType> struct Interval{
-
-public:
-	varType low;
-	varType high;
-};
 
 class ImgAnalysis {
 
 	Rect *regionOfInterest;
 	Interval<Scalar> *colorInterval;
-
-	static const int COLOR_TOLERANCE = 20;
-	static const int ROI_TOLERANCE = 100;
-	static const int SIZE_TOLERANCE = 20;
-	static const int SIZE_SUP_TOLERANCE = 128;
 
 	int colorTolerance;
 	int ROItolerance;	//region of interest cropping tolerance [px]
@@ -68,10 +58,10 @@ public:
 		if(ledColor == LedColor::RED) colorConversion = COLOR_RGB2HSV;
 		else						  colorConversion = COLOR_BGR2HSV;
 
-		colorTolerance   = COLOR_TOLERANCE;
-		ROItolerance     = ROI_TOLERANCE;
-		sizeTolerance    = SIZE_TOLERANCE;
-		sizeSupTolerance = SIZE_SUP_TOLERANCE;
+		colorTolerance   = Settings::colorTolerance;
+		ROItolerance     = Settings::ROITolerance;
+		sizeTolerance    = Settings::sizeTolerance;
+		sizeSupTolerance = Settings::sizeSupTolerance;
 
 		this->patternAnalysis = &patternAnalysis;
 
@@ -220,4 +210,3 @@ private:
 
 };
 
-#endif

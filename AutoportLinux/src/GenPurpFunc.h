@@ -12,6 +12,27 @@ using namespace std;
 
 extern string resourcesPath;
 
+template<typename varType> struct Interval {
+
+public:
+	varType low;
+	varType high;
+
+	Interval<varType>() {
+
+	}
+
+	Interval<varType>(varType arg1, varType arg2) {
+		low = arg1;
+		high = arg2;
+	}
+
+	string toString() {
+		string str = to_string(low) + " " + to_string(high);
+		return str;
+	}
+};
+
 namespace GenPurpFunc {
 	/* This function finds the angles (in RADIANS) of the yaw - pitch - roll sequence
 	R1(gamma)*R2(beta)*R3(alpha) from the direction cosine matrix

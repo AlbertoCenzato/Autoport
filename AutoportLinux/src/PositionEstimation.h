@@ -15,6 +15,8 @@
 #include <unsupported/Eigen/NumericalDiff>
 #include <unsupported/Eigen/NonLinearOptimization>
 
+#include "Settings.h"
+
 using namespace std;
 using namespace cv;
 using namespace Eigen;
@@ -118,17 +120,17 @@ class PositionEstimation {
 			double sinRoll  = sin(roll);
 
 			//precomputation of frequently used expressions
-			double cosPcosY     = cosPitch*cosYaw;
-			double cosPsinY     = cosPitch*sinYaw;
-			double sinRsinY     = sinRoll*sinYaw;
-			double cosRcosYsinP = cosRoll*cosYaw*sinPitch;
-			double cosYsinR	    = cosYaw*sinRoll;
-			double cosRsinPsinY = cosRoll*sinPitch*sinYaw;
-			double cosPcosR     = cosPitch*cosRoll;
-			double cosRcosY	    = cosRoll*cosYaw;
-			double cosRsinY	    = cosRoll*sinYaw;
-			double cosYsinPsinR = cosYaw*sinPitch*sinRoll;
-			double cosPsinR	    = cosPitch*sinRoll;
+			double cosPcosY     = cosPitch * cosYaw;
+			double cosPsinY     = cosPitch * sinYaw;
+			double sinRsinY     = sinRoll  * sinYaw;
+			double cosRcosYsinP = cosRoll  * cosYaw   * sinPitch;
+			double cosYsinR	    = cosYaw   * sinRoll;
+			double cosRsinPsinY = cosRoll  * sinPitch * sinYaw;
+			double cosPcosR     = cosPitch * cosRoll;
+			double cosRcosY	    = cosRoll  * cosYaw;
+			double cosRsinY	    = cosRoll  * sinYaw;
+			double cosYsinPsinR = cosYaw   * sinPitch * sinRoll;
+			double cosPsinR	    = cosPitch * sinRoll;
 
 			for(uint i = 0; i < numberOfPoints; i++) {
 				double Px_0 = realWorldX[i];
@@ -159,6 +161,9 @@ class PositionEstimation {
 public:
 
 	PositionEstimation(Position_XYZ_YPR &initialPosition, vector<Point3d> &realWorldPoints) {
+		focalX = Settings::focalX;
+		focalY = Settings::focalY;
+		pixelDimension = Settings::pixelDimension;
 		this->realWorldPoints  = &realWorldPoints;
 		this->currRealWorldSet = new vector<Point3d>(realWorldPoints);
 		lastKnownPositions = new list<Position_XYZ_YPR*>();
@@ -166,7 +171,7 @@ public:
 		cameraSystemPoints = NULL;
 		pointsToEvaluate = 0xFF;	// bit array set to all-ones: 11111111; uses all points
 		numberOfUsedPoints = 8;
-		pinHoleFunctor = new PinHoleEquations(*currRealWorldSet, FOCAL_X, FOCAL_Y, PIXEL_DIMENSION);
+		pinHoleFunctor = new PinHoleEquations(*currRealWorldSet, focalX, focalY, pixelDimension);
 	}
 
 	~PositionEstimation() {
@@ -182,9 +187,9 @@ public:
 
 private:
 
-	const double FOCAL_X = 3.59;
-	const double FOCAL_Y = 3.59;
-	const double PIXEL_DIMENSION = 1.4e-3d;
+	double focalX;
+	double focalY;
+	double pixelDimension;
 
 	void levenbergMarquardt() {
 

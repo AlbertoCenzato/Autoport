@@ -10,3 +10,5 @@
 \Q/Resources/terzo_laboratorio/\E.*
 \Q/OpenCV/\E.*
 \Q/Eigen/\E.*
+\Q/TemporarilyUnused/\E.*
+\Q/Resources/\E.*

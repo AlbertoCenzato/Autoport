@@ -73,7 +73,7 @@ PositionEstimation* PositionEstimation::setPointsToEvaluate(uchar pointsToEvalua
 	cout << currRealWorldSet->size() << endl;
 
 	delete pinHoleFunctor;
-	pinHoleFunctor = new PinHoleEquations(*currRealWorldSet,FOCAL_X, FOCAL_Y, PIXEL_DIMENSION);
+	pinHoleFunctor = new PinHoleEquations(*currRealWorldSet,focalX, focalY, pixelDimension);
 
 	return this;
 }
