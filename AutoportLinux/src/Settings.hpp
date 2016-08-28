@@ -8,7 +8,8 @@
 #pragma once
 
 #include <stdlib.h>
-#include "GenPurpFunc.h"
+
+#include "GenPurpFunc.hpp"
 
 using namespace std;
 

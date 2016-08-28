@@ -5,13 +5,14 @@
  *      Author: alberto
  */
 
-#ifndef PATTERNANALYSIS_H_
-#define PATTERNANALYSIS_H_
+#ifndef PATTERNANALYSIS_HPP_
+#define PATTERNANALYSIS_HPP_
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/features2d/features2d.hpp>
-#include "GenPurpFunc.h"
+
+#include "GenPurpFunc.hpp"
 
 using namespace std;
 using namespace cv;
@@ -281,4 +282,4 @@ private:
 
 
 
-#endif /* PATTERNANALYSIS_H_ */
+#endif /* PATTERNANALYSIS_HPP_ */

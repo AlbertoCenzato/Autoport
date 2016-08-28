@@ -5,11 +5,12 @@
  *      Author: alberto
  */
 
+#include "PatternAnalysis.hpp"
+
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/features2d/features2d.hpp>
-#include "GenPurpFunc.h"
-#include "PatternAnalysis.h"
+#include "GenPurpFunc.hpp"
 
 using namespace std;
 using namespace cv;

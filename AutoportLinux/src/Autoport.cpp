@@ -12,11 +12,12 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/core/ocl.hpp>
 
-#include "GenPurpFunc.h"
-#include "ImgAnalysis.h"
-#include "PatternAnalysis.h"
-#include "Settings.h"
-#include "Test.h"
+#include "GenPurpFunc.hpp"
+#include "ImgAnalysis.hpp"
+#include "PatternAnalysis.hpp"
+#include "Settings.hpp"
+
+#include "Test.hpp"
 
 using namespace std;
 using namespace cv;

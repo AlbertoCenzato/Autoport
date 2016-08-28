@@ -6,10 +6,10 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <unistd.h>
 
-#include "GenPurpFunc.h"
-#include "ImgAnalysis.h"
-#include "PatternAnalysis.h"
-#include "PositionEstimation.h"
+#include "GenPurpFunc.hpp"
+#include "ImgAnalysis.hpp"
+#include "PatternAnalysis.hpp"
+#include "PositionEstimation.hpp"
 
 extern string resourcesPath;
 

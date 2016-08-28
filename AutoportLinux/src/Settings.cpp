@@ -5,12 +5,13 @@
  *      Author: alberto
  */
 
+#include "Settings.hpp"
+
 #include <stdlib.h>
 #include <string.h>
 #include <fstream>
 #include "pugixml.hpp"
-#include "GenPurpFunc.h"
-#include "Settings.h"
+#include "GenPurpFunc.hpp"
 
 using namespace std;
 using namespace pugi;

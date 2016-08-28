@@ -5,9 +5,10 @@
  *      Author: alberto
  */
 
+#include "PositionEstimation.hpp"
+
 #include <Eigen/Dense>
 #include <opencv2/opencv.hpp>
-#include "PositionEstimation.h"
 
 using namespace std;
 using namespace cv;

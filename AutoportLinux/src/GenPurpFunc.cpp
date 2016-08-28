@@ -1,13 +1,14 @@
 //Copyright (c) 2016 Alberto Cenzato. All rights reserved.
 
+#include "GenPurpFunc.hpp"
+
 #include <stdlib.h>
 #include <chrono>
 #include <Eigen/Dense>
 #include <unsupported/Eigen/NumericalDiff>
 #include <unsupported/Eigen/NonLinearOptimization>
 #include <opencv2/opencv.hpp>
-#include "P3p.h"
-#include "GenPurpFunc.h"
+//#include "P3p.h"
 
 using namespace std;
 using namespace Eigen;
@@ -24,7 +25,7 @@ namespace GenPurpFunc {
 	 Output :
 	   C - Centro del sistema camera nel sistema di riferimento assoluto
 	   R - Matrice di rotazione dal sistema assoluto a quello camera */
-
+/*
 	Matrix<double, 3, 4> p3p_solver(Matrix<double, 3, 4> &P, Matrix<double, 3, 4> &f) {
 
 		//auto begin = std::chrono::high_resolution_clock::now();
@@ -162,7 +163,7 @@ namespace GenPurpFunc {
 		//CHECK IF RETURNS BY VALUE OR BY REFERENCE!
 		return solution;
 	}
-
+*/
 
 	
 }

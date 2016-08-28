@@ -1,13 +1,14 @@
 //Copyright (c) 2016 Alberto Cenzato. All rights reserved.
 
+#include "ImgAnalysis.hpp"
+
 #include <iostream>
 #include <set>
 #include <chrono>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/features2d/features2d.hpp>
-#include "ImgAnalysis.h"
-#include "GenPurpFunc.h"
+#include "GenPurpFunc.hpp"
 
 using namespace cv;
 using namespace std;

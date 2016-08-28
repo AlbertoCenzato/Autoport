@@ -5,8 +5,8 @@
  *      Author: alberto
  */
 
-#ifndef POSITIONESTIMATION_H_
-#define POSITIONESTIMATION_H_
+#ifndef POSITIONESTIMATION_HPP_
+#define POSITIONESTIMATION_HPP_
 
 //#include <memory>
 #include <list>
@@ -15,7 +15,7 @@
 #include <unsupported/Eigen/NumericalDiff>
 #include <unsupported/Eigen/NonLinearOptimization>
 
-#include "Settings.h"
+#include "Settings.hpp"
 
 using namespace std;
 using namespace cv;
@@ -242,4 +242,4 @@ private:
 
 
 
-#endif /* POSITIONESTIMATION_H_ */
+#endif /* POSITIONESTIMATION_HPP_ */
