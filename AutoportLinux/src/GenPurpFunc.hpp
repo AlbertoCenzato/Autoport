@@ -9,7 +9,7 @@ using namespace std;
 
 #pragma once
 
-extern string resourcesPath;
+extern string workingDir;
 
 template<typename varType> struct Interval {
 
@@ -17,19 +17,31 @@ public:
 	varType low;
 	varType high;
 
-	Interval<varType>() {
+	Interval<varType>() {	}
 
-	}
-
-	Interval<varType>(varType arg1, varType arg2) {
-		low = arg1;
-		high = arg2;
-	}
+	Interval<varType>(varType low, varType high) : low(low), high(high) {}
 
 	string toString() {
-		string str = to_string(low) + " " + to_string(high);
-		return str;
+		return to_string(low) + " " + to_string(high);
 	}
+};
+
+struct Position_XYZ_YPR {
+
+public:
+	double x, y, z, yaw, pitch, roll;
+
+	Position_XYZ_YPR()
+		: x(0), y(0), z(0), yaw(0), pitch(0), roll(0) {}
+
+	Position_XYZ_YPR(double x, double y, double z, double yaw, double pitch, double roll)
+		: x(x), y(y), z(z), yaw(yaw), pitch(pitch), roll(roll) {}
+
+	string toString() {
+		return "x:" + to_string(x) + "; y:" + to_string(y) + "; z:" + to_string(z)
+				+ "; yaw:" + to_string(yaw) + "; pitch:" + to_string(pitch) + "; roll:" + to_string(roll);
+	}
+
 };
 
 namespace GenPurpFunc {
@@ -196,7 +208,7 @@ namespace GenPurpFunc {
 		namedWindow("Detected leds", WINDOW_NORMAL);
 		imshow("Detected leds", image);
 		waitKey(25);
-		imwrite(resourcesPath + "output/detectedLeds.jpg",image);
+		imwrite(workingDir + "output/detectedLeds.jpg",image);
 		return;
 	}
 

@@ -7,23 +7,19 @@
 
 #pragma once
 
-//#include <memory>
 #include <list>
 #include <chrono>
 #include <Eigen/Dense>
 #include <unsupported/Eigen/NumericalDiff>
 #include <unsupported/Eigen/NonLinearOptimization>
-
+#include "GenPurpFunc.hpp"
 #include "Settings.hpp"
 
 using namespace std;
 using namespace cv;
 using namespace Eigen;
 
-struct Position_XYZ_YPR {
-	double x, y, z, yaw, pitch, roll;
 
-};
 
 // Generic functor
 template<typename _Scalar, int NX = Dynamic, int NY = Dynamic> struct Functor {

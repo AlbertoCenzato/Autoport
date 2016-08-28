@@ -23,6 +23,7 @@ public:
 	static int sizeTolerance;
 	static int sizeSupTolerance;
 
+	static Position_XYZ_YPR initialPosition;
 	static double focalX;
 	static double focalY;
 	static double pixelDimension;

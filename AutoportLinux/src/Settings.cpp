@@ -23,6 +23,7 @@ int Settings::ROITolerance     = 100;
 int Settings::sizeTolerance    = 20;
 int Settings::sizeSupTolerance = 128;
 
+Position_XYZ_YPR Settings::initialPosition(0,0,2000,0,0,0);
 double Settings::focalX = 3.59;
 double Settings::focalY = 3.59;
 double Settings::pixelDimension = 1.4e-3;
@@ -79,6 +80,14 @@ bool Settings::loadConfiguration(string configFilePath) {
 
 	// load default PositionEstimation settings
 
+	node = positionEstimation.child("initial_position");
+	initialPosition = Position_XYZ_YPR(node.attribute("x").as_double(),
+									   node.attribute("y").as_double(),
+									   node.attribute("z").as_double(),
+									   node.attribute("yaw").as_double(),
+									   node.attribute("pitch").as_double(),
+									   node.attribute("roll").as_double());
+
 	node = positionEstimation.child("focal_x");
 	focalX = node.attribute(VALUE).as_double();
 
@@ -100,6 +109,7 @@ string Settings::toString() {
 	config += "\nREGION OF INTEREST TOLERANCE " + to_string(ROITolerance);
 	config += "\nSIZE TOLERANCE " + to_string(sizeTolerance);
 	config += "\nSIZE SUP TOLERANACE " + to_string(sizeSupTolerance);
+	config += "\nINITIAL POSITION " + initialPosition.toString();
 	config += "\nFOCAL X " + to_string(focalX);
 	config += "\nFOCAL Y " + to_string(focalY);
 	config += "\nPIXEL_DIMENSION " + to_string(pixelDimension);

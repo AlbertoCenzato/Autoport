@@ -16,7 +16,7 @@
 using namespace std;
 using namespace cv;
 
-extern string resourcesPath;
+extern string workingDir;
 
 class PatternAnalysis {
 
@@ -61,7 +61,7 @@ private:
 								namedWindow("Detected lines", WINDOW_NORMAL);
 								imshow("Detected lines", img);
 								waitKey(1);
-								imwrite(resourcesPath + "output/detectedLines.jpg",img);
+								imwrite(workingDir + "output/detectedLines.jpg",img);
 								//std::cout << "\nvalid set";
 
 								//check if the set {p1, p2, p3} has been already found

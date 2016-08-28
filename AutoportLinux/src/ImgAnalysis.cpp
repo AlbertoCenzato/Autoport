@@ -15,7 +15,7 @@ using namespace std;
 
 //--- Structs ---
 
-extern string resourcesPath;
+extern string workingDir;
 
 struct Distance {
 	float dist = 0;
@@ -64,7 +64,7 @@ bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> &points, float downscalin
 	namedWindow("Filtered image", WINDOW_NORMAL);
 	imshow("Filtered image", *colorFilteredImg);
 	waitKey(1000);
-	imwrite(resourcesPath + "output/filterByColor.jpg", *colorFilteredImg);
+	imwrite(workingDir + "output/filterByColor.jpg", *colorFilteredImg);
 
 	//put in this->points detected blobs that satisfy this->params tolerance
 	begin = std::chrono::high_resolution_clock::now();
@@ -74,14 +74,14 @@ bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> &points, float downscalin
 	namedWindow("Blobs found", WINDOW_NORMAL);
 	imshow("Blobs found", *colorFilteredImg);
 	waitKey(100000);
-	imwrite(resourcesPath + "output/findBlobs.jpg",*colorFilteredImg);
+	imwrite(workingDir + "output/findBlobs.jpg",*colorFilteredImg);
 
 	//order this->points accordingly to the led pattern numbering
 	begin = std::chrono::high_resolution_clock::now();
 	patternAnalysis->evaluate(ledPoints, *colorFilteredImg, 10);
 	end = std::chrono::high_resolution_clock::now();
 	cout << "\nPattern: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
-	imwrite(resourcesPath + "output/patternMirko.jpg",*colorFilteredImg);
+	imwrite(workingDir + "output/patternMirko.jpg",*colorFilteredImg);
 
 	delete colorFilteredImg;
 

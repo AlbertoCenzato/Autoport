@@ -22,14 +22,15 @@
 using namespace std;
 using namespace cv;
 
-string resourcesPath;
+//string resourcesPath;
 string workingDir;
-string configFileName = "autoport.config";
+const string configFileName = "autoport.config";
 
 int main() {
 
-	cout << "Autoport funziona!!!!!!!!!!!!!!!!!!!!!!" << endl;
+	cout << "****** AUTOPORT SOFTWARE ******\n" << endl;
 
+	/*
 	const char *homeDir = getenv("HOME");
 	string homeDirectory = string(homeDir);
 
@@ -42,14 +43,18 @@ int main() {
 	}
 
 	resourcesPath = homeDirectory + "/workspace/Autoport/Resources/";
+	*/
 
 	cout << "Reading working directory..." << endl;
-	int bufferSize = 200;
+	int bufferSize = 500;
 	char* workDir = new char[bufferSize];
 	workingDir = getcwd(workDir, bufferSize);
-	cout << "Done" << endl;
+	workingDir += "/";
+	delete [] workDir;
 
-	string path = workingDir + "/" + configFileName;
+	cout << "Done. Working directory is: " << workingDir << endl;
+
+	string path = workingDir + configFileName;
 	cout << "Opening and parsing " << path << endl;
 	Settings::loadConfiguration(path);
 	cout << Settings::toString();
