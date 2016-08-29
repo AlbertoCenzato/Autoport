@@ -90,15 +90,27 @@ namespace GenPurpFunc {
 		printf("\n");
 	}
 
-	inline void printPointVector(const vector<Point2f> &vect) {
+	inline string pointVectorToStrng(const vector<Point2f> &vect) {
+		string str = "";
 		uint size = vect.size();
 		for(uint i = 0; i < size; i++)
-			cout << "\nPoint " << i+1 << ": [" << vect.at(i).x << ", " << vect.at(i).y << "]";
+			str += "\nPoint " + to_string(i+1) + ": [" + to_string(vect.at(i).x) + ", " + to_string(vect.at(i).y) + "]";
+		return str;
 	}
-	inline void printPointVector(const vector<KeyPoint> &vect) {
+	inline string pointVectorToString(const vector<KeyPoint> &vect) {
+		string str = "";
 		uint size = vect.size();
 		for(uint i = 0; i < size; i++)
-			cout << "\nPoint " << i+1 << ": [" << vect.at(i).pt.x << ", " << vect.at(i).pt.y << "]";
+			str += "\nPoint " + to_string(i+1) + ": [" + to_string(vect.at(i).pt.x) + ", " + to_string(vect.at(i).pt.y) + "]";
+		return str;
+	}
+	inline string pointVectorToString(const vector<Point3d> &vect) {
+		string str = "";
+		uint size = vect.size();
+		for(uint i = 0; i < size; i++)
+			str += "\nPoint " + to_string(i+1) + ": [" + to_string(vect.at(i).x) + ", " + to_string(vect.at(i).y)
+				+ ", " + to_string(vect.at(i).z) + "]";
+		return str;
 	}
 
 	inline Point2f multiply2f(Matrix2d &R, Point2f &point) {

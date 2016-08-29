@@ -43,49 +43,49 @@ bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> &points, float downscalin
 	if(regionOfInterest != NULL)
 		image = image(*regionOfInterest);
 
-	Mat *hsvImg = new Mat(image.rows,image.cols,image.depth());
-	Mat *colorFilteredImg = new Mat(image.rows,image.cols,image.depth());
+	Mat hsvImg(image.rows,image.cols,image.depth());
+	Mat colorFilteredImg(image.rows,image.cols,image.depth());
 
 	//change color space: from BGR to HSV;
     //TODO: color conversion and filterByColor can be performed with a shader
 	auto begin = std::chrono::high_resolution_clock::now();
-	cvtColor(image,*hsvImg,colorConversion);
+	cvtColor(image,hsvImg,colorConversion);
 	auto end = std::chrono::high_resolution_clock::now();
 	cout << "\nConvert color: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
 	namedWindow("Cropped image", WINDOW_NORMAL);
-	imshow("Cropped image", *hsvImg);
+	imshow("Cropped image", hsvImg);
 	waitKey(1);
 
 	//filter the color according to this->low and this->high tolerances
 	begin = std::chrono::high_resolution_clock::now();
-	filterByColor(hsvImg,colorFilteredImg);
+	filterByColor(&hsvImg,&colorFilteredImg);
 	end = std::chrono::high_resolution_clock::now();
 	cout << "\nFilter color: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
 	namedWindow("Filtered image", WINDOW_NORMAL);
-	imshow("Filtered image", *colorFilteredImg);
+	imshow("Filtered image", colorFilteredImg);
 	waitKey(1000);
-	imwrite(workingDir + "output/filterByColor.jpg", *colorFilteredImg);
+	imwrite(workingDir + "output/filterByColor.jpg", colorFilteredImg);
 
 	//put in this->points detected blobs that satisfy this->params tolerance
 	begin = std::chrono::high_resolution_clock::now();
-	findBlobs(colorFilteredImg, downscalingFactor);
+	findBlobs(&colorFilteredImg, downscalingFactor);
 	end = std::chrono::high_resolution_clock::now();
 	cout << "\nFind blobs: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
 	namedWindow("Blobs found", WINDOW_NORMAL);
-	imshow("Blobs found", *colorFilteredImg);
+	imshow("Blobs found", colorFilteredImg);
 	waitKey(100000);
-	imwrite(workingDir + "output/findBlobs.jpg",*colorFilteredImg);
+	imwrite(workingDir + "output/findBlobs.jpg",colorFilteredImg);
 
 	//order this->points accordingly to the led pattern numbering
 	begin = std::chrono::high_resolution_clock::now();
-	patternAnalysis->evaluate(ledPoints, *colorFilteredImg, 10);
+	patternAnalysis->evaluate(ledPoints, colorFilteredImg, 10);
 	end = std::chrono::high_resolution_clock::now();
 	cout << "\nPattern: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
-	imwrite(workingDir + "output/patternMirko.jpg",*colorFilteredImg);
+	imwrite(workingDir + "output/patternMirko.jpg",colorFilteredImg);
 
-	delete colorFilteredImg;
+	//delete colorFilteredImg;
 
-	GenPurpFunc::printPointVector(*ledPoints);
+	GenPurpFunc::pointVectorToStrng(*ledPoints);
 
 	Interval<int> hue = Interval<int>();
 	hue.low  = 0;
@@ -100,7 +100,7 @@ bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> &points, float downscalin
 	int ledPointsLength = ledPoints->size();
 	for (int i = 0; i < ledPointsLength; i++) {
 		Point2f p = ledPoints->at(i);
-		Vec3b color = hsvImg->at<Vec3b>(p);
+		Vec3b color = hsvImg.at<Vec3b>(p);
 		if (color[0] > hue.high) hue.high = color[0];
 		if (color[1] > sat.high) sat.high = color[1];
 		if (color[2] > val.high) val.high = color[2];
@@ -110,7 +110,7 @@ bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> &points, float downscalin
 	}
 	colorInterval->low  = Scalar(hue.low  - colorTolerance, sat.low  - colorTolerance, val.low  - colorTolerance);
 	colorInterval->high = Scalar(hue.high + colorTolerance, sat.high + colorTolerance, val.high + colorTolerance);
-	delete hsvImg;
+	//delete hsvImg;
 
 	findROI();
 

@@ -40,11 +40,14 @@ class ImgAnalysis {
 
 public:
 
-	ImgAnalysis(const Scalar &low, const Scalar &high, LedColor ledColor, PatternAnalysis &patternAnalysis, Rect *regionOfInterest = NULL) {
+	ImgAnalysis(Interval<Scalar> &colorInterval, LedColor ledColor, PatternAnalysis &patternAnalysis, Rect *regionOfInterest = NULL) {
+		this->colorInterval = &colorInterval;
+
+		if(ledColor == LedColor::RED) colorConversion = COLOR_RGB2HSV;
+		else						  colorConversion = COLOR_BGR2HSV;
+
+		this->patternAnalysis = &patternAnalysis;
 		this->regionOfInterest = regionOfInterest;
-		colorInterval = new Interval<Scalar>();
-		colorInterval->low  = low;
-		colorInterval->high = high;
 
 		params = new SimpleBlobDetector::Params();
 		params->filterByColor = true;
@@ -56,15 +59,41 @@ public:
 		params->filterByConvexity = false;
 		params->filterByCircularity = false;
 
-		if(ledColor == LedColor::RED) colorConversion = COLOR_RGB2HSV;
-		else						  colorConversion = COLOR_BGR2HSV;
-
 		colorTolerance   = Settings::colorTolerance;
 		ROItolerance     = Settings::ROITolerance;
 		sizeTolerance    = Settings::sizeTolerance;
 		sizeSupTolerance = Settings::sizeSupTolerance;
 
+		ledPoints = NULL;
+		oldKeyPointSizeInterval = NULL;
+	}
+
+	ImgAnalysis(LedColor ledColor, PatternAnalysis &patternAnalysis, Rect *regionOfInterest = NULL) {
+
+		Scalar low = Scalar(Settings::hue.low,Settings::saturation.low,Settings::value.low);
+		Scalar high = Scalar(Settings::hue.high,Settings::saturation.high,Settings::value.high);
+		this->colorInterval = new Interval<Scalar>(low,high);
+
+		if(ledColor == LedColor::RED) colorConversion = COLOR_RGB2HSV;
+		else						  colorConversion = COLOR_BGR2HSV;
+
 		this->patternAnalysis = &patternAnalysis;
+		this->regionOfInterest = regionOfInterest;
+
+		params = new SimpleBlobDetector::Params();
+		params->filterByColor = true;
+		params->blobColor = 255;
+		params->filterByArea = true;
+		params->minArea = 1000;
+		params->maxArea = 5000;
+		params->filterByInertia = false;
+		params->filterByConvexity = false;
+		params->filterByCircularity = false;
+
+		colorTolerance   = Settings::colorTolerance;
+		ROItolerance     = Settings::ROITolerance;
+		sizeTolerance    = Settings::sizeTolerance;
+		sizeSupTolerance = Settings::sizeSupTolerance;
 
 		ledPoints = NULL;
 		oldKeyPointSizeInterval = NULL;

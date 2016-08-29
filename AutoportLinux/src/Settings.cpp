@@ -24,6 +24,14 @@ int Settings::sizeTolerance    = 20;
 int Settings::sizeSupTolerance = 128;
 
 Position_XYZ_YPR Settings::initialPosition(0,0,2000,0,0,0);
+vector<Point3d> Settings::realWorldPoints= {{90, 70,0},
+		   	   	   	   	   	   	   	   	    {90, 30,0},
+											{90,-90,0},
+											{50, 70,0},
+											{50, 30,0},
+											{50,-90,0},
+										   {-90, 70,0},
+										   {-90, 90,0}};
 double Settings::focalX = 3.59;
 double Settings::focalY = 3.59;
 double Settings::pixelDimension = 1.4e-3;
@@ -88,6 +96,14 @@ bool Settings::loadConfiguration(string configFilePath) {
 									   node.attribute("pitch").as_double(),
 									   node.attribute("roll").as_double());
 
+	int count = 0;
+	for (xml_node iterNode = positionEstimation.child("real_world_points").first_child(); iterNode; iterNode = iterNode.next_sibling()) {
+		double x = iterNode.attribute("x").as_double();
+		double y = iterNode.attribute("y").as_double();
+		double z = iterNode.attribute("z").as_double();
+		realWorldPoints.at(count++) = {x,y,z};
+	}
+
 	node = positionEstimation.child("focal_x");
 	focalX = node.attribute(VALUE).as_double();
 
@@ -110,6 +126,7 @@ string Settings::toString() {
 	config += "\nSIZE TOLERANCE " + to_string(sizeTolerance);
 	config += "\nSIZE SUP TOLERANACE " + to_string(sizeSupTolerance);
 	config += "\nINITIAL POSITION " + initialPosition.toString();
+	config += "\nREAL WORLD POINTS " + GenPurpFunc::pointVectorToString(realWorldPoints);
 	config += "\nFOCAL X " + to_string(focalX);
 	config += "\nFOCAL Y " + to_string(focalY);
 	config += "\nPIXEL_DIMENSION " + to_string(pixelDimension);

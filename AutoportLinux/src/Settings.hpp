@@ -4,6 +4,7 @@
 #include "GenPurpFunc.hpp"
 
 using namespace std;
+using namespace Eigen;
 
 class Settings {
 
@@ -24,6 +25,7 @@ public:
 	static int sizeSupTolerance;
 
 	static Position_XYZ_YPR initialPosition;
+	static vector<Point3d> realWorldPoints;
 	static double focalX;
 	static double focalY;
 	static double pixelDimension;

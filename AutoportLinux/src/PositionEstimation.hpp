@@ -19,8 +19,6 @@ using namespace std;
 using namespace cv;
 using namespace Eigen;
 
-
-
 // Generic functor
 template<typename _Scalar, int NX = Dynamic, int NY = Dynamic> struct Functor {
 	typedef _Scalar Scalar;
@@ -147,7 +145,7 @@ class PositionEstimation {
 
 	vector<Point3d> *currRealWorldSet;
 
-	list<Position_XYZ_YPR*> *lastKnownPositions;
+	list<Position_XYZ_YPR*> lastKnownPositions;
 	static const int MAX_LAST_KNOWN_POSITIONS_SIZE = 5;
 	uchar pointsToEvaluate;
 	uint numberOfUsedPoints;
@@ -155,24 +153,26 @@ class PositionEstimation {
 
 public:
 
-	PositionEstimation(Position_XYZ_YPR &initialPosition, vector<Point3d> &realWorldPoints) {
+
+	PositionEstimation(vector<Point3d> &realWorldPoints) {
 		focalX = Settings::focalX;
 		focalY = Settings::focalY;
 		pixelDimension = Settings::pixelDimension;
 		this->realWorldPoints  = &realWorldPoints;
 		this->currRealWorldSet = new vector<Point3d>(realWorldPoints);
-		lastKnownPositions = new list<Position_XYZ_YPR*>();
-		lastKnownPositions->push_front(&initialPosition);
+		lastKnownPositions = list<Position_XYZ_YPR*>();
+		lastKnownPositions.push_front(&Settings::initialPosition);
 		cameraSystemPoints = NULL;
 		pointsToEvaluate = 0xFF;	// bit array set to all-ones: 11111111; uses all points
 		numberOfUsedPoints = 8;
 		pinHoleFunctor = new PinHoleEquations(*currRealWorldSet, focalX, focalY, pixelDimension);
 	}
 
+	PositionEstimation() : PositionEstimation(Settings::realWorldPoints) {}
+
 	~PositionEstimation() {
 		delete cameraSystemPoints;
 		delete currRealWorldSet;
-		delete lastKnownPositions;
 		delete pinHoleFunctor;
 	}
 
@@ -189,7 +189,7 @@ private:
 	void levenbergMarquardt() {
 
 		VectorXd &dynVar = *(new VectorXd(6));
-		Position_XYZ_YPR *lastKnownPos = lastKnownPositions->front();
+		Position_XYZ_YPR *lastKnownPos = lastKnownPositions.front();
 		dynVar(0) = lastKnownPos->x;
 		dynVar(1) = lastKnownPos->y;
 		dynVar(2) = lastKnownPos->z;
@@ -219,7 +219,7 @@ private:
 		lastKnownPos->yaw 	= dynVar(3);
 		lastKnownPos->pitch = dynVar(4);
 		lastKnownPos->roll  = dynVar(5);
-		lastKnownPositions->push_front(lastKnownPos);
+		lastKnownPositions.push_front(lastKnownPos);
 
 		return;
 	}

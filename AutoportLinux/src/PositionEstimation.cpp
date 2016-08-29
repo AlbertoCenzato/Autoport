@@ -36,12 +36,12 @@ void PositionEstimation::evaluate(vector<Point2f> &cameraSystemPoints, Matrix<do
 	//Kalman
 	kalmanFilter();
 
-	if(lastKnownPositions->size() > MAX_LAST_KNOWN_POSITIONS_SIZE)
-		lastKnownPositions->pop_back();
+	if(lastKnownPositions.size() > MAX_LAST_KNOWN_POSITIONS_SIZE)
+		lastKnownPositions.pop_back();
 	Vector3d pos;
 	Vector3d angle;
-	pos   << lastKnownPositions->front()->x,   lastKnownPositions->front()->y,     lastKnownPositions->front()->z;
-	angle << lastKnownPositions->front()->yaw, lastKnownPositions->front()->pitch, lastKnownPositions->front()->roll;
+	pos   << lastKnownPositions.front()->x,   lastKnownPositions.front()->y,     lastKnownPositions.front()->z;
+	angle << lastKnownPositions.front()->yaw, lastKnownPositions.front()->pitch, lastKnownPositions.front()->roll;
 	evaluatedPoints << pos, angle;
 	return;
 }

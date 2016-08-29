@@ -30,21 +30,6 @@ int main() {
 
 	cout << "****** AUTOPORT SOFTWARE ******\n" << endl;
 
-	/*
-	const char *homeDir = getenv("HOME");
-	string homeDirectory = string(homeDir);
-
-	//check if the workspace name is "workspace"
-	string thisFilePath = homeDirectory + "/workspace/Autoport/src/Autoport.cpp";
-	if( access( thisFilePath.c_str(), F_OK ) == -1 ) {
-		cout << "ERRORE: DIRECTORY CORRENTE ERRATA, PROBABILMENTE IL NOME DEL WORKSPACE NON E' \"WORKSPACE\"" << endl;
-		sleep(5000);
-		return -1;
-	}
-
-	resourcesPath = homeDirectory + "/workspace/Autoport/Resources/";
-	*/
-
 	cout << "Reading working directory..." << endl;
 	int bufferSize = 500;
 	char* workDir = new char[bufferSize];
@@ -56,14 +41,15 @@ int main() {
 
 	string path = workingDir + configFileName;
 	cout << "Opening and parsing " << path << endl;
+	cout << "\n*** Settings ***" << endl;
 	Settings::loadConfiguration(path);
 	cout << Settings::toString();
 
-	ocl::setUseOpenCL(true); // enable OpenCL in the processing of Mat
+	//ocl::setUseOpenCL(true); // enable OpenCL in the processing of Mat
 
-	
 	//testImgAnalysisPositionEstimationPic();
-	//testImgAnalysisPositionEstimationPic();
+
+	testCameraCapture();
 
 	getchar();
 	return 0;

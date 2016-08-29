@@ -1,7 +1,7 @@
 
 
 
-
+void testCameraCapture();
 
 void testImgAnalysisPositionEstimationPic();
 
