@@ -12,6 +12,7 @@
 #include "ImgAnalysis.hpp"
 #include "PatternAnalysis.hpp"
 #include "PositionEstimation.hpp"
+#include "ImageLoader.hpp"
 
 using namespace cv;
 
@@ -19,9 +20,9 @@ extern string workingDir;
 
 void testCameraCapture() {
 
-	cv::VideoCapture vid = cv::VideoCapture();
+	auto loader = ImageLoader();
 	Mat frame;
-	vid >> frame;
+	loader.getNextFrame(frame);
 	imwrite(workingDir + "Resources/output/frame.jpg",frame);
 
 }

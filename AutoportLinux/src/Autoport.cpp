@@ -16,6 +16,7 @@
 #include "ImgAnalysis.hpp"
 #include "PatternAnalysis.hpp"
 #include "Settings.hpp"
+#include "ImageLoader.hpp"
 
 #include "Test.hpp"
 
