@@ -1,22 +1,16 @@
 /*
- * ImageLoader.h
+ * ImageLoader.hpp
  *
  *  Created on: Sep 7, 2016
  *      Author: root
  */
 
-#pragma once
-
-#include <opencv2/opencv.hpp>
+#ifndef IMAGELOADER_HPP_
+#define IMAGELOADER_HPP_
 
 class ImageLoader {
 public:
 	ImageLoader();
-	virtual ~ImageLoader();
-
-	void getNextFrame(cv::Mat &frame);
-
-private:
-	cv::VideoCapture capture;
-
 };
+
+#endif /* IMAGELOADER_HPP_ */
