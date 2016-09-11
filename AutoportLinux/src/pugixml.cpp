@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
-#include <limits.h>
+#include <climits>
 
 #ifdef PUGIXML_WCHAR_MODE
 #	include <wchar.h>

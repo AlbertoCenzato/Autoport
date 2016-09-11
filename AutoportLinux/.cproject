@@ -23,7 +23,7 @@
 								<option id="gnu.cpp.compiler.exe.debug.option.optimization.level.1098185407" name="Optimization Level" superClass="gnu.cpp.compiler.exe.debug.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.exe.debug.option.debugging.level.143187876" name="Debug Level" superClass="gnu.cpp.compiler.exe.debug.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.139966292" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="/usr/local/include"/>
+									<listOptionValue builtIn="false" value="/usr/local/include/opencv-3.1"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Eigen}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/PugiXML}&quot;"/>
 								</option>
@@ -43,10 +43,11 @@
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.1568205535" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug"/>
 							<tool errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1560081244" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
 								<option id="gnu.cpp.link.option.paths.251466765" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" useByScannerDiscovery="false" valueType="libPaths">
-									<listOptionValue builtIn="false" value="/usr/local/lib"/>
+									<listOptionValue builtIn="false" value="/usr/local/lib/opencv-3.1"/>
 								</option>
 								<option id="gnu.cpp.link.option.libs.1388684959" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" useByScannerDiscovery="false" valueType="libs">
 									<listOptionValue builtIn="false" value=":libopencv_core.so.3.1.0"/>
+									<listOptionValue builtIn="false" value=":libopencv_videoio.so.3.1.0"/>
 									<listOptionValue builtIn="false" value=":libopencv_flann.so.3.1.0"/>
 									<listOptionValue builtIn="false" value=":libopencv_highgui.so.3.1.0"/>
 									<listOptionValue builtIn="false" value=":libopencv_features2d.so.3.1.0"/>
@@ -140,10 +141,10 @@
 				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.exe.release.856933436.687136697" name="Raspberry_release" parent="cdt.managedbuild.config.gnu.exe.release">
 					<folderInfo id="cdt.managedbuild.config.gnu.exe.release.856933436.687136697." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.cross.base.1680316949" name="Cross GCC" superClass="cdt.managedbuild.toolchain.gnu.cross.base">
-							<option id="cdt.managedbuild.option.gnu.cross.prefix.1777143435" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix" value="arm-unknown-linux-gnueabi-" valueType="string"/>
-							<option id="cdt.managedbuild.option.gnu.cross.path.31340302" name="Path" superClass="cdt.managedbuild.option.gnu.cross.path" value="/opt/cross/bin" valueType="string"/>
+							<option id="cdt.managedbuild.option.gnu.cross.prefix.1777143435" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix" useByScannerDiscovery="false" value="arm-unknown-linux-gnueabi-" valueType="string"/>
+							<option id="cdt.managedbuild.option.gnu.cross.path.31340302" name="Path" superClass="cdt.managedbuild.option.gnu.cross.path" useByScannerDiscovery="false" value="/opt/cross/bin" valueType="string"/>
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.targetPlatform.gnu.cross.464569105" isAbstract="false" osList="all" superClass="cdt.managedbuild.targetPlatform.gnu.cross"/>
-							<builder buildPath="${workspace_loc:/Autoport}/Raspberry_release" id="cdt.managedbuild.builder.gnu.cross.223811192" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" superClass="cdt.managedbuild.builder.gnu.cross"/>
+							<builder buildPath="${workspace_loc:/Autoport}/Raspberry_release" id="cdt.managedbuild.builder.gnu.cross.223811192" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="cdt.managedbuild.builder.gnu.cross"/>
 							<tool id="cdt.managedbuild.tool.gnu.cross.c.compiler.1930529230" name="Cross GCC Compiler" superClass="cdt.managedbuild.tool.gnu.cross.c.compiler">
 								<option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.option.optimization.level.301907192" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.debugging.level.1421197456" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.none" valueType="enumerated"/>
@@ -159,28 +160,30 @@
 								<option id="gnu.cpp.compiler.option.debugging.level.1133238700" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.dialect.std.117546482" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.c++1y" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.1944296149" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/OpenCV/include}&quot;"/>
+									<listOptionValue builtIn="false" value="/usr/local/include"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/PugiXML}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Eigen}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.470110773" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.1056880131" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker"/>
 							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.linker.1335865596" name="Cross G++ Linker" superClass="cdt.managedbuild.tool.gnu.cross.cpp.linker">
-								<option id="gnu.cpp.link.option.libs.558809739" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
+								<option id="gnu.cpp.link.option.libs.558809739" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" useByScannerDiscovery="false" valueType="libs">
 									<listOptionValue builtIn="false" value=":libopencv_core.so.3.1.0"/>
+									<listOptionValue builtIn="false" value=":libopencv_videoio.so.3.1.0"/>
 									<listOptionValue builtIn="false" value=":libopencv_imgcodecs.so.3.1.0"/>
 									<listOptionValue builtIn="false" value=":libopencv_imgproc.so.3.1.0"/>
 									<listOptionValue builtIn="false" value=":libopencv_features2d.so.3.1.0"/>
 									<listOptionValue builtIn="false" value=":libopencv_highgui.so.3.1.0"/>
 									<listOptionValue builtIn="false" value=":libopencv_flann.so.3.1.0"/>
 								</option>
-								<option id="gnu.cpp.link.option.paths.671834004" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/OpenCV/lib/raspberry/lib}&quot;"/>
-									<listOptionValue builtIn="false" value=""/>
-									<listOptionValue builtIn="false" value=""/>
+								<option id="gnu.cpp.link.option.paths.671834004" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" useByScannerDiscovery="false" valueType="libPaths">
+									<listOptionValue builtIn="false" value="/home/alberto/Code/raspberry/opencv-3.1/lib"/>
 								</option>
-								<option id="gnu.cpp.link.option.other.1971508431" name="Other options (-Xlinker [option])" superClass="gnu.cpp.link.option.other" valueType="stringList">
+								<option id="gnu.cpp.link.option.other.1971508431" name="Other options (-Xlinker [option])" superClass="gnu.cpp.link.option.other" useByScannerDiscovery="false" valueType="stringList">
 									<listOptionValue builtIn="false" value="-rpath '/home/alberto/Code/raspberry/rootfs/lib/arm-linux-gnueabihf'"/>
+									<listOptionValue builtIn="false" value="-rpath-link '/home/alberto/Code/raspberry/rootfs/lib/arm-linux-gnueabihf'"/>
+									<listOptionValue builtIn="false" value="-rpath-link '/home/alberto/Code/raspberry/rootfs/usr/lib/arm-linux-gnueabihf'"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1457031688" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>

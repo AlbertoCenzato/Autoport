@@ -23,7 +23,10 @@ void testCameraCapture() {
 	auto loader = ImageLoader();
 	Mat frame;
 	loader.getNextFrame(frame);
-	imwrite(workingDir + "Resources/output/frame.jpg",frame);
+	if(imwrite(workingDir + "Resources/output/frame.jpg",frame))
+		cout << "Frame saved" << endl;
+	else
+		cout << "Error while saving frame" << endl;
 
 }
 
