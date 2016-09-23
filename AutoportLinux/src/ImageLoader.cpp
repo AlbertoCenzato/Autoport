@@ -15,15 +15,24 @@ using namespace cv;
 
 extern string workingDir;
 
-ImageLoader::ImageLoader() {
+ImageLoader::ImageLoader(string source, int type) {
 
-	capture = VideoCapture(0);
+	switch(type) {
+		case DEVICE:
+			capture = VideoCapture(0);
+			break;
+		case FILE:
+			capture = VideoCapture(source);
+			break;
+		case STREAM:
+			capture = VideoCapture(source);
+			break;
+	}
+
 	if(!capture.isOpened()) {
 		string imagesPath = workingDir + "Images/";
-		cout << "Cannot find a camera input, trying to load images from: " << imagesPath << endl;
-
-		// load images...
-
+		cout << "Cannot find input" << endl;
+		return;
 	}
 	else {
 		cout << "Found camera input" << endl;

@@ -54,7 +54,7 @@
 									<listOptionValue builtIn="false" value=":libopencv_imgcodecs.so.3.1.0"/>
 								</option>
 								<option id="gnu.cpp.link.option.other.1190972418" name="Other options (-Xlinker [option])" superClass="gnu.cpp.link.option.other" useByScannerDiscovery="false" valueType="stringList">
-									<listOptionValue builtIn="false" value="-rpath &quot;/usr/local/lib&quot;"/>
+									<listOptionValue builtIn="false" value="-rpath &quot;/usr/local/lib/opencv-3.1&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.349911147" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
@@ -162,6 +162,7 @@
 									<listOptionValue builtIn="false" value="/usr/local/include/opencv-3.1"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Eigen}&quot;"/>
 								</option>
+								<option id="gnu.cpp.compiler.option.debugging.codecov.341261699" name="Generate gcov information (-ftest-coverage -fprofile-arcs)" superClass="gnu.cpp.compiler.option.debugging.codecov" useByScannerDiscovery="false" value="true" valueType="boolean"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.470110773" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.1056880131" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker"/>
