@@ -3,7 +3,7 @@
 // Author      : Alberto Cenzato
 // Version     : 2.0
 // Copyright   : Copyright (c) 2016 Alberto Cenzato. All rights reserved.
-// Description : Image analysis software for Autoport project
+// Description : Software for Autoport project
 //============================================================================
 
 #include <unistd.h>
