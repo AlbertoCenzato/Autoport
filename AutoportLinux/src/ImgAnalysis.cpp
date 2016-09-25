@@ -8,26 +8,6 @@ using namespace std;
 
 extern string workingDir;
 
-//--- Structs ---
-
-/*
-struct Distance {
-	float dist = 0;
-	Point2f *point1;
-	//KeyPoint *keyPoint2;
-	int point2;
-};
-
-struct lessDist : binary_function <Distance, Distance, bool> {
-	bool operator() (const Distance &d1, const Distance &d2) const { return d1.dist < d2.dist; }
-};
-
-
-struct orderByX : binary_function <Point2f, Point2f, bool> {
-	bool operator() (const Point2f &p1, const Point2f &p2) const { return p1.x < p2.x; }
-};
-*/
-
 //--- Functions ---
 
 //TODO: make the function accept a pointer to a pattern analysis function
@@ -49,7 +29,7 @@ bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> &points, float downscalin
 	cout << "\nConvert color: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
 	namedWindow("Cropped image", WINDOW_NORMAL);
 	imshow("Cropped image", hsvImg);
-	waitKey(1);
+	waitKey(0);
 
 	//filter the color according to this->low and this->high tolerances
 	begin = chrono::high_resolution_clock::now();
@@ -58,8 +38,8 @@ bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> &points, float downscalin
 	cout << "\nFilter color: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
 	namedWindow("Filtered image", WINDOW_NORMAL);
 	imshow("Filtered image", colorFilteredImg);
-	waitKey(1);
-	imwrite(workingDir + "output/filterByColor.jpg", colorFilteredImg);
+	waitKey(0);
+	//imwrite(workingDir + "output/filterByColor.jpg", colorFilteredImg);
 
 	//put in this->points detected blobs that satisfy this->params tolerance
 	begin = chrono::high_resolution_clock::now();
@@ -68,25 +48,25 @@ bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> &points, float downscalin
 	cout << "\nFind blobs: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
 	namedWindow("Blobs found", WINDOW_NORMAL);
 	imshow("Blobs found", colorFilteredImg);
-	waitKey(1);
-	imwrite(workingDir + "output/findBlobs.jpg",colorFilteredImg);
+	waitKey(0);
+	//imwrite(workingDir + "output/findBlobs.jpg",colorFilteredImg);
 
 	//order this->points accordingly to the led pattern numbering
 	begin = chrono::high_resolution_clock::now();
 	patternAnalysis.evaluate(ledPoints, colorFilteredImg, 10);
 	end = chrono::high_resolution_clock::now();
 	cout << "\nPattern: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
-	imwrite(workingDir + "output/patternMirko.jpg",colorFilteredImg);
+	//imwrite(workingDir + "output/patternMirko.jpg",colorFilteredImg);
 
 	GenPurpFunc::pointVectorToStrng(ledPoints);
 
-	Interval<int> hue = Interval<int>(0,255);
-	Interval<int> sat = Interval<int>(0,255);
-	Interval<int> val = Interval<int>(0,255);
+	Interval<int> hue(0,255);
+	Interval<int> sat(0,255);
+	Interval<int> val(0,255);
 
 	int ledPointsLength = ledPoints.size();
 	for (int i = 0; i < ledPointsLength; i++) {
-		Point2f p = ledPoints.at(i);
+		Point2f p = ledPoints[i];
 		Vec3b color = hsvImg.at<Vec3b>(p);
 		if (color[0] > hue.high) hue.high = color[0];
 		if (color[1] > sat.high) sat.high = color[1];
@@ -95,14 +75,14 @@ bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> &points, float downscalin
 		if (color[1] < sat.low)	 sat.low  = color[1];
 		if (color[2] < val.low)	 val.low  = color[2];
 	}
-	colorInterval.low  = Scalar(hue.low  - colorTolerance, sat.low  - colorTolerance, val.low  - colorTolerance);
+	colorInterval.low(hue.low  - colorTolerance, sat.low  - colorTolerance, val.low  - colorTolerance);
 	colorInterval.high = Scalar(hue.high + colorTolerance, sat.high + colorTolerance, val.high + colorTolerance);
 
 	findROI();
 
 	points = ledPoints;
 
-	int averageSize = (oldKeyPointSizeInterval->low + oldKeyPointSizeInterval->high)/2;
+	int averageSize = (oldKeyPointSizeInterval.low + oldKeyPointSizeInterval.high)/2;
 
 	return averageSize > sizeSupTolerance;
 }

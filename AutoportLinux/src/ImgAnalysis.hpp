@@ -23,16 +23,16 @@ class ImgAnalysis {
 	int ROItolerance;	//region of interest cropping tolerance [px]
 	int sizeTolerance;
 	int sizeSupTolerance;
-	vector<Point2f> ledPoints;
 	SimpleBlobDetector::Params params;
+	vector<Point2f> ledPoints;
 	int colorConversion;
 	PatternAnalysis patternAnalysis;
 
-	Interval<float> *oldKeyPointSizeInterval;
+	Interval<float> oldKeyPointSizeInterval;
 
 public:
 
-	ImgAnalysis(const Interval<Scalar> &colorInterval, LedColor ledColor, PatternAnalysis &patternAnalysis, const Rect &regionOfInterest = Rect(0,0,0,0)) {
+	ImgAnalysis(const Interval<Scalar> &colorInterval, LedColor ledColor, const PatternAnalysis &patternAnalysis, const Rect &regionOfInterest = Rect(0,0,0,0)) {
 		constructor(colorInterval, ledColor, patternAnalysis, regionOfInterest);
 	}
 
@@ -55,7 +55,7 @@ public:
 
 private:
 
-	void constructor(const Interval<Scalar> &colorInterval, LedColor ledColor, PatternAnalysis &patternAnalysis, const Rect &regionOfInterest = Rect(0,0,0,0)) {
+	void constructor(const Interval<Scalar> &colorInterval, LedColor ledColor, const PatternAnalysis &patternAnalysis, const Rect &regionOfInterest = Rect(0,0,0,0)) {
 		this->colorInterval = colorInterval; //FIXME: what happens here? is it coping the object? Probably yes
 
 		if(ledColor == LedColor::RED) colorConversion = COLOR_RGB2HSV;
@@ -79,7 +79,7 @@ private:
 		sizeTolerance    = Settings::sizeTolerance;
 		sizeSupTolerance = Settings::sizeSupTolerance;
 
-		oldKeyPointSizeInterval = nullptr;
+		oldKeyPointSizeInterval = Interval<float>(0,0);
 	}
 
 	// Processes the input image (in HSV color space) filtering out (setting to black)
@@ -115,15 +115,12 @@ private:
 		//a degeneration of the interval amplitude continuously increasing it in presence
 		//of noise similar to leds, maybe it would be better to use the medium value of led sizes
 
-		if(oldKeyPointSizeInterval != NULL) {
-			params.maxArea = oldKeyPointSizeInterval->high;
-			params.minArea = oldKeyPointSizeInterval->low;
-		}
-		else {
-			oldKeyPointSizeInterval = new Interval<float>();
+		if(oldKeyPointSizeInterval.high != 0 && oldKeyPointSizeInterval.low != 0) {
+			params.maxArea = oldKeyPointSizeInterval.high;
+			params.minArea = oldKeyPointSizeInterval.low;
 		}
 
-		vector<KeyPoint> keyPoints = vector<KeyPoint>();
+		auto keyPoints = vector<KeyPoint>();
 
 		Ptr<SimpleBlobDetector> featureDetector = SimpleBlobDetector::create(params);
 		featureDetector->detect(colorFilteredImg, keyPoints);
@@ -138,7 +135,7 @@ private:
 		uint size = ledPoints.size();
 		float *distances = new float[size];	// TODO: try to use another way, dangerous pointer
 		for (uint i = 0; i < size; i++) {
-			float dist = GenPurpFunc::distancePointToPoint(centr, ledPoints.at(i));
+			float dist = GenPurpFunc::distancePointToPoint(centr, ledPoints[i]);
 			meanDist += dist;
 			distances[i] = dist;
 		}
@@ -147,7 +144,7 @@ private:
 		// remove points
 		for (uint i = 0; i < size; ) {
 			if (distances[i] > 2 * meanDist) {
-				ledPoints.at(i) = ledPoints.at(size - 1);
+				ledPoints[i] = ledPoints[size - 1];
 				distances[i] = distances[size - 1];
 				ledPoints.erase(--ledPoints.end());
 			}
@@ -160,21 +157,20 @@ private:
 
 		//draws detected points
 		for (uint i = 0; i < size; i++) {
-			Point2f p = ledPoints.at(i);
-			Scalar color = Scalar(150, 150, 0);
+			Point2f p = ledPoints[i];
+			Scalar color(150, 150, 0);
 			circle(colorFilteredImg, p, 30, color, 10);
 		}
 
-		float min = keyPoints.at(0).size;
+		float min = keyPoints[0].size;
 		float max = min;
 		for(uint i = 1; i < keyPoints.size(); i++) {
-			float newSize = keyPoints.at(i).size;
+			float newSize = keyPoints[i].size;
 			if(newSize < min)	min = newSize;
 			if(newSize > max)	max = newSize;
 		}
-		oldKeyPointSizeInterval->low  = min;
-		oldKeyPointSizeInterval->high = max;
-
+		oldKeyPointSizeInterval.low  = min;
+		oldKeyPointSizeInterval.high = max;
 
 		return;
 	}
@@ -183,16 +179,16 @@ private:
 	//Finds the Region Of Interest that surrounds the pattern
 	void findROI() {
 
-		Point2f *point = &ledPoints.at(0);
-		Interval<float> x = Interval<float>();
+		const Point2f *point = &ledPoints[0];
+		auto x = Interval<float>();
+		auto y = Interval<float>();
 		x.low  = point->x;
 		x.high = point->x;
-		Interval<float> y = Interval<float>();
 		y.low  = point->y;
 		y.high = point->y;
 		uint size = ledPoints.size();
 		for (uint i = 1; i < size; i++) {
-			point = &ledPoints.at(i);
+			point = &ledPoints[i];
 			if (point->x < x.low)	x.low  = point->x;
 			if (point->x > x.high)	x.high = point->x;
 			if (point->y < y.low)	y.low  = point->y;

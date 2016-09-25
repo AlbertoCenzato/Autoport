@@ -5,7 +5,8 @@
  *      Author: root
  */
 
-#include "ImageLoader.hpp"
+#include "ImgLoader.hpp"
+
 #include <opencv2/opencv.hpp>
 #include <opencv2/videoio.hpp>
 #include <iostream>
@@ -15,7 +16,7 @@ using namespace cv;
 
 extern string workingDir;
 
-ImageLoader::ImageLoader(string source, int type) {
+ImgLoader::ImgLoader(string source, int type) {
 
 	switch(type) {
 		case DEVICE:
@@ -39,7 +40,7 @@ ImageLoader::ImageLoader(string source, int type) {
 	}
 }
 
-void ImageLoader::getNextFrame(Mat &frame) {
+void ImgLoader::getNextFrame(Mat &frame) {
 	capture >> frame;
 }
 

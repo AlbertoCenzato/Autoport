@@ -14,14 +14,25 @@
 
 #include "GenPurpFunc.hpp"
 #include "ImgAnalysis.hpp"
+#include "ImgLoader.hpp"
 #include "PatternAnalysis.hpp"
 #include "Settings.hpp"
-#include "ImageLoader.hpp"
-
 #include "Test.hpp"
 
 using namespace std;
 using namespace cv;
+
+enum Status {
+	LOOKING_FOR_TARGET,
+	FIRST_LANDING_PHASE,
+	SECOND_LANDING_PHASE,
+
+	HOVERING,
+	ERROR,
+	MANUAL_CONTROL,
+
+	LANDED
+};
 
 string workingDir;
 const string configFileName = "autoport.config";
@@ -47,7 +58,8 @@ int main() {
 
 	//ocl::setUseOpenCL(true); // enable OpenCL in the processing of Mat
 
-	Test::cameraCapture();
+	Test::imgAnalysisPositionEstimationPic();
+	//Test::cameraCapture();
 
 	getchar();
 	return 0;

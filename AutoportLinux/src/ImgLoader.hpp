@@ -5,8 +5,8 @@
  *      Author: root
  */
 
-#ifndef IMAGELOADER_HPP_
-#define IMAGELOADER_HPP_
+#ifndef IMGLOADER_HPP_
+#define IMGLOADER_HPP_
 
 
 #include <opencv2/opencv.hpp>
@@ -14,7 +14,7 @@
 
 using namespace cv;
 
-class ImageLoader {
+class ImgLoader {
 public:
 
 	static const int FILE   = 0;
@@ -23,7 +23,7 @@ public:
 
 	VideoCapture capture;
 
-	ImageLoader(std::string source, int type);
+	ImgLoader(std::string source, int type);
 
 	void getNextFrame(Mat &frame);
 
@@ -32,4 +32,4 @@ public:
 
 
 
-#endif /* IMAGELOADER_HPP_ */
+#endif /* IMGLOADER_HPP_ */

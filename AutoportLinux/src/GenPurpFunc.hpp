@@ -21,6 +21,8 @@ public:
 
 	Interval<varType>(varType low, varType high) : low(low), high(high) {}
 
+	//Interval<varType>& Interval<varType>::operator=(Interval<varType> interval) { return interval;}
+
 	string toString() {
 		return to_string(low) + " " + to_string(high);
 	}
@@ -42,18 +44,6 @@ public:
 				+ "; yaw:" + to_string(yaw) + "; pitch:" + to_string(pitch) + "; roll:" + to_string(roll);
 	}
 
-};
-
-enum Status {
-	LOOKING_FOR_TARGET,
-	FIRST_LANDING_PHASE,
-	SECOND_LANDING_PHASE,
-
-	HOVERING,
-	ERROR,
-	MANUAL_CONTROL,
-
-	LANDED
 };
 
 

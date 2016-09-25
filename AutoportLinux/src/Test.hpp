@@ -9,9 +9,9 @@
 
 #include "GenPurpFunc.hpp"
 #include "ImgAnalysis.hpp"
+#include "ImgLoader.hpp"
 #include "PatternAnalysis.hpp"
 #include "PositionEstimation.hpp"
-#include "ImageLoader.hpp"
 
 using namespace cv;
 
@@ -19,9 +19,29 @@ extern string workingDir;
 
 namespace Test {
 
+	void operatorParentheses() {
+		string path = workingDir + "matteoealberto.jpg";
+		cout << "Reading " << path << endl;
+		Mat image = imread(path, IMREAD_COLOR);
+		Rect rect(0,0,500,500);
+
+		auto begin = chrono::high_resolution_clock::now();
+		image = image(rect);
+		auto end = chrono::high_resolution_clock::now();
+		cout << "\nCopy: " << chrono::duration_cast<chrono::microseconds>(end-begin).count() << "us" << endl;
+
+		namedWindow("Prova", WINDOW_NORMAL);
+		imshow("Prova",image);
+		waitKey(0);
+	}
+
+	void languageIssues() {
+
+	}
+
 	void cameraCapture() {
 
-		auto loader = ImageLoader("http://192.168.1.6:8080/stream", ImageLoader::STREAM);
+		auto loader = ImgLoader("http://192.168.1.6:8080/stream", ImgLoader::STREAM);
 		const string windowName("Video stream");
 		namedWindow(windowName, WINDOW_AUTOSIZE);
 		Mat frame;
@@ -48,32 +68,14 @@ namespace Test {
 		auto posEstimator = PositionEstimation();
 		string imgName;
 		auto ledPoints = vector<Point2f>();
-		for (int i = 0; i < 1; i++) {
+		ImgLoader loader("",ImgLoader::DEVICE);
+		Mat img;
+		int downscalingFactor = 1;
+		while(true) {
 
-			switch (i) {
-			case 0:
-				imgName = workingDir + "Resources/secondo_laboratorio/1ms170cm.jpg";
-				break;
-			case 1:
-				imgName = workingDir + "Resources/secondo_laboratorio/1ms100cm0deg.jpg";
-				break;
-			case 2:
-				imgName = workingDir + "Resources/secondo_laboratorio/01ms50cm0deg.jpg";
-				break;
-			case 3:
-				imgName = workingDir + "Resources/secondo_laboratorio/1ms30cm0deg.jpg";
-				break;
-			case 4:
-				imgName = workingDir + "Resources/secondo_laboratorio/1ms15cm0deg.jpg";
-				break;
-			}
 
 			cout << "\n\nLoading image " << imgName << endl;
-			Mat img;
-			imread(imgName, IMREAD_COLOR).copyTo(img);
-			imwrite(workingDir + "Resources/output/originalImage.jpg",img);
-
-			int downscalingFactor = 1;
+			loader.getNextFrame(img);
 			bool downscalingNeeded = imgAnalyzer.evaluate(img, ledPoints, downscalingFactor);
 			if(downscalingNeeded)
 				cout << "\nDownscaling needed!";
