@@ -25,7 +25,7 @@ ImageLoader::ImageLoader(string source, int type) {
 			capture = VideoCapture(source);
 			break;
 		case STREAM:
-			capture = VideoCapture(source);
+			capture = VideoCapture(source, CAP_FFMPEG);
 			break;
 	}
 

@@ -44,6 +44,19 @@ public:
 
 };
 
+enum Status {
+	LOOKING_FOR_TARGET,
+	FIRST_LANDING_PHASE,
+	SECOND_LANDING_PHASE,
+
+	HOVERING,
+	ERROR,
+	MANUAL_CONTROL,
+
+	LANDED
+};
+
+
 namespace GenPurpFunc {
 	/* This function finds the angles (in RADIANS) of the yaw - pitch - roll sequence
 	R1(gamma)*R2(beta)*R3(alpha) from the direction cosine matrix

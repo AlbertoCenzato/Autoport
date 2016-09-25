@@ -22,7 +22,7 @@ using namespace cv;
 // @tolerance: tolerance in the alignement (in pixels).
 //returns: vector of Point2f ordered with the numbering convention
 
-void PatternAnalysis::evaluate(vector<Point2f> *ledPoints, Mat &img, int tolerance) {
+void PatternAnalysis::evaluate(vector<Point2f> &ledPoints, Mat &img, int tolerance) {
 
 	patternMirko(ledPoints, img, tolerance);
 	//nearerPoints(ledPoints, img, tolerance);

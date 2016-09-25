@@ -23,20 +23,19 @@
 using namespace std;
 using namespace cv;
 
-//string resourcesPath;
 string workingDir;
 const string configFileName = "autoport.config";
+Status status = Status::LOOKING_FOR_TARGET;
 
 int main() {
 
 	cout << "****** AUTOPORT SOFTWARE ******\n" << endl;
 
 	cout << "Reading working directory..." << endl;
-	int bufferSize = 500;
-	char* workDir = new char[bufferSize];
+	const int bufferSize = 500;
+	char workDir[bufferSize];
 	workingDir = getcwd(workDir, bufferSize);
 	workingDir += "/";
-	delete [] workDir;
 
 	cout << "Done. Working directory is: " << workingDir << endl;
 

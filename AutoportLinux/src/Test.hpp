@@ -22,20 +22,28 @@ namespace Test {
 	void cameraCapture() {
 
 		auto loader = ImageLoader("http://192.168.1.6:8080/stream", ImageLoader::STREAM);
+		const string windowName("Video stream");
+		namedWindow(windowName, WINDOW_AUTOSIZE);
 		Mat frame;
-		loader.getNextFrame(frame);
+		while(true) {
+			loader.getNextFrame(frame);
+			imshow(windowName, frame);
+			waitKey(50);
+		}
+
+		/*
 		if(imwrite(workingDir + "Resources/output/frame.jpg",frame))
 			cout << "Frame saved" << endl;
 		else
 			cout << "Error while saving frame" << endl;
+			*/
 
 	}
 
 	void imgAnalysisPositionEstimationPic() {
 		//--- Image analysis and position estimation test ----
 
-		auto patternAnalysis = PatternAnalysis();
-		auto imgAnalyzer = ImgAnalysis(LedColor::RED, patternAnalysis);
+		auto imgAnalyzer = ImgAnalysis(LedColor::RED);
 
 		auto posEstimator = PositionEstimation();
 		string imgName;
@@ -90,19 +98,19 @@ namespace Test {
 
 	void positionEstimation() {
 
-		vector<Point2f> *ledPoints = new vector<Point2f>(8);
-		ledPoints->at(0) = {576.71, 741.49};
-		ledPoints->at(1) = {247.17, 741.49};
-		ledPoints->at(2) = {-741.5, 741.5};
-		ledPoints->at(3) = {617.91, 441.37};
-		ledPoints->at(4) = {247.17, 441.94};
-		ledPoints->at(5) = {741.49, 441.94};
-		ledPoints->at(6) = {576.72, -741.49};
-		ledPoints->at(7) = {-741.5, -741.5};
+		auto ledPoints = vector<Point2f>(8);
+		ledPoints.at(0) = {576.71, 741.49};
+		ledPoints.at(1) = {247.17, 741.49};
+		ledPoints.at(2) = {-741.5, 741.5};
+		ledPoints.at(3) = {617.91, 441.37};
+		ledPoints.at(4) = {247.17, 441.94};
+		ledPoints.at(5) = {741.49, 441.94};
+		ledPoints.at(6) = {576.72, -741.49};
+		ledPoints.at(7) = {-741.5, -741.5};
 
 		auto posEstimator = PositionEstimation();
 		auto position = Matrix<double,3,2>();
-		posEstimator.setPointsToEvaluate(0xAB)->evaluate(*ledPoints, position);
+		posEstimator.setPointsToEvaluate(0xAB)->evaluate(ledPoints, position);
 		cout << "\nCurrent position is:\n";
 		GenPurpFunc::printMatrixd(position,3,2);
 
