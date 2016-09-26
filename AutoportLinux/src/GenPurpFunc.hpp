@@ -46,6 +46,25 @@ public:
 
 };
 
+struct Line {
+
+public:
+	float m, q;
+
+	Line(Point2f &p1, Point2f &p2) {
+		float dx = p1.x - p2.x;
+		if(dx == 0) {
+			m = numeric_limits<float>::infinity();
+			q = nan;
+		}
+		else {
+			m = (p1.y - p2.y) / dx;
+			q = p1.y - m*(p1.x);
+		}
+	}
+};
+
+
 
 namespace GenPurpFunc {
 	/* This function finds the angles (in RADIANS) of the yaw - pitch - roll sequence
@@ -190,8 +209,13 @@ namespace GenPurpFunc {
 	}
 
 
-	inline float distancePointToPoint(Point2f &p1, Point2f &p2) {
+	inline float distPoint2Point(Point2f &p1, Point2f &p2) {
 		return sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2));
+	}
+
+	inline float distPoint2Line(Point2f &point, Line &line) {
+		// FIXME: if m = INF and q = NAN?
+		return abs(point.y - (line.m*(point.x) + line.q)) / sqrt(1 + pow(line.m, 2));
 	}
 
 	inline Point2f centroid(const vector<KeyPoint> &points) {

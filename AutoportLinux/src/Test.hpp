@@ -19,44 +19,27 @@ extern string workingDir;
 
 namespace Test {
 
-	void operatorParentheses() {
-		string path = workingDir + "matteoealberto.jpg";
-		cout << "Reading " << path << endl;
-		Mat image = imread(path, IMREAD_COLOR);
-		Rect rect(0,0,500,500);
-
-		auto begin = chrono::high_resolution_clock::now();
-		image = image(rect);
-		auto end = chrono::high_resolution_clock::now();
-		cout << "\nCopy: " << chrono::duration_cast<chrono::microseconds>(end-begin).count() << "us" << endl;
-
-		namedWindow("Prova", WINDOW_NORMAL);
-		imshow("Prova",image);
-		waitKey(0);
-	}
-
-	void languageIssues() {
-
-	}
-
 	void cameraCapture() {
 
-		auto loader = ImgLoader("http://192.168.1.6:8080/stream", ImgLoader::STREAM);
+		Size frameSize(800,600);
+		auto loader = ImgLoader("", ImgLoader::DEVICE);
 		const string windowName("Video stream");
 		namedWindow(windowName, WINDOW_AUTOSIZE);
+
+		const string fileName = workingDir + "output.avi";
+		int frameWidht = loader.getFrameWidth();
+		int frameHeight = loader.getFrameHeight();
+		VideoWriter video(fileName, CV_FOURCC('M','J','P','G'),10, Size(frameWidht,frameHeight), true);
 		Mat frame;
-		while(true) {
+		char c = 64;
+		while(c != 27) {
 			loader.getNextFrame(frame);
+			video.write(frame);
 			imshow(windowName, frame);
-			waitKey(50);
+			c = (char)waitKey(33);
 		}
 
-		/*
-		if(imwrite(workingDir + "Resources/output/frame.jpg",frame))
-			cout << "Frame saved" << endl;
-		else
-			cout << "Error while saving frame" << endl;
-			*/
+
 
 	}
 

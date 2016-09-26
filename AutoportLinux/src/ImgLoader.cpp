@@ -16,7 +16,7 @@ using namespace cv;
 
 extern string workingDir;
 
-ImgLoader::ImgLoader(string source, int type) {
+ImgLoader::ImgLoader(const string &source, int type, const Size &frameSize) {
 
 	switch(type) {
 		case DEVICE:
@@ -35,9 +35,34 @@ ImgLoader::ImgLoader(string source, int type) {
 		cout << "Cannot find input" << endl;
 		return;
 	}
-	else {
-		cout << "Found camera input" << endl;
+
+	setFrameHeight(frameSize.height);
+	setFrameWidth(frameSize.width);
+
+	cout << "Found camera input" << endl;
+}
+
+ImgLoader::ImgLoader(const string &source, int type) {
+
+	switch(type) {
+		case DEVICE:
+			capture = VideoCapture(0);
+			break;
+		case FILE:
+			capture = VideoCapture(source);
+			break;
+		case STREAM:
+			capture = VideoCapture(source, CAP_FFMPEG);
+			break;
 	}
+
+	if(!capture.isOpened()) {
+		string imagesPath = workingDir + "Images/";
+		cout << "Cannot find input" << endl;
+		return;
+	}
+
+	cout << "Found camera input" << endl;
 }
 
 void ImgLoader::getNextFrame(Mat &frame) {

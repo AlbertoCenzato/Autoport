@@ -75,7 +75,7 @@ bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> &points, float downscalin
 		if (color[1] < sat.low)	 sat.low  = color[1];
 		if (color[2] < val.low)	 val.low  = color[2];
 	}
-	colorInterval.low(hue.low  - colorTolerance, sat.low  - colorTolerance, val.low  - colorTolerance);
+	colorInterval.low  = Scalar(hue.low  - colorTolerance, sat.low  - colorTolerance, val.low  - colorTolerance);
 	colorInterval.high = Scalar(hue.high + colorTolerance, sat.high + colorTolerance, val.high + colorTolerance);
 
 	findROI();

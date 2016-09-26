@@ -54,12 +54,12 @@ int main() {
 	cout << "Opening and parsing " << path << endl;
 	cout << "\n*** Settings ***" << endl;
 	Settings::loadConfiguration(path);
-	cout << Settings::toString();
+	cout << Settings::toString() << "\n\n" << endl;
 
 	//ocl::setUseOpenCL(true); // enable OpenCL in the processing of Mat
 
-	Test::imgAnalysisPositionEstimationPic();
-	//Test::cameraCapture();
+	//Test::imgAnalysisPositionEstimationPic();
+	Test::cameraCapture();
 
 	getchar();
 	return 0;

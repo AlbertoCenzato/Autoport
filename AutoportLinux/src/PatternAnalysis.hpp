@@ -11,6 +11,7 @@
 
 using namespace std;
 using namespace cv;
+using namespace GenPurpFunc;
 
 extern string workingDir;
 
@@ -18,17 +19,15 @@ class PatternAnalysis {
 
 public:
 	PatternAnalysis() {
-		oldPoints = nullptr;
+		oldPoints = vector<Point2f>();
 	}
 
-	~PatternAnalysis() {
-		delete oldPoints;
-	}
+	~PatternAnalysis() {}
 
 	void evaluate(vector<Point2f>&, Mat&, int);
 
 private:
-	vector<Point2f> *oldPoints;
+	vector<Point2f> oldPoints;
 
 	void patternMirko(vector<Point2f> &points, Mat &img, int tolerance) {
 
@@ -102,7 +101,7 @@ private:
 		for (int j = 0; j < 4; j++)
 			for (int k = 0; k < 4; k++)
 				if (k != j) {
-					float dist = GenPurpFunc::distancePointToPoint(massCenter[j],massCenter[k]);
+					float dist = GenPurpFunc::distPoint2Point(massCenter[j],massCenter[k]);
 					if ( dist < minDist) {
 						secondMinDist[0] = maxMinCouples[0][0];
 						secondMinDist[1] = maxMinCouples[0][1];
@@ -162,7 +161,7 @@ private:
 			for (int i = 0; i < 3; i++) {
 				for (int j = 0; j < 3; j++) {
 					if (i != j) {
-						double dist = GenPurpFunc::distancePointToPoint(alignedSet.at(i), alignedSet.at(j));
+						double dist = GenPurpFunc::distPoint2Point(alignedSet.at(i), alignedSet.at(j));
 						if (dist < minDist) {
 							minDist = dist;
 							minIndx[0] = i;
@@ -233,47 +232,120 @@ private:
 		vector<Point2f> orderedVector(8);
 
 		//looking for led 6
-		Point2f *point = &(oldPoints->at(6));
+		Point2f point = oldPoints[6];
 
-		float minDist = GenPurpFunc::distancePointToPoint(*point,ledPoints.at(0));
+		float minDist = GenPurpFunc::distPoint2Point(point,ledPoints[0]);
 		int minIndex = 0;
 		for (int i = 1; i < 8; i++) {
-			Point2f *keyPoint = &(ledPoints.at(i));
-			float distance = GenPurpFunc::distancePointToPoint(*point,*keyPoint);
+			Point2f keyPoint = ledPoints[i];
+			float distance = GenPurpFunc::distPoint2Point(point,keyPoint);
 			if(distance < minDist) {
 				minDist = distance;
 				minIndex = i;
 			}
 		}
 
-		orderedVector.at(6) = ledPoints.at(minIndex);	//TODO: do it by ref
-		ledPoints.at(minIndex) = ledPoints.at(7);
+		orderedVector[6] = ledPoints[minIndex];
+		ledPoints[minIndex] = ledPoints[7];
 		ledPoints.pop_back();
 
 		//looking for led 7
-		point = &(oldPoints->at(7));
+		point = oldPoints[7];
 
-		minDist = GenPurpFunc::distancePointToPoint(*point,ledPoints.at(0));
+		minDist = GenPurpFunc::distPoint2Point(point,ledPoints[0]);
 		minIndex = 0;
 		for (int i = 1; i < 7; i++) {
-			Point2f *keyPoint = &(ledPoints.at(i));
-			float distance = GenPurpFunc::distancePointToPoint(*point,*keyPoint);
+			Point2f keyPoint = ledPoints[i];
+			float distance = GenPurpFunc::distPoint2Point(point, keyPoint);
 			if(distance < minDist) {
 				minDist = distance;
 				minIndex = i;
 			}
 		}
 
-		orderedVector.at(7) = ledPoints.at(minIndex);	//TODO: do it by ref
-		ledPoints.at(minIndex) = ledPoints.at(6);
+		orderedVector[7] = ledPoints[minIndex];
+		ledPoints[minIndex] = ledPoints[6];
 		ledPoints.pop_back();
-
-
-
-
 	}
 
-	void ransac(vector<Point2f> &points, Mat &img, int tolerance);
+	// TODO: check this method
+	// TODO: rename this shitty-named method
+	bool firstPhase(vector<Point2f> &ledPoints, int tolerance) {
+
+		uint size = ledPoints.size();
+		if(size != 5)
+			return false;
+
+		Point2f minPoint1;
+		Point2f minPoint2;
+		uint minDist = FLT_MAX;
+
+		vector<Point2f> sortedVector(size);
+
+		for(uint i = 0; i < size; i++) {
+			for(uint j = 0; j < size; j++) {
+				if(i != j) {
+					Point2f p1 = ledPoints[i];
+					Point2f p2 = ledPoints[j];
+					float distance = distPoint2Point(p1,p2);
+					if(distance < minDist) {
+						minDist = distance;
+						minPoint1 = p1;
+						minPoint2 = p2;
+					}
+				}
+			}
+		}
+
+		Line line(minPoint1,minPoint2);
+
+		Point2f patternLed3(-1,-1);
+		for(uint i = 0; i < size; i++) {
+			Point2f point = ledPoints[i];
+			if(&point != &minPoint1 && &point != &minPoint2) {
+				float distance = distPoint2Line(point, line);
+				if (distance < tolerance) {
+					patternLed3 = point;
+				}
+			}
+		}
+
+		if(patternLed3.x == -1)
+			return false;	//ERRORE!
+
+		sortedVector[3] = patternLed3;
+		float d1 = distPoint2Point(minPoint1,patternLed3);
+		float d2 = distPoint2Point(minPoint2,patternLed3);
+		if(d1 > d2) {
+			sortedVector[1] = minPoint1;
+			sortedVector[2] = minPoint2;
+		}
+		else {
+			sortedVector[1] = minPoint2;
+			sortedVector[2] = minPoint1;
+		}
+
+		Point2f led[] = Point2f[2];
+		for(uint i = 0, count = 0; i < size; i++) {
+			Point2f point = ledPoints[i];
+			if(&point != &minPoint1 && &point != &minPoint2 && &point != &patternLed3) {
+				led[count++] = point;
+			}
+		}
+
+		d1 = distPoint2Point(sortedVector[1],led[0]);
+		d2 = distPoint2Point(sortedVector[1],led[1]);
+		if(d1 < d2) {
+			sortedVector[0] = led[0];
+			sortedVector[4] = led[1];
+		}
+		else {
+			sortedVector[0] = led[1];
+			sortedVector[4] = led[0];
+		}
+
+		return true;
+	}
 
 
 };

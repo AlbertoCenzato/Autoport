@@ -181,6 +181,7 @@
 								</option>
 								<option id="gnu.cpp.link.option.other.1971508431" name="Other options (-Xlinker [option])" superClass="gnu.cpp.link.option.other" useByScannerDiscovery="false" valueType="stringList">
 									<listOptionValue builtIn="false" value="-rpath '/home/alberto/Code/raspberry/rootfs/lib/arm-linux-gnueabihf'"/>
+									<listOptionValue builtIn="false" value="-rpath-link '/home/alberto/Code/raspberry/opencv-3.1/lib'"/>
 									<listOptionValue builtIn="false" value="-rpath-link '/home/alberto/Code/raspberry/rootfs/lib/arm-linux-gnueabihf'"/>
 									<listOptionValue builtIn="false" value="-rpath-link '/home/alberto/Code/raspberry/rootfs/usr/lib/arm-linux-gnueabihf'"/>
 								</option>

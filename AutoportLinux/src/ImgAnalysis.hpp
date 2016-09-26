@@ -135,7 +135,7 @@ private:
 		uint size = ledPoints.size();
 		float *distances = new float[size];	// TODO: try to use another way, dangerous pointer
 		for (uint i = 0; i < size; i++) {
-			float dist = GenPurpFunc::distancePointToPoint(centr, ledPoints[i]);
+			float dist = GenPurpFunc::distPoint2Point(centr, ledPoints[i]);
 			meanDist += dist;
 			distances[i] = dist;
 		}
