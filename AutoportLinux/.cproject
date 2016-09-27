@@ -137,7 +137,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.exe.release.856933436.687136697" name="Raspberry_release" parent="cdt.managedbuild.config.gnu.exe.release">
+				<configuration artifactExtension="" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.exe.release.856933436.687136697" name="Raspberry_release" parent="cdt.managedbuild.config.gnu.exe.release">
 					<folderInfo id="cdt.managedbuild.config.gnu.exe.release.856933436.687136697." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.cross.base.1680316949" name="Cross GCC" superClass="cdt.managedbuild.toolchain.gnu.cross.base">
 							<option id="cdt.managedbuild.option.gnu.cross.prefix.1777143435" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix" useByScannerDiscovery="false" value="arm-unknown-linux-gnueabi-" valueType="string"/>
@@ -162,7 +162,7 @@
 									<listOptionValue builtIn="false" value="/usr/local/include/opencv-3.1"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Eigen}&quot;"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.debugging.codecov.341261699" name="Generate gcov information (-ftest-coverage -fprofile-arcs)" superClass="gnu.cpp.compiler.option.debugging.codecov" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+								<option id="gnu.cpp.compiler.option.debugging.codecov.341261699" name="Generate gcov information (-ftest-coverage -fprofile-arcs)" superClass="gnu.cpp.compiler.option.debugging.codecov" useByScannerDiscovery="false" value="false" valueType="boolean"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.470110773" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.1056880131" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker"/>
@@ -180,10 +180,9 @@
 									<listOptionValue builtIn="false" value="/home/alberto/Code/raspberry/opencv-3.1/lib"/>
 								</option>
 								<option id="gnu.cpp.link.option.other.1971508431" name="Other options (-Xlinker [option])" superClass="gnu.cpp.link.option.other" useByScannerDiscovery="false" valueType="stringList">
-									<listOptionValue builtIn="false" value="-rpath '/home/alberto/Code/raspberry/rootfs/lib/arm-linux-gnueabihf'"/>
 									<listOptionValue builtIn="false" value="-rpath-link '/home/alberto/Code/raspberry/opencv-3.1/lib'"/>
-									<listOptionValue builtIn="false" value="-rpath-link '/home/alberto/Code/raspberry/rootfs/lib/arm-linux-gnueabihf'"/>
 									<listOptionValue builtIn="false" value="-rpath-link '/home/alberto/Code/raspberry/rootfs/usr/lib/arm-linux-gnueabihf'"/>
+									<listOptionValue builtIn="false" value="-rpath-link '/home/alberto/Code/raspberry/rootfs/lib/arm-linux-gnueabihf'"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1457031688" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>

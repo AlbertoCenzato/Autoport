@@ -55,7 +55,7 @@ public:
 		float dx = p1.x - p2.x;
 		if(dx == 0) {
 			m = numeric_limits<float>::infinity();
-			q = nan;
+			q = nanf("");
 		}
 		else {
 			m = (p1.y - p2.y) / dx;

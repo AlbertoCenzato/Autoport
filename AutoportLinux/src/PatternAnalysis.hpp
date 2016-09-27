@@ -278,7 +278,7 @@ private:
 
 		Point2f minPoint1;
 		Point2f minPoint2;
-		uint minDist = FLT_MAX;
+		float minDist = FLT_MAX;
 
 		vector<Point2f> sortedVector(size);
 
@@ -325,7 +325,7 @@ private:
 			sortedVector[2] = minPoint1;
 		}
 
-		Point2f led[] = Point2f[2];
+		Point2f led[2];
 		for(uint i = 0, count = 0; i < size; i++) {
 			Point2f point = ledPoints[i];
 			if(&point != &minPoint1 && &point != &minPoint2 && &point != &patternLed3) {
