@@ -56,10 +56,20 @@ int main() {
 	Settings::loadConfiguration(path);
 	cout << Settings::toString() << "\n\n" << endl;
 
-	//ocl::setUseOpenCL(true); // enable OpenCL in the processing of Mat
+	int frameWidth;
+	int frameHeight;
+	char color;
+	cout << "Enter frame width" << endl;
+	cin >> frameWidth;
+	cout << "Enter frame height" << endl;
+	cin >> frameHeight;
+	cout << "Enter led color (r/b)" << endl;
+	cin >> color;
 
-	//Test::imgAnalysisPositionEstimationPic();
-	Test::cameraCapture();
+	Size frameSize(frameWidth,frameHeight);
+	LedColor ledColor = color == 'r' ? LedColor::RED : LedColor::BLUE;
+
+	Test::notteDellaRicerca(frameSize, ledColor);
 
 	getchar();
 	return 0;

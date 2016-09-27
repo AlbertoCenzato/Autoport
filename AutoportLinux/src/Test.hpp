@@ -19,22 +19,57 @@ extern string workingDir;
 
 namespace Test {
 
+	void notteDellaRicerca(Size &frameSize, LedColor ledColor) {
+		//Size frameSize(800,600);
+
+		cout << "opening image loader" << endl;
+		ImgLoader loader("", ImgLoader::DEVICE/*, frameSize*/);
+		cout << "done" << endl;
+		ImgAnalysis imgAnalyzer(ledColor);
+		vector<Point2f> ledPoints(7);
+
+		const string originalFrame("Video stream");
+		const string processedFrame("Processed stream");
+		namedWindow(originalFrame,  WINDOW_AUTOSIZE);
+		namedWindow(processedFrame, WINDOW_AUTOSIZE);
+
+		Mat frame;
+		char c = 64;
+		float downscalingFactor = 1;
+		while(c != 27) {
+			loader.getNextFrame(frame);
+
+			imshow(originalFrame, frame);
+			bool downScalingNeeded = imgAnalyzer.evaluate(frame, ledPoints, downscalingFactor);
+			if(downScalingNeeded) {
+				loader.setFrameHeight(loader.getFrameHeight()/2);
+				loader.setFrameWidth (loader.getFrameWidth ()/2);
+				downscalingFactor = 0.5;
+			}
+			imshow(processedFrame, frame);
+
+			c = (char)waitKey(33);
+		}
+	}
+
 	void cameraCapture() {
 
-		Size frameSize(800,600);
+		//Size frameSize(800,600);
 		auto loader = ImgLoader("", ImgLoader::DEVICE);
 		const string windowName("Video stream");
 		namedWindow(windowName, WINDOW_AUTOSIZE);
 
+		/*
 		const string fileName = workingDir + "output.avi";
 		int frameWidht = loader.getFrameWidth();
 		int frameHeight = loader.getFrameHeight();
 		VideoWriter video(fileName, CV_FOURCC('M','J','P','G'),10, Size(frameWidht,frameHeight), true);
+		*/
 		Mat frame;
 		char c = 64;
 		while(c != 27) {
 			loader.getNextFrame(frame);
-			video.write(frame);
+			//video.write(frame);
 			imshow(windowName, frame);
 			c = (char)waitKey(33);
 		}

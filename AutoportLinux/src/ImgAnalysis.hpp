@@ -109,7 +109,7 @@ private:
 	// @img: image to analyze.
 	// @blobParam: parameters to fit.
 	// returns: a vector of Point2f containing centroids coordinates of detected blobs.
-	void findBlobs(Mat &colorFilteredImg, float downscalingFactor) {
+	int findBlobs(Mat &colorFilteredImg, float downscalingFactor) {
 
 		//TODO: check this way of computing valid led sizes interval: it can lead to
 		//a degeneration of the interval amplitude continuously increasing it in presence
@@ -125,54 +125,55 @@ private:
 		Ptr<SimpleBlobDetector> featureDetector = SimpleBlobDetector::create(params);
 		featureDetector->detect(colorFilteredImg, keyPoints);
 
-		ledPoints = vector<Point2f>(keyPoints.size());
-		KeyPoint::convert(keyPoints, ledPoints);
-		
-		// Remove points too far from the centroid of the detected points set
-		// compute the mean distance from the centroid
-		Point2f centr = GenPurpFunc::centroid(ledPoints);
-		float meanDist = 0;
-		uint size = ledPoints.size();
-		float *distances = new float[size];	// TODO: try to use another way, dangerous pointer
-		for (uint i = 0; i < size; i++) {
-			float dist = GenPurpFunc::distPoint2Point(centr, ledPoints[i]);
-			meanDist += dist;
-			distances[i] = dist;
-		}
-		meanDist = meanDist / size;
+		uint size = keyPoints.size();
+		if(size > 0) {
+			ledPoints = vector<Point2f>(keyPoints.size());
+			KeyPoint::convert(keyPoints, ledPoints);
 
-		// remove points
-		for (uint i = 0; i < size; ) {
-			if (distances[i] > 2 * meanDist) {
-				ledPoints[i] = ledPoints[size - 1];
-				distances[i] = distances[size - 1];
-				ledPoints.erase(--ledPoints.end());
+			// Remove points too far from the centroid of the detected points set
+			// compute the mean distance from the centroid
+			Point2f centr = GenPurpFunc::centroid(ledPoints);
+			float meanDist = 0;
+			float *distances = new float[size];	// TODO: try to use another way, dangerous pointer
+			for (uint i = 0; i < size; i++) {
+				float dist = GenPurpFunc::distPoint2Point(centr, ledPoints[i]);
+				meanDist += dist;
+				distances[i] = dist;
 			}
-			else i++;
-			size = ledPoints.size();
+			meanDist = meanDist / size;
+
+			// remove points
+			for (uint i = 0; i < size; ) {
+				if (distances[i] > 2 * meanDist) {
+					ledPoints[i] = ledPoints[size - 1];
+					distances[i] = distances[size - 1];
+					ledPoints.erase(--ledPoints.end());
+				}
+				else i++;
+				size = ledPoints.size();
+			}
+			delete[] distances;
+
+			cout << "ledPoints length: " << size << endl;
+
+			//draws detected points
+			for (uint i = 0; i < size; i++) {
+				Scalar color(150, 150, 0);
+				circle(colorFilteredImg, ledPoints[i], 30, color, 10);
+			}
+
+			float min = keyPoints[0].size;
+			float max = min;
+			for(uint i = 1; i < keyPoints.size(); i++) {
+				float newSize = keyPoints[i].size;
+				if(newSize < min)	min = newSize;
+				if(newSize > max)	max = newSize;
+			}
+			oldKeyPointSizeInterval.low  = min;
+			oldKeyPointSizeInterval.high = max;
 		}
-		delete[] distances;
 
-		cout << "ledPoints length: " << size << endl;
-
-		//draws detected points
-		for (uint i = 0; i < size; i++) {
-			Point2f p = ledPoints[i];
-			Scalar color(150, 150, 0);
-			circle(colorFilteredImg, p, 30, color, 10);
-		}
-
-		float min = keyPoints[0].size;
-		float max = min;
-		for(uint i = 1; i < keyPoints.size(); i++) {
-			float newSize = keyPoints[i].size;
-			if(newSize < min)	min = newSize;
-			if(newSize > max)	max = newSize;
-		}
-		oldKeyPointSizeInterval.low  = min;
-		oldKeyPointSizeInterval.high = max;
-
-		return;
+		return size;
 	}
 
 
