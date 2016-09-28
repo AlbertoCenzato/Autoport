@@ -16,22 +16,41 @@
 using namespace cv;
 
 extern string workingDir;
+ImgAnalysis imgAnalyzer;
+const int MAX_VAL = 255;
+int minHue = 0, maxHue = 255;
+int minSat = 0, maxSat = 255;
+int minVal = 0, maxVal = 255;
 
 namespace Test {
+
+	void on_trackbar(int, void*) {
+		Scalar low (minHue, minSat, minVal);
+		Scalar high(maxHue, maxSat, maxVal);
+		Interval<Scalar> colorInterval(low, high);
+		imgAnalyzer.setColorInterval(colorInterval);
+	}
 
 	void notteDellaRicerca(Size &frameSize, LedColor ledColor) {
 		//Size frameSize(800,600);
 
 		cout << "opening image loader" << endl;
-		ImgLoader loader("", ImgLoader::DEVICE/*, frameSize*/);
+		ImgLoader loader("", ImgLoader::DEVICE, frameSize);
 		cout << "done" << endl;
-		ImgAnalysis imgAnalyzer(ledColor);
+		imgAnalyzer = ImgAnalysis(ledColor);
 		vector<Point2f> ledPoints(7);
 
 		const string originalFrame("Video stream");
 		const string processedFrame("Processed stream");
 		namedWindow(originalFrame,  WINDOW_AUTOSIZE);
 		namedWindow(processedFrame, WINDOW_AUTOSIZE);
+
+		createTrackbar("Min hue", processedFrame, &minHue, MAX_VAL, on_trackbar);
+		createTrackbar("Min sat", processedFrame, &minSat, MAX_VAL, on_trackbar);
+		createTrackbar("Min val", processedFrame, &minVal, MAX_VAL, on_trackbar);
+		createTrackbar("Max hue", originalFrame,  &maxHue, MAX_VAL, on_trackbar);
+		createTrackbar("Max sat", originalFrame,  &maxSat, MAX_VAL, on_trackbar);
+		createTrackbar("Max val", originalFrame,  &maxSat, MAX_VAL, on_trackbar);
 
 		Mat frame;
 		char c = 64;

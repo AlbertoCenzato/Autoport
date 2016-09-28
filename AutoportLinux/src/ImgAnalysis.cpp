@@ -111,5 +111,15 @@ ImgAnalysis* ImgAnalysis::setSizeSupTolerance(int sizeSupTolerance) {
 	this->sizeSupTolerance = sizeSupTolerance;
 	return this;
 }
+ImgAnalysis* ImgAnalysis::setColorInterval(Interval<Scalar> &colorInterval) {
+	this->colorInterval.high[0] = colorInterval.high[0];
+	this->colorInterval.high[1] = colorInterval.high[1];
+	this->colorInterval.high[2] = colorInterval.high[2];
 
+	this->colorInterval.low[0] = colorInterval.low[0];
+	this->colorInterval.low[1] = colorInterval.low[1];
+	this->colorInterval.low[2] = colorInterval.low[2];
+
+	return this;
+}
 

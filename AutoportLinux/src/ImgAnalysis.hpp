@@ -45,6 +45,8 @@ public:
 		constructor(Interval<Scalar>(low,high), ledColor, patternAnalysis);
 	}
 
+	ImgAnalysis() : ImgAnalysis(LedColor::BLUE) {}
+
 	~ImgAnalysis() {}
 
 	bool evaluate(Mat &, vector<Point2f> &, float);
@@ -52,6 +54,7 @@ public:
 	ImgAnalysis* setColorTolerance(int);
 	ImgAnalysis* setSizeTolerance(int);
 	ImgAnalysis* setSizeSupTolerance(int);
+	ImgAnalysis* setColorInterval(Interval<Scalar> &colorInterval);
 
 private:
 
