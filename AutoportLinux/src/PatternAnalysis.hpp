@@ -272,7 +272,7 @@ private:
 	// TODO: rename this shitty-named method
 	bool firstPhase(vector<Point2f> &ledPoints, int tolerance) {
 
-		uint size = ledPoints.size();
+		int size = ledPoints.size();
 		if(size != 5)
 			return false;
 
@@ -285,13 +285,11 @@ private:
 		for(uint i = 0; i < size; i++) {
 			for(uint j = 0; j < size; j++) {
 				if(i != j) {
-					Point2f p1 = ledPoints[i];
-					Point2f p2 = ledPoints[j];
-					float distance = distPoint2Point(p1,p2);
+					float distance = distPoint2Point(ledPoints[i],ledPoints[j]);
 					if(distance < minDist) {
 						minDist = distance;
-						minPoint1 = p1;
-						minPoint2 = p2;
+						minPoint1 = ledPoints[i];
+						minPoint2 = ledPoints[j];
 					}
 				}
 			}
@@ -306,6 +304,7 @@ private:
 				float distance = distPoint2Line(point, line);
 				if (distance < tolerance) {
 					patternLed3 = point;
+					break;
 				}
 			}
 		}

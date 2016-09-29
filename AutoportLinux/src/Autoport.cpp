@@ -56,23 +56,7 @@ int main() {
 	Settings::loadConfiguration(path);
 	cout << Settings::toString() << "\n\n" << endl;
 
-	int frameWidth;
-	int frameHeight;
-	int fps;
-	char color;
-	cout << "Enter frame width" << endl;
-	cin >> frameWidth;
-	cout << "Enter frame height" << endl;
-	cin >> frameHeight;
-	cout << "Enter fps" << endl;
-	cin >> fps;
-	cout << "Enter led color (r/b)" << endl;
-	cin >> color;
-
-	Size frameSize(frameWidth,frameHeight);
-	LedColor ledColor = color == 'r' ? LedColor::RED : LedColor::BLUE;
-
-	Test::notteDellaRicerca(frameSize, fps, ledColor);
+	Test::notteDellaRicerca();
 
 	getchar();
 	return 0;

@@ -20,7 +20,7 @@ ImgLoader::ImgLoader(const string &source, int type, const Size &frameSize, int 
 
 	switch(type) {
 		case DEVICE:
-			capture = VideoCapture(0);
+			capture = VideoCapture(1);
 			break;
 		case FILE:
 			capture = VideoCapture(source);
@@ -38,6 +38,7 @@ ImgLoader::ImgLoader(const string &source, int type, const Size &frameSize, int 
 	setFrameHeight(frameSize.height);
 	setFrameWidth(frameSize.width);
 	capture.set(CAP_PROP_FPS, fps);
+	capture.set(CAP_PROP_BRIGHTNESS, 0.0001);
 
 	cout << "Found camera input, " << fps << "fps" << endl;
 }
@@ -69,8 +70,9 @@ ImgLoader::ImgLoader(const string &source, int type) {
 	cout << "Found input" << endl;
 }
 
-void ImgLoader::getNextFrame(Mat &frame) {
+bool ImgLoader::getNextFrame(Mat &frame) {
 	cout << "FPS: " << capture.get(CAP_PROP_FPS);
 	capture >> frame;
+	return !frame.empty();
 }
 

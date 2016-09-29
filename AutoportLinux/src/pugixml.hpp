@@ -466,6 +466,20 @@ namespace pugi
 		xml_node next_sibling(const char_t* name) const;
 		xml_node previous_sibling(const char_t* name) const;
 
+		xml_node findChild(const char_t* name) const {
+			xml_node node = child(name);
+			if(node.empty()) {
+				for(pugi::xml_node tool = first_child(); tool; tool = tool.next_sibling()) {
+					xml_node child = tool.findChild(name);
+					if(!child.empty())
+						return child;
+				}
+				return xml_node();
+			}
+			else
+				return node;
+		}
+
 		// Get attribute, starting the search from a hint (and updating hint so that searching for a sequence of attributes is fast)
 		xml_attribute attribute(const char_t* name, xml_attribute& hint) const;
 

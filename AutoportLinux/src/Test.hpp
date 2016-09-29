@@ -31,18 +31,20 @@ namespace Test {
 		imgAnalyzer.setColorInterval(colorInterval);
 	}
 
-	void notteDellaRicerca(Size &frameSize, int fps, LedColor ledColor) {
+	void notteDellaRicerca() {
 
+		Size frameSize(800,600);
+		int fps = 10;
 		cout << "opening image loader" << endl;
-		ImgLoader loader(workingDir+"video.mp4", ImgLoader::FILE, frameSize, fps);
+		ImgLoader loader(/*workingDir+"video.mp4",*/"", ImgLoader::DEVICE, frameSize, fps);
 		cout << "done" << endl;
-		imgAnalyzer = ImgAnalysis(ledColor);
+		imgAnalyzer = ImgAnalysis();
 		vector<Point2f> ledPoints(7);
 
 		const string originalFrame("Video stream");
 		const string processedFrame("Processed stream");
-		namedWindow(originalFrame,  WINDOW_AUTOSIZE);
-		namedWindow(processedFrame, WINDOW_AUTOSIZE);
+		namedWindow(originalFrame,  WINDOW_NORMAL);
+		namedWindow(processedFrame, WINDOW_NORMAL);
 
 		Interval<Scalar> colorInterval;
 		imgAnalyzer.getColorInterval(colorInterval);
@@ -58,20 +60,22 @@ namespace Test {
 		minVal = l[2];
 
 		createTrackbar("Min hue", processedFrame, &minHue, MAX_VAL, on_trackbar);
+		createTrackbar("Max hue", processedFrame, &maxHue, MAX_VAL, on_trackbar);
+
 		createTrackbar("Min sat", processedFrame, &minSat, MAX_VAL, on_trackbar);
+		createTrackbar("Max sat", processedFrame, &maxSat, MAX_VAL, on_trackbar);
+
 		createTrackbar("Min val", processedFrame, &minVal, MAX_VAL, on_trackbar);
-		createTrackbar("Max hue", originalFrame,  &maxHue, MAX_VAL, on_trackbar);
-		createTrackbar("Max sat", originalFrame,  &maxSat, MAX_VAL, on_trackbar);
-		createTrackbar("Max val", originalFrame,  &maxSat, MAX_VAL, on_trackbar);
+		createTrackbar("Max val", processedFrame, &maxVal, MAX_VAL, on_trackbar);
 
 		Mat frame;
 		char c = 64;
 		float downscalingFactor = 1;
-		while(c != 27) {
-			loader.getNextFrame(frame);
+		while(c != 27 && loader.getNextFrame(frame)) {
 			//imwrite(workingDir+originalFrame+".jpg", frame);
 
-			imshow(originalFrame, frame);
+			//imshow(originalFrame, frame);
+
 			bool downScalingNeeded = imgAnalyzer.evaluate(frame, ledPoints, downscalingFactor);
 			if(downScalingNeeded) {
 				loader.setFrameHeight(loader.getFrameHeight()/2);
@@ -79,6 +83,7 @@ namespace Test {
 				downscalingFactor = 0.5;
 			}
 			imshow(processedFrame, frame);
+
 			//imwrite(workingDir+processedFrame+".jpg", frame);
 
 			c = (char)waitKey(33);

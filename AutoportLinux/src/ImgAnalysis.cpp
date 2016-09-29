@@ -42,7 +42,7 @@ bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> &points, float downscalin
 	namedWindow("Filtered image", WINDOW_NORMAL);
 	imshow("Filtered image", colorFilteredImg);
 	waitKey(1);
-	imwrite(workingDir + "output/filterByColor.jpg", colorFilteredImg);
+	//imwrite(workingDir + "output/filterByColor.jpg", colorFilteredImg);
 
 
 	//put in this->points detected blobs that satisfy this->params tolerance
@@ -54,10 +54,11 @@ bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> &points, float downscalin
 	namedWindow("Blobs found", WINDOW_NORMAL);
 	imshow("Blobs found", colorFilteredImg);
 	waitKey(1);
-	imwrite(workingDir + "output/findBlobs.jpg",colorFilteredImg);
+	//imwrite(workingDir + "output/findBlobs.jpg",colorFilteredImg);
 
 
 	if(blobNumber == 5) {
+		/*
 		//order this->points accordingly to the led pattern numbering
 		begin = chrono::high_resolution_clock::now();
 		bool matchFound = patternAnalysis.evaluate(ledPoints, image, 10);
@@ -90,11 +91,12 @@ bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> &points, float downscalin
 
 			points = ledPoints;
 		}
+		int averageSize = (oldKeyPointSizeInterval.low + oldKeyPointSizeInterval.high)/2;
+		return averageSize > sizeSupTolerance;
+		*/
 	}
 
-	int averageSize = (oldKeyPointSizeInterval.low + oldKeyPointSizeInterval.high)/2;
-
-	return averageSize > sizeSupTolerance;
+	return false;
 }
 
 ImgAnalysis* ImgAnalysis::setROItolerance(int ROItolerance) {

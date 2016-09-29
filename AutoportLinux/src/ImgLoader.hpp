@@ -23,7 +23,7 @@ public:
 	ImgLoader(const std::string &source, int type, const Size &frameSize, int fps);	//FIXME setting frameSize throws an exception when reding frame
 	ImgLoader(const std::string &source, int type);
 
-	void getNextFrame(Mat &frame);
+	bool getNextFrame(Mat &frame);
 
 	int getFrameWidth()  { return capture.get(CV_CAP_PROP_FRAME_WIDTH ); }
 	int getFrameHeight() { return capture.get(CV_CAP_PROP_FRAME_HEIGHT); }

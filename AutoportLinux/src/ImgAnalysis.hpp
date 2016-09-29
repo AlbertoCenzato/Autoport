@@ -72,14 +72,14 @@ private:
 		params = SimpleBlobDetector::Params();
 		params.filterByColor = true;
 		params.blobColor = 255;
-		params.filterByArea = false;
-		//params.minArea = 1000;
-		//params.maxArea = 5000;
+		params.filterByArea = true;
+		params.minArea = 0;
+		params.maxArea = 10000;
 		params.filterByInertia = false;
 		params.filterByConvexity = false;
-		params.filterByCircularity = true;
-		params.minCircularity = 0.5;
-		params.maxCircularity = 1;
+		params.filterByCircularity = false;
+		//params.minCircularity = 0.5;
+		//params.maxCircularity = 1;
 
 		colorTolerance   = Settings::colorTolerance;
 		ROItolerance     = Settings::ROITolerance;
@@ -159,7 +159,7 @@ private:
 				else i++;
 				size = ledPoints.size();
 			}
-			delete[] distances;
+			delete [] distances;
 
 			cout << "ledPoints length: " << size << endl;
 
@@ -180,7 +180,7 @@ private:
 			oldKeyPointSizeInterval.high = max;
 		}
 
-		return size;
+		return ledPoints.size();
 	}
 
 
