@@ -56,6 +56,8 @@ public:
 	ImgAnalysis* setSizeSupTolerance(int);
 	ImgAnalysis* setColorInterval(Interval<Scalar> &colorInterval);
 
+	void getColorInterval(Interval<Scalar> &colorInterval);
+
 private:
 
 	void constructor(const Interval<Scalar> &colorInterval, LedColor ledColor, const PatternAnalysis &patternAnalysis, const Rect &regionOfInterest = Rect(0,0,0,0)) {
@@ -70,12 +72,14 @@ private:
 		params = SimpleBlobDetector::Params();
 		params.filterByColor = true;
 		params.blobColor = 255;
-		params.filterByArea = true;
-		params.minArea = 1000;
-		params.maxArea = 5000;
+		params.filterByArea = false;
+		//params.minArea = 1000;
+		//params.maxArea = 5000;
 		params.filterByInertia = false;
 		params.filterByConvexity = false;
-		params.filterByCircularity = false;
+		params.filterByCircularity = true;
+		params.minCircularity = 0.5;
+		params.maxCircularity = 1;
 
 		colorTolerance   = Settings::colorTolerance;
 		ROItolerance     = Settings::ROITolerance;
@@ -112,7 +116,7 @@ private:
 	// @img: image to analyze.
 	// @blobParam: parameters to fit.
 	// returns: a vector of Point2f containing centroids coordinates of detected blobs.
-	int findBlobs(Mat &colorFilteredImg, float downscalingFactor) {
+	int findBlobs(const Mat &colorFilteredImg, Mat &outputImage, float downscalingFactor) {
 
 		//TODO: check this way of computing valid led sizes interval: it can lead to
 		//a degeneration of the interval amplitude continuously increasing it in presence
@@ -162,7 +166,7 @@ private:
 			//draws detected points
 			for (uint i = 0; i < size; i++) {
 				Scalar color(150, 150, 0);
-				circle(colorFilteredImg, ledPoints[i], 30, color, 10);
+				circle(outputImage, ledPoints[i], 30, color, 10);
 			}
 
 			float min = keyPoints[0].size;

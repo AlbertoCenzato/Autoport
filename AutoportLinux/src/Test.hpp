@@ -31,11 +31,10 @@ namespace Test {
 		imgAnalyzer.setColorInterval(colorInterval);
 	}
 
-	void notteDellaRicerca(Size &frameSize, LedColor ledColor) {
-		//Size frameSize(800,600);
+	void notteDellaRicerca(Size &frameSize, int fps, LedColor ledColor) {
 
 		cout << "opening image loader" << endl;
-		ImgLoader loader("", ImgLoader::DEVICE, frameSize);
+		ImgLoader loader(workingDir+"video.mp4", ImgLoader::FILE, frameSize, fps);
 		cout << "done" << endl;
 		imgAnalyzer = ImgAnalysis(ledColor);
 		vector<Point2f> ledPoints(7);
@@ -44,6 +43,19 @@ namespace Test {
 		const string processedFrame("Processed stream");
 		namedWindow(originalFrame,  WINDOW_AUTOSIZE);
 		namedWindow(processedFrame, WINDOW_AUTOSIZE);
+
+		Interval<Scalar> colorInterval;
+		imgAnalyzer.getColorInterval(colorInterval);
+
+		Scalar h = colorInterval.high;
+		Scalar l = colorInterval.low;
+
+		maxHue = h[0];
+		maxSat = h[1];
+		maxVal = h[2];
+		minHue = l[0];
+		minSat = l[1];
+		minVal = l[2];
 
 		createTrackbar("Min hue", processedFrame, &minHue, MAX_VAL, on_trackbar);
 		createTrackbar("Min sat", processedFrame, &minSat, MAX_VAL, on_trackbar);
@@ -57,6 +69,7 @@ namespace Test {
 		float downscalingFactor = 1;
 		while(c != 27) {
 			loader.getNextFrame(frame);
+			//imwrite(workingDir+originalFrame+".jpg", frame);
 
 			imshow(originalFrame, frame);
 			bool downScalingNeeded = imgAnalyzer.evaluate(frame, ledPoints, downscalingFactor);
@@ -66,9 +79,24 @@ namespace Test {
 				downscalingFactor = 0.5;
 			}
 			imshow(processedFrame, frame);
+			//imwrite(workingDir+processedFrame+".jpg", frame);
 
 			c = (char)waitKey(33);
 		}
+
+		const string hue = "hue";
+		const string sat = "saturation";
+		const string val = "value";
+
+		const string low  = "low";
+		const string high = "high";
+
+		Settings::saveConfigParam(hue, low,  minHue);
+		Settings::saveConfigParam(sat, low,  minSat);
+		Settings::saveConfigParam(val, low,  minVal);
+		Settings::saveConfigParam(hue, high, maxHue);
+		Settings::saveConfigParam(sat, high, maxSat);
+		Settings::saveConfigParam(val, high, maxVal);
 	}
 
 	void cameraCapture() {

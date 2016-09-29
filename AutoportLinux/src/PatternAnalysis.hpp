@@ -24,7 +24,7 @@ public:
 
 	~PatternAnalysis() {}
 
-	void evaluate(vector<Point2f>&, Mat&, int);
+	bool evaluate(vector<Point2f>&, Mat&, int);
 
 private:
 	vector<Point2f> oldPoints;

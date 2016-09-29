@@ -14,6 +14,8 @@ const char*	Settings::VALUE = "value";
 const char* Settings::LOW = "low";
 const char* Settings::HIGH = "high";
 
+string Settings::filePath = "";
+
 Interval<int> Settings::hue 	   = Interval<int>(105,135);
 Interval<int> Settings::saturation = Interval<int>(150,255);
 Interval<int> Settings::value 	   = Interval<int>(  0,255);
@@ -44,15 +46,21 @@ Settings::~Settings() {
 	// TODO Auto-generated destructor stub
 }
 
-bool Settings::loadConfiguration(string configFilePath) {
+bool Settings::loadConfiguration(string &configFilePath) {
 
 	xml_document doc;
 	const char* path = configFilePath.c_str();
-	if(!doc.load_file(path))
+	if(!doc.load_file(path)) {
 		cout << "Error loading file " << configFilePath << endl;
+		return false;
+	}
 
-	if(strcmp(doc.child(HEADER).name(), HEADER) != 0)
+	if(strcmp(doc.child(HEADER).name(), HEADER) != 0) {
 		cout << "Wrong file!" << endl;
+		return false;
+	}
+
+	Settings::filePath = configFilePath;
 
 	xml_node imageAnalysis		= doc.child(HEADER).child("ImageAnalysis"	  ).child("DefaultValues");
 	xml_node positionEstimation = doc.child(HEADER).child("PositionEstimation").child("DefaultValues");
@@ -113,8 +121,35 @@ bool Settings::loadConfiguration(string configFilePath) {
 	node = positionEstimation.child("pixel_dimension");
 	pixelDimension = node.attribute(VALUE).as_double();
 
+	//FIXME: doc must be closed?
+
 	return true;
 
+}
+
+bool Settings::saveConfigParam(const string &paramName, const string &attributeName, double value) {
+
+	xml_document doc;
+	const char* path = Settings::filePath.c_str();
+	if(!doc.load_file(path)) {
+		cout << "Error loading file " << filePath << endl;
+		return false;
+	}
+
+	if(strcmp(doc.child(HEADER).name(), HEADER) != 0) {
+		cout << "Wrong file!" << endl;
+		return false;
+	}
+
+	const char* param = paramName.c_str();
+	xml_node node = doc.child(HEADER).child(param);
+
+	const char* attribute = attributeName.c_str();
+	node.attribute(attribute).set_value(value);
+
+	doc.save_file(path);
+
+	return true;
 }
 
 string Settings::toString() {

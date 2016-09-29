@@ -16,7 +16,7 @@ using namespace cv;
 
 extern string workingDir;
 
-ImgLoader::ImgLoader(const string &source, int type, const Size &frameSize) {
+ImgLoader::ImgLoader(const string &source, int type, const Size &frameSize, int fps) {
 
 	switch(type) {
 		case DEVICE:
@@ -37,8 +37,9 @@ ImgLoader::ImgLoader(const string &source, int type, const Size &frameSize) {
 
 	setFrameHeight(frameSize.height);
 	setFrameWidth(frameSize.width);
+	capture.set(CAP_PROP_FPS, fps);
 
-	cout << "Found camera input" << endl;
+	cout << "Found camera input, " << fps << "fps" << endl;
 }
 
 ImgLoader::ImgLoader(const string &source, int type) {
@@ -63,12 +64,13 @@ ImgLoader::ImgLoader(const string &source, int type) {
 
 	capture.set(CV_CAP_PROP_FRAME_WIDTH , 640);
 	capture.set(CV_CAP_PROP_FRAME_HEIGHT , 480);
-	//capture.set (CV_CAP_PROP_FOURCC, CV_FOURCC('B', 'G', 'R', '3'));
+	fps = capture.get(CAP_PROP_FPS);
 
 	cout << "Found input" << endl;
 }
 
 void ImgLoader::getNextFrame(Mat &frame) {
+	cout << "FPS: " << capture.get(CAP_PROP_FPS);
 	capture >> frame;
 }
 

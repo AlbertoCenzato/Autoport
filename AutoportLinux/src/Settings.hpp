@@ -15,6 +15,8 @@ public:
 	static const char* LOW;
 	static const char* HIGH;
 
+	static string filePath;
+
 	static Interval<int> hue;
 	static Interval<int> saturation;
 	static Interval<int> value;
@@ -34,7 +36,9 @@ public:
 	Settings();
 	virtual ~Settings();
 
-	static bool loadConfiguration(string configFilePath);
+	static bool loadConfiguration(string &configFilePath);
+
+	static bool saveConfigParam(const string &paramName, const string &attributeName, double value);
 
 	static string toString();
 };

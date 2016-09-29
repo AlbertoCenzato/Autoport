@@ -20,7 +20,7 @@ public:
 	static const int DEVICE = 1;
 	static const int STREAM = 2;
 
-	ImgLoader(const std::string &source, int type, const Size &frameSize);	//FIXME setting frameSize throws an exception when reding frame
+	ImgLoader(const std::string &source, int type, const Size &frameSize, int fps);	//FIXME setting frameSize throws an exception when reding frame
 	ImgLoader(const std::string &source, int type);
 
 	void getNextFrame(Mat &frame);
@@ -33,7 +33,7 @@ public:
 private:
 
 	VideoCapture capture;
-
+	int fps = 30;
 };
 
 

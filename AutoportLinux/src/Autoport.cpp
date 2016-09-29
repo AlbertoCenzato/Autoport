@@ -58,18 +58,21 @@ int main() {
 
 	int frameWidth;
 	int frameHeight;
+	int fps;
 	char color;
 	cout << "Enter frame width" << endl;
 	cin >> frameWidth;
 	cout << "Enter frame height" << endl;
 	cin >> frameHeight;
+	cout << "Enter fps" << endl;
+	cin >> fps;
 	cout << "Enter led color (r/b)" << endl;
 	cin >> color;
 
 	Size frameSize(frameWidth,frameHeight);
 	LedColor ledColor = color == 'r' ? LedColor::RED : LedColor::BLUE;
 
-	Test::notteDellaRicerca(frameSize, ledColor);
+	Test::notteDellaRicerca(frameSize, fps, ledColor);
 
 	getchar();
 	return 0;
