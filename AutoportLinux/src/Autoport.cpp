@@ -56,7 +56,8 @@ int main() {
 	Settings::loadConfiguration(path);
 	cout << Settings::toString() << "\n\n" << endl;
 
-	Test::notteDellaRicerca();
+	//Test::notteDellaRicerca();
+	Test::pointCloudRegister();
 
 	getchar();
 	return 0;

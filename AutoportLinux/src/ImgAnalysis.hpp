@@ -70,11 +70,12 @@ private:
 		this->regionOfInterest = regionOfInterest;
 
 		params = SimpleBlobDetector::Params();
+
 		params.filterByColor = true;
-		params.blobColor = 255;
-		params.filterByArea = true;
-		params.minArea = 0;
-		params.maxArea = 10000;
+		params.blobColor = 0;
+		params.filterByArea = false;
+		//params.minArea = 0;
+		//params.maxArea = 10000;
 		params.filterByInertia = false;
 		params.filterByConvexity = false;
 		params.filterByCircularity = false;
@@ -133,6 +134,7 @@ private:
 		featureDetector->detect(colorFilteredImg, keyPoints);
 
 		uint size = keyPoints.size();
+		cout << "KeyPoints size: " << size << endl;
 		if(size > 0) {
 			ledPoints = vector<Point2f>(keyPoints.size());
 			KeyPoint::convert(keyPoints, ledPoints);
@@ -165,7 +167,7 @@ private:
 
 			//draws detected points
 			for (uint i = 0; i < size; i++) {
-				Scalar color(150, 150, 0);
+				Scalar color(0, 255, 0);
 				circle(outputImage, ledPoints[i], 30, color, 10);
 			}
 

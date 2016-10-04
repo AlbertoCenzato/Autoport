@@ -27,23 +27,23 @@ bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> &points, float downscalin
 	cvtColor(image,hsvImg,colorConversion);
 	auto end = chrono::high_resolution_clock::now();
 	cout << "\nConvert color: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
-
+/*
 	namedWindow("Cropped image", WINDOW_NORMAL);
 	imshow("Cropped image", hsvImg);
 	waitKey(1);
-
+*/
 
 	//filter the color according to this->low and this->high tolerances
 	begin = chrono::high_resolution_clock::now();
 	filterByColor(hsvImg,colorFilteredImg);
 	end = chrono::high_resolution_clock::now();
 	cout << "\nFilter color: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
-
+/*
 	namedWindow("Filtered image", WINDOW_NORMAL);
 	imshow("Filtered image", colorFilteredImg);
 	waitKey(1);
 	//imwrite(workingDir + "output/filterByColor.jpg", colorFilteredImg);
-
+*/
 
 	//put in this->points detected blobs that satisfy this->params tolerance
 	begin = chrono::high_resolution_clock::now();
@@ -57,46 +57,45 @@ bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> &points, float downscalin
 	//imwrite(workingDir + "output/findBlobs.jpg",colorFilteredImg);
 
 
-	if(blobNumber == 5) {
-		/*
-		//order this->points accordingly to the led pattern numbering
-		begin = chrono::high_resolution_clock::now();
-		bool matchFound = patternAnalysis.evaluate(ledPoints, image, 10);
-		end = chrono::high_resolution_clock::now();
-		cout << "\nPattern: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
-		//imwrite(workingDir + "output/patternMirko.jpg",colorFilteredImg);
+	//if(blobNumber == 5) {
 
-		if(matchFound) {
-			GenPurpFunc::pointVectorToStrng(ledPoints);
+	//order this->points accordingly to the led pattern numbering
+	begin = chrono::high_resolution_clock::now();
+	bool matchFound = patternAnalysis.evaluate(ledPoints, image, 10);
+	end = chrono::high_resolution_clock::now();
+	cout << "\nPattern: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
+	//imwrite(workingDir + "output/patternMirko.jpg",colorFilteredImg);
 
-			Interval<int> hue(0,255);
-			Interval<int> sat(0,255);
-			Interval<int> val(0,255);
+	if(matchFound) {
+		GenPurpFunc::pointVectorToStrng(ledPoints);
 
-			int ledPointsLength = ledPoints.size();
-			for (int i = 0; i < ledPointsLength; i++) {
-				Point2f p = ledPoints[i];
-				Vec3b color = hsvImg.at<Vec3b>(p);
-				if (color[0] > hue.high) hue.high = color[0];
-				if (color[1] > sat.high) sat.high = color[1];
-				if (color[2] > val.high) val.high = color[2];
-				if (color[0] < hue.low)	 hue.low  = color[0];
-				if (color[1] < sat.low)	 sat.low  = color[1];
-				if (color[2] < val.low)	 val.low  = color[2];
-			}
-			colorInterval.low  = Scalar(hue.low  - colorTolerance, sat.low  - colorTolerance, val.low  - colorTolerance);
-			colorInterval.high = Scalar(hue.high + colorTolerance, sat.high + colorTolerance, val.high + colorTolerance);
+		Interval<int> hue(0,255);
+		Interval<int> sat(0,255);
+		Interval<int> val(0,255);
 
-			findROI();
-
-			points = ledPoints;
+		int ledPointsLength = ledPoints.size();
+		for (int i = 0; i < ledPointsLength; i++) {
+			Point2f p = ledPoints[i];
+			Vec3b color = hsvImg.at<Vec3b>(p);
+			if (color[0] > hue.high) hue.high = color[0];
+			if (color[1] > sat.high) sat.high = color[1];
+			if (color[2] > val.high) val.high = color[2];
+			if (color[0] < hue.low)	 hue.low  = color[0];
+			if (color[1] < sat.low)	 sat.low  = color[1];
+			if (color[2] < val.low)	 val.low  = color[2];
 		}
-		int averageSize = (oldKeyPointSizeInterval.low + oldKeyPointSizeInterval.high)/2;
-		return averageSize > sizeSupTolerance;
-		*/
-	}
+		colorInterval.low  = Scalar(hue.low  - colorTolerance, sat.low  - colorTolerance, val.low  - colorTolerance);
+		colorInterval.high = Scalar(hue.high + colorTolerance, sat.high + colorTolerance, val.high + colorTolerance);
 
-	return false;
+		findROI();
+
+		points = ledPoints;
+	}
+	int averageSize = (oldKeyPointSizeInterval.low + oldKeyPointSizeInterval.high)/2;
+	return averageSize > sizeSupTolerance;
+
+	//}
+
 }
 
 ImgAnalysis* ImgAnalysis::setROItolerance(int ROItolerance) {

@@ -31,19 +31,62 @@ namespace Test {
 		imgAnalyzer.setColorInterval(colorInterval);
 	}
 
+	/*
+	Mat ransac(vector<Point2f> &points) {
+		auto model = Settings::realWorldPoints;
+		for_each(model.begin(),model.end(), [] (Point3f &point) { point.z = 0; });
+		Mat H = findHomography(points, model, RANSAC);
+		return H;
+	}
+	*/
+
+	void pointCloudRegister() {
+		srand (time(NULL));
+		Scalar color(255,255,255);
+		Mat image = Mat::zeros( 800, 600, CV_8UC3);
+
+		auto points = vector<Point2i>(5);
+		for(int i = 0; i < 5; ++i) {
+			points[i] = Point2i(rand()%500,rand()%500);
+			circle(image, points[i], 10, color, 10);
+		}
+
+		namedWindow("Points", WINDOW_AUTOSIZE);
+		imshow("Points",image);
+
+		auto rot = getRotationMatrix2D(Point2f(400, 300), rand()%180, 0.5);
+		warpAffine(image,image, rot, Size(800,600));
+
+		namedWindow("Rotated image", WINDOW_AUTOSIZE);
+		imshow("Rotated image",image);
+
+		//warpAffine(points, points, rot, )
+
+		image = Mat::zeros( 800, 600, CV_8UC3);
+
+		for(int i = 0; i < 5; ++i) {
+			circle(image, points[i], 10, color, 10);
+		}
+
+		namedWindow("Rotated points", WINDOW_AUTOSIZE);
+		imshow("Rotated points",image);
+
+		waitKey(0);
+	}
+
 	void notteDellaRicerca() {
 
 		Size frameSize(800,600);
-		int fps = 10;
+		int fps = 25;
 		cout << "opening image loader" << endl;
-		ImgLoader loader(/*workingDir+"video.mp4",*/"", ImgLoader::DEVICE, frameSize, fps);
+		ImgLoader loader(workingDir+"video.mp4", ImgLoader::DEVICE, frameSize, fps);
 		cout << "done" << endl;
 		imgAnalyzer = ImgAnalysis();
 		vector<Point2f> ledPoints(7);
 
-		const string originalFrame("Video stream");
+		const string settings("Settings");
 		const string processedFrame("Processed stream");
-		namedWindow(originalFrame,  WINDOW_NORMAL);
+		//namedWindow(originalFrame,  WINDOW_NORMAL);
 		namedWindow(processedFrame, WINDOW_NORMAL);
 
 		Interval<Scalar> colorInterval;
@@ -59,22 +102,22 @@ namespace Test {
 		minSat = l[1];
 		minVal = l[2];
 
-		createTrackbar("Min hue", processedFrame, &minHue, MAX_VAL, on_trackbar);
-		createTrackbar("Max hue", processedFrame, &maxHue, MAX_VAL, on_trackbar);
+		imshow(settings, Mat::zeros(1,800,3));
 
-		createTrackbar("Min sat", processedFrame, &minSat, MAX_VAL, on_trackbar);
-		createTrackbar("Max sat", processedFrame, &maxSat, MAX_VAL, on_trackbar);
+		createTrackbar("Min hue", settings, &minHue, MAX_VAL, on_trackbar);
+		createTrackbar("Max hue", settings, &maxHue, MAX_VAL, on_trackbar);
 
-		createTrackbar("Min val", processedFrame, &minVal, MAX_VAL, on_trackbar);
-		createTrackbar("Max val", processedFrame, &maxVal, MAX_VAL, on_trackbar);
+		createTrackbar("Min sat", settings, &minSat, MAX_VAL, on_trackbar);
+		createTrackbar("Max sat", settings, &maxSat, MAX_VAL, on_trackbar);
+
+		createTrackbar("Min val", settings, &minVal, MAX_VAL, on_trackbar);
+		createTrackbar("Max val", settings, &maxVal, MAX_VAL, on_trackbar);
+
 
 		Mat frame;
 		char c = 64;
 		float downscalingFactor = 1;
 		while(c != 27 && loader.getNextFrame(frame)) {
-			//imwrite(workingDir+originalFrame+".jpg", frame);
-
-			//imshow(originalFrame, frame);
 
 			bool downScalingNeeded = imgAnalyzer.evaluate(frame, ledPoints, downscalingFactor);
 			if(downScalingNeeded) {
@@ -84,10 +127,10 @@ namespace Test {
 			}
 			imshow(processedFrame, frame);
 
-			//imwrite(workingDir+processedFrame+".jpg", frame);
-
 			c = (char)waitKey(33);
 		}
+
+		//destroyWindow(processedFrame);
 
 		const string hue = "hue";
 		const string sat = "saturation";

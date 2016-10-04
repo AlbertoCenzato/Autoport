@@ -142,18 +142,21 @@ bool Settings::saveConfigParam(const string &paramName, const string &attributeN
 	}
 
 	const char* param = paramName.c_str();
-	cout << "Looking for " << param << " node" << endl;
+	//cout << "Looking for " << param << " node" << endl;
 	xml_node node = doc.findChild(param);
 
 	const char* attribute = attributeName.c_str();
-	cout << "Setting " << param << " to value " << value << endl;
-	cout << "Setting " << node.name() << " to value " << value << endl;
-	if(!node.attribute(attribute).set_value(value))
+	//cout << "Setting " << param << " to value " << value << endl;
+	//cout << "Setting " << node.name() << " to value " << value << endl;
+	if(!node.attribute(attribute).set_value(value)) {
 		cout << "Failed" << endl;
+		return false;
+	}
 
-	cout << "Saving file to " << path << endl;
+	//cout << "Saving file to " << path << endl;
 	if(!doc.save_file(path)) {
-		cout << "Can't save file" << endl;;
+		cout << "Can't save file " << path << endl;;
+		return false;
 	}
 
 	return true;
