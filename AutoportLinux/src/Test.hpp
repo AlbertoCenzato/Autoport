@@ -46,77 +46,90 @@ namespace Test {
 		Scalar red(0,0,255);
 		Scalar green(0,255,0);
 		Scalar blue(125,125,125);
-		Mat image = Mat::zeros( 500, 500, CV_8UC3);
 
-		Vec3f points[5];
-		for(int i = 0; i < 5; ++i) {
-			points[i] = Vec3f(rand()%500,rand()%500,1);
-			Point2f point(points[i].val[0],points[i].val[1]);
-			circle(image, point, 10, white, 10);
-			cout << "OriginalPoint: " << point << endl;
+		double meanError = 0;
+		long timeElapsed = 0;
+		int count = 0;
+
+		const int ITERATIONS = 100000;
+		for(int j = 0; j < ITERATIONS; ++j) {
+			cout << j << endl;
+			//Mat image = Mat::zeros( 500, 500, CV_8UC3);
+
+			Vec3f points[5];
+			Point2f originalPoints[5];
+			for(int i = 0; i < 5; ++i) {
+				points[i] = Vec3f(rand()%500,rand()%500,1);
+				originalPoints[i] = Point2f(points[i].val[0],points[i].val[1]);
+				//circle(image, originalPoints[i], 10, white, 10);
+				//cout << "OriginalPoint: " << originalPoints[i] << endl;
+			}
+
+			Point2f pivot(rand()%250+125,rand()%250+125);
+			double angle = rand()%180;
+			//circle(image, pivot, 10, green, 10);
+			Mat_<float> rot = getRotationMatrix2D(pivot, angle, 1);
+
+			//cout << "Pivot:\n" << pivot << endl;
+			//cout << "Angle:\n" << angle << endl;
+			//cout << "\nMatrice di rotazione:\n" << rot << endl;
+
+			Vec2f rotPoint[5];
+			for(int i = 0; i< 5; ++i) {
+				Mat_<float> result = rot*Mat_<float>(points[i]);
+				rotPoint[i] = Vec2f(result);
+				//circle(image, Point2i(rotPoint[i].val[0],rotPoint[i].val[1]), 10, red, 10);
+			}
+
+			//cout << "Punto ruotato:\n" << rotPoint << endl;
+
+			vector<Point2f> rotPointsVec(5);
+			vector<Point2f> pointsVec(5);
+			for(int i = 0; i < 5; ++i) {
+				rotPointsVec[i] = Point2f(rotPoint[i]);
+				pointsVec[i]	= Point2f(points[i].val[0], points[i].val[1]);
+			}
+			rotPointsVec[rand()%5] = Point2f(rand()%500,rand()%500);
+
+			auto begin = chrono::high_resolution_clock::now();
+			Mat_<float> H = findHomography(rotPointsVec, pointsVec, LMEDS);
+			if(H.empty())
+				cout << "EMPTY!!" << endl;
+			else {
+				++count;
+				auto end = chrono::high_resolution_clock::now();
+				timeElapsed += chrono::duration_cast<chrono::nanoseconds>(end-begin).count();
+
+				//cout << "Homography matrix:\n" << H << endl;
+
+				//Vec3f reversedPoints[5];
+				Point2f revPoint[5];
+				for(int i = 0; i< 5; ++i) {
+					Vec3f vec(rotPointsVec[i].x, rotPointsVec[i].y, 1);
+					Mat_<float> result = H*Mat_<float>(vec);
+					Vec3f reversedPoint(result);
+					Point2f revPoint[i] = Point2f(reversedPoint.val[0],reversedPoint.val[1]);
+					//circle(image, revPoint[i], 10, blue, 10);
+					//cout << "RevPoint: " << revPoint[i] << endl;
+				}
+
+				double meanDistance = 0;
+				for(int i = 0; i < 5; ++i) {
+					meanDistance += GenPurpFunc::distPoint2Point(revPoint[i],originalPoints[i]);
+				}
+				meanError += meanDistance/5;
+			}
+			//namedWindow("Points", WINDOW_AUTOSIZE);
+			//imshow("Points",image);
+
+			//waitKey(0);
+
 		}
 
-		Point2f pivot(rand()%250+125,rand()%250+125);
-		double angle = rand()%180;
-		circle(image, pivot, 10, green, 10);
-		Mat_<float> rot = getRotationMatrix2D(pivot, angle, 1);
+		meanError /= count;
 
-		cout << "Pivot:\n" << pivot << endl;
-		cout << "Angle:\n" << angle << endl;
-		cout << "\nMatrice di rotazione:\n" << rot << endl;
-
-		Vec2f rotPoint[5];
-		for(int i = 0; i< 5; ++i) {
-			Mat_<float> result = rot*Mat_<float>(points[i]);
-			rotPoint[i] = Vec2f(result);
-			circle(image, Point2i(rotPoint[i].val[0],rotPoint[i].val[1]), 10, red, 10);
-		}
-
-		cout << "Punto ruotato:\n" << rotPoint << endl;
-
-		vector<Point2f> rotPointsVec(5);
-		vector<Point2f> pointsVec(5);
-		for(int i = 0; i < 5; ++i) {
-			rotPointsVec[i] = Point2f(rotPoint[i]);
-			pointsVec[i]	= Point2f(points[i].val[0], points[i].val[1]);
-		}
-
-		auto begin = chrono::high_resolution_clock::now();
-		Mat_<float> H = findHomography(rotPointsVec, pointsVec, RANSAC);
-		auto end = chrono::high_resolution_clock::now();
-		cout << "\nComputation time: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
-
-
-		cout << "Homography matrix:\n" << H << endl;
-		namedWindow("Points", WINDOW_AUTOSIZE);
-		imshow("Points",image);
-
-		Vec3f reversedPoints[5];
-		for(int i = 0; i< 5; ++i) {
-			Vec3f vec(rotPointsVec[i].x, rotPointsVec[i].y, 1);
-			Mat_<float> result = H*Mat_<float>(vec);
-			reversedPoints[i] = Vec3f(result);
-			Point2f revPoint(reversedPoints[i].val[0],reversedPoints[i].val[1]);
-			circle(image, revPoint, 10, blue, 10);
-			cout << "RevPoint: " << revPoint << endl;
-		}
-
-		/*
-		namedWindow("Rotated image", WINDOW_AUTOSIZE);
-		imshow("Rotated image",image);
-
-		//warpAffine(points, points, rot, )
-
-		image = Mat::zeros( 800, 600, CV_8UC3);
-
-		//for(int i = 0; i < 5; ++i) {
-			circle(image, Point2i(points[i].val[0],points[i].val[1]), 10, color, 10);
-		//}
-
-		namedWindow("Rotated points", WINDOW_AUTOSIZE);
-		imshow("Rotated points",image);
-		 */
-		waitKey(0);
+		cout << "Mean time elapsed: " << timeElapsed/1000/ITERATIONS << "us" << endl;
+		cout << "Mean error: " << meanError << endl;
 	}
 
 	void notteDellaRicerca() {
