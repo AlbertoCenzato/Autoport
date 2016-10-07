@@ -42,21 +42,66 @@ namespace Test {
 
 	void pointCloudRegister() {
 		srand (time(NULL));
-		Scalar color(255,255,255);
-		Mat image = Mat::zeros( 800, 600, CV_8UC3);
+		Scalar white(255,255,255);
+		Scalar red(0,0,255);
+		Scalar green(0,255,0);
+		Scalar blue(125,125,125);
+		Mat image = Mat::zeros( 500, 500, CV_8UC3);
 
-		auto points = vector<Point2i>(5);
+		Vec3f points[5];
 		for(int i = 0; i < 5; ++i) {
-			points[i] = Point2i(rand()%500,rand()%500);
-			circle(image, points[i], 10, color, 10);
+			points[i] = Vec3f(rand()%500,rand()%500,1);
+			Point2f point(points[i].val[0],points[i].val[1]);
+			circle(image, point, 10, white, 10);
+			cout << "OriginalPoint: " << point << endl;
 		}
 
+		Point2f pivot(rand()%250+125,rand()%250+125);
+		double angle = rand()%180;
+		circle(image, pivot, 10, green, 10);
+		Mat_<float> rot = getRotationMatrix2D(pivot, angle, 1);
+
+		cout << "Pivot:\n" << pivot << endl;
+		cout << "Angle:\n" << angle << endl;
+		cout << "\nMatrice di rotazione:\n" << rot << endl;
+
+		Vec2f rotPoint[5];
+		for(int i = 0; i< 5; ++i) {
+			Mat_<float> result = rot*Mat_<float>(points[i]);
+			rotPoint[i] = Vec2f(result);
+			circle(image, Point2i(rotPoint[i].val[0],rotPoint[i].val[1]), 10, red, 10);
+		}
+
+		cout << "Punto ruotato:\n" << rotPoint << endl;
+
+		vector<Point2f> rotPointsVec(5);
+		vector<Point2f> pointsVec(5);
+		for(int i = 0; i < 5; ++i) {
+			rotPointsVec[i] = Point2f(rotPoint[i]);
+			pointsVec[i]	= Point2f(points[i].val[0], points[i].val[1]);
+		}
+
+		auto begin = chrono::high_resolution_clock::now();
+		Mat_<float> H = findHomography(rotPointsVec, pointsVec, RANSAC);
+		auto end = chrono::high_resolution_clock::now();
+		cout << "\nComputation time: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
+
+
+		cout << "Homography matrix:\n" << H << endl;
 		namedWindow("Points", WINDOW_AUTOSIZE);
 		imshow("Points",image);
 
-		auto rot = getRotationMatrix2D(Point2f(400, 300), rand()%180, 0.5);
-		warpAffine(image,image, rot, Size(800,600));
+		Vec3f reversedPoints[5];
+		for(int i = 0; i< 5; ++i) {
+			Vec3f vec(rotPointsVec[i].x, rotPointsVec[i].y, 1);
+			Mat_<float> result = H*Mat_<float>(vec);
+			reversedPoints[i] = Vec3f(result);
+			Point2f revPoint(reversedPoints[i].val[0],reversedPoints[i].val[1]);
+			circle(image, revPoint, 10, blue, 10);
+			cout << "RevPoint: " << revPoint << endl;
+		}
 
+		/*
 		namedWindow("Rotated image", WINDOW_AUTOSIZE);
 		imshow("Rotated image",image);
 
@@ -64,13 +109,13 @@ namespace Test {
 
 		image = Mat::zeros( 800, 600, CV_8UC3);
 
-		for(int i = 0; i < 5; ++i) {
-			circle(image, points[i], 10, color, 10);
-		}
+		//for(int i = 0; i < 5; ++i) {
+			circle(image, Point2i(points[i].val[0],points[i].val[1]), 10, color, 10);
+		//}
 
 		namedWindow("Rotated points", WINDOW_AUTOSIZE);
 		imshow("Rotated points",image);
-
+		 */
 		waitKey(0);
 	}
 

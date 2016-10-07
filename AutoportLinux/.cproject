@@ -46,6 +46,7 @@
 								</option>
 								<option id="gnu.cpp.link.option.libs.1388684959" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" useByScannerDiscovery="false" valueType="libs">
 									<listOptionValue builtIn="false" value=":libopencv_core.so.3.1.0"/>
+									<listOptionValue builtIn="false" value=":libopencv_calib3d.so.3.1.0"/>
 									<listOptionValue builtIn="false" value=":libopencv_videoio.so.3.1.0"/>
 									<listOptionValue builtIn="false" value=":libopencv_flann.so.3.1.0"/>
 									<listOptionValue builtIn="false" value=":libopencv_highgui.so.3.1.0"/>
