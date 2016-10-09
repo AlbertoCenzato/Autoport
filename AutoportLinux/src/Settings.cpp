@@ -104,6 +104,7 @@ bool Settings::loadConfiguration(string &configFilePath) {
 									   node.attribute("pitch").as_double(),
 									   node.attribute("roll").as_double());
 
+	realWorldPoints.empty();
 	int count = 0;
 	for (xml_node iterNode = positionEstimation.child("real_world_points").first_child(); iterNode; iterNode = iterNode.next_sibling()) {
 		double x = iterNode.attribute("x").as_double();

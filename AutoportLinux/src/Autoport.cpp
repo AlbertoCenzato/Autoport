@@ -57,7 +57,7 @@ int main() {
 	cout << Settings::toString() << "\n\n" << endl;
 
 	//Test::notteDellaRicerca();
-	Test::pointCloudRegister();
+	Test::imgAnalysisPositionEstimationPic();
 
 	getchar();
 	return 0;

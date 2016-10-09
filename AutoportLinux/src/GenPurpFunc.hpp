@@ -209,13 +209,28 @@ namespace GenPurpFunc {
 	}
 
 
-	inline float distPoint2Point(Point2f &p1, Point2f &p2) {
+	inline float distPoint2Point(const Point2f &p1, const Point2f &p2) {
 		return sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2));
 	}
 
-	inline float distPoint2Line(Point2f &point, Line &line) {
+	inline float distPoint2Line(const Point2f &point, const Line &line) {
 		// FIXME: if m = INF and q = NAN?
 		return abs(point.y - (line.m*(point.x) + line.q)) / sqrt(1 + pow(line.m, 2));
+	}
+
+	inline int findNeraestPoint(const Point2f &point, const vector<Point2f> &vec) {
+		int minIndex = -1;
+		int minDist  = FLT_MAX;
+		const int SIZE = vec.size();
+		for(int i = 0; i < SIZE; ++i) {
+			float distance = distPoint2Point(point, vec[i]);
+			if(distance < minDist) {
+				minDist  = distance;
+				minIndex = i;
+			}
+		}
+
+		return minIndex;
 	}
 
 	inline Point2f centroid(const vector<KeyPoint> &points) {

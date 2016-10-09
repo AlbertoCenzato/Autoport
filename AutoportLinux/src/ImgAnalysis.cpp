@@ -53,49 +53,55 @@ bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> &points, float downscalin
 
 	namedWindow("Blobs found", WINDOW_NORMAL);
 	imshow("Blobs found", colorFilteredImg);
-	waitKey(1);
-	//imwrite(workingDir + "output/findBlobs.jpg",colorFilteredImg);
+	waitKey(0);
 
+	cout << "Skip frame? [y/n]" << endl;
+	char skip;
+	cin >> skip;
+	if(skip == 'n') {
+		//order this->ledPoints accordingly to the led pattern numbering
+		begin = chrono::high_resolution_clock::now();
+		bool matchFound = patternAnalysis.evaluate(ledPoints, 10);
+		end = chrono::high_resolution_clock::now();
+		cout << "\nPattern: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
 
-	//if(blobNumber == 5) {
+		if(matchFound) {
 
-	//order this->points accordingly to the led pattern numbering
-	begin = chrono::high_resolution_clock::now();
-	bool matchFound = patternAnalysis.evaluate(ledPoints, image, 10);
-	end = chrono::high_resolution_clock::now();
-	cout << "\nPattern: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
-	//imwrite(workingDir + "output/patternMirko.jpg",colorFilteredImg);
+			for(int i = 0; i < ledPoints.size(); ++i) {
+				char str[2];
+				sprintf(str,"%d",i);
+				putText(image, str, ledPoints[i], FONT_HERSHEY_PLAIN, 2,  Scalar(0,0,255,255));
+			}
 
-	if(matchFound) {
-		GenPurpFunc::pointVectorToStrng(ledPoints);
+			GenPurpFunc::pointVectorToStrng(ledPoints);
 
-		Interval<int> hue(0,255);
-		Interval<int> sat(0,255);
-		Interval<int> val(0,255);
+			Interval<int> hue(0,255);
+			Interval<int> sat(0,255);
+			Interval<int> val(0,255);
 
-		int ledPointsLength = ledPoints.size();
-		for (int i = 0; i < ledPointsLength; i++) {
-			Point2f p = ledPoints[i];
-			Vec3b color = hsvImg.at<Vec3b>(p);
-			if (color[0] > hue.high) hue.high = color[0];
-			if (color[1] > sat.high) sat.high = color[1];
-			if (color[2] > val.high) val.high = color[2];
-			if (color[0] < hue.low)	 hue.low  = color[0];
-			if (color[1] < sat.low)	 sat.low  = color[1];
-			if (color[2] < val.low)	 val.low  = color[2];
+			int ledPointsLength = ledPoints.size();
+			for (int i = 0; i < ledPointsLength; i++) {
+				Point2f p = ledPoints[i];
+				Vec3b color = hsvImg.at<Vec3b>(p);
+				if (color[0] > hue.high) hue.high = color[0];
+				if (color[1] > sat.high) sat.high = color[1];
+				if (color[2] > val.high) val.high = color[2];
+				if (color[0] < hue.low)	 hue.low  = color[0];
+				if (color[1] < sat.low)	 sat.low  = color[1];
+				if (color[2] < val.low)	 val.low  = color[2];
+			}
+			colorInterval.low  = Scalar(hue.low  - colorTolerance, sat.low  - colorTolerance, val.low  - colorTolerance);
+			colorInterval.high = Scalar(hue.high + colorTolerance, sat.high + colorTolerance, val.high + colorTolerance);
+
+			findROI();
+
+			points = ledPoints;
 		}
-		colorInterval.low  = Scalar(hue.low  - colorTolerance, sat.low  - colorTolerance, val.low  - colorTolerance);
-		colorInterval.high = Scalar(hue.high + colorTolerance, sat.high + colorTolerance, val.high + colorTolerance);
-
-		findROI();
-
-		points = ledPoints;
+		int averageSize = (oldKeyPointSizeInterval.low + oldKeyPointSizeInterval.high)/2;
+		return false;//averageSize > sizeSupTolerance;
 	}
-	int averageSize = (oldKeyPointSizeInterval.low + oldKeyPointSizeInterval.high)/2;
-	return averageSize > sizeSupTolerance;
 
-	//}
-
+	return true;
 }
 
 ImgAnalysis* ImgAnalysis::setROItolerance(int ROItolerance) {

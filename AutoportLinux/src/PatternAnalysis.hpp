@@ -7,7 +7,9 @@
 
 #pragma once
 
+#include "assert.h"
 #include "GenPurpFunc.hpp"
+#include "Settings.hpp"
 
 using namespace std;
 using namespace cv;
@@ -20,15 +22,24 @@ class PatternAnalysis {
 public:
 	PatternAnalysis() {
 		oldPoints = vector<Point2f>();
+		const int SIZE = Settings::realWorldPoints.size();
+		pattern = vector<Point2f>(SIZE);
+
+		// TODO: check if this assumption is correct
+		// here the z-component is neglected because it is very small
+		for(int i = 0; i < SIZE; ++i)
+			pattern[i] = Point2f(Settings::realWorldPoints[i].x,Settings::realWorldPoints[i].y);
 	}
 
 	~PatternAnalysis() {}
 
-	bool evaluate(vector<Point2f>&, Mat&, int);
+	bool evaluate(vector<Point2f> &ledPoints, int tolerance);
 
 private:
 	vector<Point2f> oldPoints;
+	vector<Point2f> pattern;
 
+/*
 	void patternMirko(vector<Point2f> &points, Mat &img, int tolerance) {
 
 		int numOfPoints = points.size();
@@ -226,8 +237,9 @@ private:
 
 		return; //ledPattern;
 	}
+	*/
 
-	void nearerPoints(vector<Point2f> &ledPoints, Mat &img, int tolerance) {
+	void nearestPoints(vector<Point2f> &ledPoints, Mat &img, int tolerance) {
 
 		vector<Point2f> orderedVector(8);
 
@@ -346,7 +358,42 @@ private:
 		return true;
 	}
 
+	bool ransac(vector<Point2f> &input) {
+		const int SIZE = input.size();
+		assert(SIZE == pattern.size() &&
+			"PatternAnalysis error! RANSAC input vector and pattern vector don't have the same size");
 
+		// find the homography that transforms input points in pattern points
+		Mat_<float> H = findHomography(input, pattern, RANSAC);
+
+		// apply the homography to each point
+		vector<Point2f> tmp(SIZE);
+		for(int i = 0; i < SIZE; ++i) {
+			Vec3f vec(input[i].x, input[i].y, 1);
+			Mat_<float> p = H*Mat_<float>(vec);
+			Vec3f reversedPoint(p);
+			tmp[i] = Point2f(reversedPoint.val[0],reversedPoint.val[1]);;
+		}
+
+		// find the nearest point
+		int *flag = new int[SIZE];
+		for(int i = 0; i < SIZE; ++i)
+			flag[i] = -1;
+
+		for(int i = 0; i < SIZE; ++i) {
+			int index = GenPurpFunc::findNeraestPoint(tmp[i],pattern);
+			if(flag[i] == 1) {
+				cout << "ERROR!! overlapping points" << endl;
+				return false;
+			}
+			flag[i] = 1;
+			input[index] = tmp[i];
+		}
+
+		delete [] flag;
+
+		return true;
+	}
 
 
 };
