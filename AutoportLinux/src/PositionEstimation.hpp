@@ -155,20 +155,21 @@ public:
 
 
 	PositionEstimation(vector<Point3d> &realWorldPoints) {
-		focalX = Settings::focalX;
-		focalY = Settings::focalY;
-		pixelDimension = Settings::pixelDimension;
+		Settings &settings = Settings::getInstance();
+		focalX = settings.focalX;
+		focalY = settings.focalY;
+		pixelDimension = settings.pixelDimension;
 		this->realWorldPoints  = &realWorldPoints;
 		this->currRealWorldSet = new vector<Point3d>(realWorldPoints);
 		lastKnownPositions = list<Position_XYZ_YPR*>();
-		lastKnownPositions.push_front(&Settings::initialPosition);
+		lastKnownPositions.push_front(&settings.initialPosition);
 		cameraSystemPoints = NULL;
 		pointsToEvaluate = 0xFF;	// bit array set to all-ones: 11111111; uses all points
 		numberOfUsedPoints = 8;
 		pinHoleFunctor = new PinHoleEquations(*currRealWorldSet, focalX, focalY, pixelDimension);
 	}
 
-	PositionEstimation() : PositionEstimation(Settings::realWorldPoints) {}
+	PositionEstimation() : PositionEstimation(Settings::getInstance().realWorldPoints) {}
 
 	~PositionEstimation() {
 		delete cameraSystemPoints;

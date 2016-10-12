@@ -37,27 +37,22 @@ enum Status {
 string workingDir;
 const string configFileName = "autoport.config";
 Status status = Status::LOOKING_FOR_TARGET;
+//Settings settings;
 
 int main() {
 
 	cout << "****** AUTOPORT SOFTWARE ******\n" << endl;
 
-	cout << "Reading working directory..." << endl;
-	const int bufferSize = 500;
-	char workDir[bufferSize];
-	workingDir = getcwd(workDir, bufferSize);
-	workingDir += "/";
-
-	cout << "Done. Working directory is: " << workingDir << endl;
-
-	string path = workingDir + configFileName;
-	cout << "Opening and parsing " << path << endl;
 	cout << "\n*** Settings ***" << endl;
-	Settings::loadConfiguration(path);
-	cout << Settings::toString() << "\n\n" << endl;
+	Settings& settings = Settings::getInstance();
+	cout << settings.toString() << "\n\n" << endl;
 
-	//Test::notteDellaRicerca();
-	Test::imgAnalysisPositionEstimationPic();
+	cout << "Enter the path of the file to analyze [d for camera capture]" << endl;
+	string path;
+	cin >> path;
+	if(path.compare("d") == 0)
+		path = "";
+	Test::taraturaParametriChristian(path);
 
 	getchar();
 	return 0;

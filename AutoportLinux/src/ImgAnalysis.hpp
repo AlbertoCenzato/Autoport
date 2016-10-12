@@ -3,16 +3,9 @@
 #pragma once
 
 #include "PatternAnalysis.hpp"
-#include "Settings.hpp"
 
 using namespace std;
 using namespace cv;
-
-enum LedColor {
-	RED,
-	BLUE
-};
-
 
 class ImgAnalysis {
 
@@ -36,16 +29,15 @@ public:
 		constructor(colorInterval, ledColor, patternAnalysis, regionOfInterest);
 	}
 
-	ImgAnalysis(LedColor ledColor) {
+	ImgAnalysis() {
 
-		Scalar low = Scalar(Settings::hue.low,Settings::saturation.low,Settings::value.low);
-		Scalar high = Scalar(Settings::hue.high,Settings::saturation.high,Settings::value.high);
+		Settings& settings = Settings::getInstance();
+		Scalar low  = Scalar(settings.hue.low, settings.saturation.low, settings.value.low);
+		Scalar high = Scalar(settings.hue.high, settings.saturation.high, settings.value.high);
 
 		auto patternAnalysis = PatternAnalysis();
-		constructor(Interval<Scalar>(low,high), ledColor, patternAnalysis);
+		constructor(Interval<Scalar>(low,high), settings.patternColor, patternAnalysis);
 	}
-
-	ImgAnalysis() : ImgAnalysis(LedColor::BLUE) {}
 
 	~ImgAnalysis() {}
 
@@ -72,7 +64,7 @@ private:
 		params = SimpleBlobDetector::Params();
 
 		params.filterByColor = true;
-		params.blobColor = 0;
+		params.blobColor = 255;
 		params.filterByArea = false;
 		//params.minArea = 0;
 		//params.maxArea = 10000;
@@ -82,10 +74,11 @@ private:
 		//params.minCircularity = 0.5;
 		//params.maxCircularity = 1;
 
-		colorTolerance   = Settings::colorTolerance;
-		ROItolerance     = Settings::ROITolerance;
-		sizeTolerance    = Settings::sizeTolerance;
-		sizeSupTolerance = Settings::sizeSupTolerance;
+		Settings& settings = Settings::getInstance();
+		colorTolerance   = settings.colorTolerance;
+		ROItolerance     = settings.ROITolerance;
+		sizeTolerance    = settings.sizeTolerance;
+		sizeSupTolerance = settings.sizeSupTolerance;
 
 		oldKeyPointSizeInterval = Interval<float>(0,0);
 	}
@@ -123,10 +116,12 @@ private:
 		//a degeneration of the interval amplitude continuously increasing it in presence
 		//of noise similar to leds, maybe it would be better to use the medium value of led sizes
 
+		/*
 		if(oldKeyPointSizeInterval.high != 0 && oldKeyPointSizeInterval.low != 0) {
 			params.maxArea = oldKeyPointSizeInterval.high;
 			params.minArea = oldKeyPointSizeInterval.low;
 		}
+		*/
 
 		auto keyPoints = vector<KeyPoint>();
 

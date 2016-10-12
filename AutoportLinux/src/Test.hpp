@@ -15,7 +15,9 @@
 
 using namespace cv;
 
-extern string workingDir;
+extern string   workingDir;
+extern Settings settings;
+
 ImgAnalysis imgAnalyzer;
 const int MAX_VAL = 255;
 int minHue = 0, maxHue = 255;
@@ -112,7 +114,7 @@ namespace Test {
 		imgAnalyzer = ImgAnalysis();
 		vector<Point2f> ledPoints(7);
 
-		const string settings("Settings");
+		const string settingsWindow("Settings");
 		const string processedFrame("Processed stream");
 		//namedWindow(originalFrame,  WINDOW_NORMAL);
 		namedWindow(processedFrame, WINDOW_NORMAL);
@@ -130,16 +132,16 @@ namespace Test {
 		minSat = l[1];
 		minVal = l[2];
 
-		imshow(settings, Mat::zeros(1,800,3));
+		imshow(settingsWindow, Mat::zeros(1,800,3));
 
-		createTrackbar("Min hue", settings, &minHue, MAX_VAL, on_trackbar);
-		createTrackbar("Max hue", settings, &maxHue, MAX_VAL, on_trackbar);
+		createTrackbar("Min hue", settingsWindow, &minHue, MAX_VAL, on_trackbar);
+		createTrackbar("Max hue", settingsWindow, &maxHue, MAX_VAL, on_trackbar);
 
-		createTrackbar("Min sat", settings, &minSat, MAX_VAL, on_trackbar);
-		createTrackbar("Max sat", settings, &maxSat, MAX_VAL, on_trackbar);
+		createTrackbar("Min sat", settingsWindow, &minSat, MAX_VAL, on_trackbar);
+		createTrackbar("Max sat", settingsWindow, &maxSat, MAX_VAL, on_trackbar);
 
-		createTrackbar("Min val", settings, &minVal, MAX_VAL, on_trackbar);
-		createTrackbar("Max val", settings, &maxVal, MAX_VAL, on_trackbar);
+		createTrackbar("Min val", settingsWindow, &minVal, MAX_VAL, on_trackbar);
+		createTrackbar("Max val", settingsWindow, &maxVal, MAX_VAL, on_trackbar);
 
 
 		Mat frame;
@@ -167,12 +169,15 @@ namespace Test {
 		const string low  = "low";
 		const string high = "high";
 
-		Settings::saveConfigParam(hue, low,  minHue);
-		Settings::saveConfigParam(sat, low,  minSat);
-		Settings::saveConfigParam(val, low,  minVal);
-		Settings::saveConfigParam(hue, high, maxHue);
-		Settings::saveConfigParam(sat, high, maxSat);
-		Settings::saveConfigParam(val, high, maxVal);
+		Settings& settings = Settings::getInstance();
+		settings.modifyConfigParam(hue, low,  minHue);
+		settings.modifyConfigParam(sat, low,  minSat);
+		settings.modifyConfigParam(val, low,  minVal);
+		settings.modifyConfigParam(hue, high, maxHue);
+		settings.modifyConfigParam(sat, high, maxSat);
+		settings.modifyConfigParam(val, high, maxVal);
+
+		settings.saveConfig();
 	}
 
 	void cameraCapture() {
@@ -202,14 +207,19 @@ namespace Test {
 	}
 
 	//--- Image analysis and position estimation test ----
-	void imgAnalysisPositionEstimationPic() {
+	void taraturaParametriChristian(const string &path) {
 
 		auto posEstimator = PositionEstimation();
 		string imgName;
 		auto ledPoints = vector<Point2f>();
-		ImgLoader loader(workingDir + "video.mp4",ImgLoader::FILE);
+		ImgLoader loader;
+		if(path.compare("d") == 0)
+			loader = ImgLoader(path,ImgLoader::DEVICE);
+		else
+			loader = ImgLoader(path,ImgLoader::FILE);
 
 		Interval<Scalar> colorInterval;
+		imgAnalyzer = ImgAnalysis();
 		imgAnalyzer.getColorInterval(colorInterval);
 
 		Scalar h = colorInterval.high;
@@ -222,30 +232,39 @@ namespace Test {
 		minSat = l[1];
 		minVal = l[2];
 
-		const string settings("Settings");
-		imshow(settings, Mat::zeros(1,800,3));
+		const string settingsWindow("Settings");
+		imshow(settingsWindow, Mat::zeros(1,800,3));
 
-		createTrackbar("Min hue", settings, &minHue, MAX_VAL, on_trackbar);
-		createTrackbar("Max hue", settings, &maxHue, MAX_VAL, on_trackbar);
+		createTrackbar("Min hue", settingsWindow, &minHue, MAX_VAL, on_trackbar);
+		createTrackbar("Max hue", settingsWindow, &maxHue, MAX_VAL, on_trackbar);
 
-		createTrackbar("Min sat", settings, &minSat, MAX_VAL, on_trackbar);
-		createTrackbar("Max sat", settings, &maxSat, MAX_VAL, on_trackbar);
+		createTrackbar("Min sat", settingsWindow, &minSat, MAX_VAL, on_trackbar);
+		createTrackbar("Max sat", settingsWindow, &maxSat, MAX_VAL, on_trackbar);
 
-		createTrackbar("Min val", settings, &minVal, MAX_VAL, on_trackbar);
-		createTrackbar("Max val", settings, &maxVal, MAX_VAL, on_trackbar);
+		createTrackbar("Min val", settingsWindow, &minVal, MAX_VAL, on_trackbar);
+		createTrackbar("Max val", settingsWindow, &maxVal, MAX_VAL, on_trackbar);
 
-		Mat img;
+		Mat image;
+		loader.getNextFrame(image);
 		int downscalingFactor = 1;
-		while(true) {
+		namedWindow("Original image", WINDOW_NORMAL);
+		char ch = 64;
+		while(ch != 27) {
 
 			cout << "\n\nLoading image " << imgName << endl;
-			loader.getNextFrame(img);
-			bool downscalingNeeded = imgAnalyzer.evaluate(img, ledPoints, downscalingFactor);
-			if(downscalingNeeded)
-				continue;
-			if(!downscalingNeeded)
-				cout << "\nDownscaling needed!";
+			if(!loader.getNextFrame(image)) {
+				cout << "Reached video ending" << endl;
+				break;
+			}
 
+			imgAnalyzer.evaluate(image, ledPoints, downscalingFactor);
+			for(uint i = 0; i < ledPoints.size(); ++i)
+				circle(image,ledPoints[i],20,Scalar(0,255,0),10);
+
+			imshow("Original image", image);
+			ch = waitKey(0);
+
+			/*
 			cout << "\n\nPunti traslati:";
 			Point2f trasl = Point2f(-1296,972);
 			for(int i = 0; i < 8; i++) {
@@ -259,9 +278,19 @@ namespace Test {
 			posEstimator.evaluate(ledPoints, position);
 			cout << "\nCurrent position is:\n";
 			GenPurpFunc::printMatrixd(position,3,2);
+			*/
 
-			waitKey(0);
 		}
+
+		Settings& settings = Settings::getInstance();
+		settings.modifyConfigParam("hue",	     "low", minHue);
+		settings.modifyConfigParam("hue",	     "high",maxHue);
+		settings.modifyConfigParam("saturation", "low", minSat);
+		settings.modifyConfigParam("saturation", "high",maxSat);
+		settings.modifyConfigParam("value",		 "low", minVal);
+		settings.modifyConfigParam("value",		 "high",maxVal);
+
+		settings.saveConfig();
 
 		return;
 	}

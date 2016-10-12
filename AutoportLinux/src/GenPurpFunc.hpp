@@ -64,7 +64,10 @@ public:
 	}
 };
 
-
+enum LedColor {
+	RED,
+	BLUE
+};
 
 namespace GenPurpFunc {
 	/* This function finds the angles (in RADIANS) of the yaw - pitch - roll sequence
@@ -218,9 +221,9 @@ namespace GenPurpFunc {
 		return abs(point.y - (line.m*(point.x) + line.q)) / sqrt(1 + pow(line.m, 2));
 	}
 
-	inline int findNeraestPoint(const Point2f &point, const vector<Point2f> &vec) {
+	inline int findNearestPoint(const Point2f &point, const vector<Point2f> &vec) {
 		int minIndex = -1;
-		int minDist  = FLT_MAX;
+		float minDist  = FLT_MAX;
 		const int SIZE = vec.size();
 		for(int i = 0; i < SIZE; ++i) {
 			float distance = distPoint2Point(point, vec[i]);

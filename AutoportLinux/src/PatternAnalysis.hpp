@@ -22,13 +22,14 @@ class PatternAnalysis {
 public:
 	PatternAnalysis() {
 		oldPoints = vector<Point2f>();
-		const int SIZE = Settings::realWorldPoints.size();
+		Settings& settings = Settings::getInstance();
+		const int SIZE = settings.realWorldPoints.size();
 		pattern = vector<Point2f>(SIZE);
 
 		// TODO: check if this assumption is correct
 		// here the z-component is neglected because it is very small
 		for(int i = 0; i < SIZE; ++i)
-			pattern[i] = Point2f(Settings::realWorldPoints[i].x,Settings::realWorldPoints[i].y);
+			pattern[i] = Point2f(settings.realWorldPoints[i].x, settings.realWorldPoints[i].y);
 	}
 
 	~PatternAnalysis() {}
@@ -39,206 +40,7 @@ private:
 	vector<Point2f> oldPoints;
 	vector<Point2f> pattern;
 
-/*
-	void patternMirko(vector<Point2f> &points, Mat &img, int tolerance) {
-
-		int numOfPoints = points.size();
-		int setNumber = 0;			//number of aligned sets found;
-
-		vector<Point2f> *alignedPoints = new vector<Point2f>[4];	//TODO: use an array of vectors of POINTERS to Point2f
-		long alignedPointsHash[4] = {0L,0L,0L,0L};
-
-		//look for the 4 sets of 3 aligned points
-		for (int i = 0; i < numOfPoints; i++) {
-			Point2f *p1 = &(points.at(i));
-			//for each couple of points...
-			for (int j = 0; j < numOfPoints; j++) {
-				Point2f *p2 = &(points.at(j));
-				if (p1 != p2) {
-					//... compute the equation of the line laying on p1 and p2...
-					float dx = p1->x - p2->x;
-					float m = (p1->y - p2->y) / dx;
-					float q = p1->y - m*(p1->x);
-
-					//... and look for another point that satisfies the equation
-					for (int k = 0; k < numOfPoints; k++) {
-						Point2f *p3 = &(points.at(k));
-						if (p3 != p1 && p3 != p2) {		//TODO: manage strange cases like +INF, -INF, NAN
-							float distance = abs(p3->y - (m*(p3->x) + q)) / sqrt(1 + pow(m, 2));
-							if (distance < tolerance) {
-
-								line(img, *p1, *p2, Scalar(150, 150, 0));
-								namedWindow("Detected lines", WINDOW_NORMAL);
-								imshow("Detected lines", img);
-								waitKey(1);
-								imwrite(workingDir + "output/detectedLines.jpg",img);
-								//std::cout << "\nvalid set";
-
-								//check if the set {p1, p2, p3} has been already found
-								bool alreadyFound = false;
-								long hash = (long)p1 + (long)p2 + (long)p3;
-								for (int h = setNumber - 1; h >= 0; h--) {
-									if (hash == alignedPointsHash[h])
-										alreadyFound = true;
-								}
-								if (!alreadyFound) {
-									alignedPointsHash[setNumber] = hash;
-									alignedPoints[setNumber].push_back(*p1);
-									alignedPoints[setNumber].push_back(*p2);
-									alignedPoints[setNumber++].push_back(*p3);
-									//std::cout << "\nAligned set " << setNumber - 1 << ": p1[" << p1->x << "," << p1->y << "]"
-											//<< " p2["  << p2->x << "," << p2->y << "]"
-											//<< " p3["  << p3->x << "," << p3->y << "]";
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
-		//compute the mass center for every set
-		Point2f massCenter[4];
-		for (int i = 0; i < setNumber-1; i++) {
-			massCenter[i] = GenPurpFunc::centroid(alignedPoints[i]);
-			//std::cout << "\nMass center " << i << ": " << massCenter[i];
-		}
-
-		//order lines: 0 extern vertical, 1 intern vertical, 2 upper horizontal, 3 lower horizontal
-		int maxMinCouples[2][2];
-		int secondMinDist[2];
-		float maxDist = 0, minDist = INT_MAX;
-		//find couples of lines with min distance, second min distance and max distance
-		for (int j = 0; j < 4; j++)
-			for (int k = 0; k < 4; k++)
-				if (k != j) {
-					float dist = GenPurpFunc::distPoint2Point(massCenter[j],massCenter[k]);
-					if ( dist < minDist) {
-						secondMinDist[0] = maxMinCouples[0][0];
-						secondMinDist[1] = maxMinCouples[0][1];
-						minDist = dist;
-						maxMinCouples[0][0] = j;
-						maxMinCouples[0][1] = k;
-					}
-					if (dist > maxDist) {
-						maxDist = dist;
-						maxMinCouples[1][0] = j;
-						maxMinCouples[1][1] = k;
-					}
-				}
-		//std::cout << "\nMin distance: (" << maxMinCouples[0][0] << "," << maxMinCouples[0][1] << ")";
-		//std::cout << "\nMax distance: (" << maxMinCouples[1][0] << "," << maxMinCouples[1][1] << ")";
-
-		int lines[4];
-		//the line that has both min distance and second min distance is the internal vertical line, the others are assigned consequently
-		if (secondMinDist[0] == maxMinCouples[0][0]) {
-			//secondMinDist[0] internal vertical line
-			lines[1] = secondMinDist[0];
-			lines[0] = maxMinCouples[0][1];
-			lines[2] = secondMinDist[1];
-			lines[3] = maxMinCouples[1][0] != secondMinDist[1] ? maxMinCouples[1][0] : maxMinCouples[1][1];
-		}
-		else if (secondMinDist[0] == maxMinCouples[0][1]) {
-			lines[1] = secondMinDist[0];
-			lines[0] = maxMinCouples[0][0];
-			lines[2] = secondMinDist[1];
-			lines[3] = maxMinCouples[1][0] != secondMinDist[1] ? maxMinCouples[1][0] : maxMinCouples[1][1];
-		}
-		else if (secondMinDist[1] == maxMinCouples[0][0]) {
-			lines[1] = secondMinDist[1];
-			lines[0] = maxMinCouples[0][1];
-			lines[2] = secondMinDist[0];
-			lines[3] = maxMinCouples[1][0] != secondMinDist[0] ? maxMinCouples[1][0] : maxMinCouples[1][1];
-		}
-		else {
-			lines[1] = secondMinDist[1];
-			lines[0] = maxMinCouples[0][0];
-			lines[2] = secondMinDist[0];
-			lines[3] = maxMinCouples[1][0] != secondMinDist[0] ? maxMinCouples[1][0] : maxMinCouples[1][1];
-		}
-		std::cout << "\nLine 0: " << lines[0];
-		std::cout << "\nLine 1: " << lines[1];
-		std::cout << "\nLine 2: " << lines[2];
-		std::cout << "\nLine 3: " << lines[3];
-
-
-
-		vector<Point2f> ledPattern = vector<Point2f>(8);
-		int count = 0;
-		for (int i = 0; i < 2; i++) {
-			double minDist = INT_MAX, maxDist = 0;
-			int minIndx[2], maxIndx[2];
-			vector<Point2f> alignedSet = alignedPoints[lines[i]];
-			for (int i = 0; i < 3; i++) {
-				for (int j = 0; j < 3; j++) {
-					if (i != j) {
-						double dist = GenPurpFunc::distPoint2Point(alignedSet.at(i), alignedSet.at(j));
-						if (dist < minDist) {
-							minDist = dist;
-							minIndx[0] = i;
-							minIndx[1] = j;
-						}
-						if (dist > maxDist) {
-							maxDist = dist;
-							maxIndx[0] = i;
-							maxIndx[1] = j;
-						}
-					}
-				}
-			}
-			if (minIndx[0] == maxIndx[0]) {
-				ledPattern.at(count++) = alignedSet[minIndx[0]];
-				ledPattern.at(count++) = alignedSet[minIndx[1]];
-				ledPattern.at(count++) = alignedSet[maxIndx[1]];
-			}
-			else if (minIndx[0] == maxIndx[1]) {
-				ledPattern.at(count++) = alignedSet[minIndx[0]];
-				ledPattern.at(count++) = alignedSet[minIndx[1]];
-				ledPattern.at(count++) = alignedSet[maxIndx[0]];
-			}
-			else if (minIndx[1] == maxIndx[0]) {
-				ledPattern.at(count++) = alignedSet[minIndx[1]];
-				ledPattern.at(count++) = alignedSet[minIndx[0]];
-				ledPattern.at(count++) = alignedSet[maxIndx[1]];
-			}
-			else {
-				ledPattern.at(count++) = alignedSet[minIndx[1]];
-				ledPattern.at(count++) = alignedSet[minIndx[0]];
-				ledPattern.at(count++) = alignedSet[maxIndx[0]];
-			}
-		}
-
-		for (int i = 0; i < 3; i++) {
-			Point2f *p = &(alignedPoints[lines[2]][i]);
-			if (p->x != ledPattern.at(0).x && p->y != ledPattern.at(0).y && p->x != ledPattern.at(3).x && p->y != ledPattern.at(3).y) {
-				ledPattern.at(6) = *p;
-				break;
-			}
-		}
-		for (int i = 0; i < 3; i++) {
-			Point2f *p = &(alignedPoints[lines[3]][i]);
-			if (p->x != ledPattern.at(2).x && p->y != ledPattern.at(2).y && p->x != ledPattern.at(5).x && p->y != ledPattern.at(5).y) {
-				ledPattern.at(7) = *p;
-				break;
-			}
-		}
-
-		for (int i = 0; i < 8; i++) {
-			ostringstream convert;
-			convert << i;
-			string s = convert.str();
-			GenPurpFunc::drawDetectedLed(img, ledPattern.at(i), s);
-		}
-		waitKey(1);
-
-		points.assign(ledPattern.begin(),ledPattern.end());
-
-		delete [] alignedPoints;
-
-		return; //ledPattern;
-	}
-	*/
-
+	// TODO: use a KD-tree and simplify the code
 	void nearestPoints(vector<Point2f> &ledPoints, Mat &img, int tolerance) {
 
 		vector<Point2f> orderedVector(8);
@@ -280,11 +82,11 @@ private:
 		ledPoints.pop_back();
 	}
 
-	// TODO: check this method
+	// TODO: remove this method
 	// TODO: rename this shitty-named method
 	bool firstPhase(vector<Point2f> &ledPoints, int tolerance) {
 
-		int size = ledPoints.size();
+		auto size = ledPoints.size();
 		if(size != 5)
 			return false;
 
@@ -294,8 +96,8 @@ private:
 
 		vector<Point2f> sortedVector(size);
 
-		for(uint i = 0; i < size; i++) {
-			for(uint j = 0; j < size; j++) {
+		for(int i = 0; i < size; i++) {
+			for(int j = 0; j < size; j++) {
 				if(i != j) {
 					float distance = distPoint2Point(ledPoints[i],ledPoints[j]);
 					if(distance < minDist) {
@@ -359,16 +161,21 @@ private:
 	}
 
 	bool ransac(vector<Point2f> &input) {
-		const int SIZE = input.size();
+		const uint SIZE = input.size();
 		assert(SIZE == pattern.size() &&
 			"PatternAnalysis error! RANSAC input vector and pattern vector don't have the same size");
 
 		// find the homography that transforms input points in pattern points
-		Mat_<float> H = findHomography(input, pattern, RANSAC);
+		Mat_<float> H = findHomography(pattern, input, RANSAC);
+
+		if(H.empty()) {
+			cout << "homography not found!" << endl;
+			return false;
+		}
 
 		// apply the homography to each point
 		vector<Point2f> tmp(SIZE);
-		for(int i = 0; i < SIZE; ++i) {
+		for(uint i = 0; i < SIZE; ++i) {
 			Vec3f vec(input[i].x, input[i].y, 1);
 			Mat_<float> p = H*Mat_<float>(vec);
 			Vec3f reversedPoint(p);
@@ -377,11 +184,11 @@ private:
 
 		// find the nearest point
 		int *flag = new int[SIZE];
-		for(int i = 0; i < SIZE; ++i)
+		for(uint i = 0; i < SIZE; ++i)
 			flag[i] = -1;
 
-		for(int i = 0; i < SIZE; ++i) {
-			int index = GenPurpFunc::findNeraestPoint(tmp[i],pattern);
+		for(uint i = 0; i < SIZE; ++i) {
+			int index = GenPurpFunc::findNearestPoint(tmp[i],pattern);
 			if(flag[i] == 1) {
 				cout << "ERROR!! overlapping points" << endl;
 				return false;

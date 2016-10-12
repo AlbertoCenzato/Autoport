@@ -53,12 +53,16 @@ bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> &points, float downscalin
 
 	namedWindow("Blobs found", WINDOW_NORMAL);
 	imshow("Blobs found", colorFilteredImg);
-	waitKey(0);
+	waitKey(1);
 
+	/*
 	cout << "Skip frame? [y/n]" << endl;
 	char skip;
 	cin >> skip;
 	if(skip == 'n') {
+	*/
+
+	/*
 		//order this->ledPoints accordingly to the led pattern numbering
 		begin = chrono::high_resolution_clock::now();
 		bool matchFound = patternAnalysis.evaluate(ledPoints, 10);
@@ -67,6 +71,7 @@ bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> &points, float downscalin
 
 		if(matchFound) {
 
+			cout << "Match found!" << endl;
 			for(int i = 0; i < ledPoints.size(); ++i) {
 				char str[2];
 				sprintf(str,"%d",i);
@@ -95,12 +100,12 @@ bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> &points, float downscalin
 
 			findROI();
 
-			points = ledPoints;
 		}
 		int averageSize = (oldKeyPointSizeInterval.low + oldKeyPointSizeInterval.high)/2;
 		return false;//averageSize > sizeSupTolerance;
-	}
-
+	//}
+*/
+	points = ledPoints;
 	return true;
 }
 
