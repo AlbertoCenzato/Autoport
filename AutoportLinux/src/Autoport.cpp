@@ -50,9 +50,8 @@ int main() {
 	cout << "Enter the path of the file to analyze [d for camera capture]" << endl;
 	string path;
 	cin >> path;
-	if(path.compare("d") == 0)
-		path = "";
-	Test::taraturaParametriChristian(path);
+
+	Test::ippAnalysis(path);
 
 	getchar();
 	return 0;

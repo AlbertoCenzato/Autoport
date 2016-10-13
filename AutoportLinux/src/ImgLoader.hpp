@@ -30,13 +30,17 @@ public:
 
 	bool getNextFrame(Mat &frame);
 
-	int  getFrameWidth () { return capture.get(CV_CAP_PROP_FRAME_WIDTH ); }
-	int  getFrameHeight() { return capture.get(CV_CAP_PROP_FRAME_HEIGHT); }
+	int  getFrameWidth ();
+	int  getFrameHeight();
+	Rect getROI() { return roi; }
+
+	void clearROI();
 
 	bool isOpen() { return capture.isOpened() && opened; }
 
-	bool setFrameWidth (int frameWidth)  { return capture.set(CV_CAP_PROP_FRAME_WIDTH,  frameWidth); }
-	bool setFrameHeight(int frameHeight) { return capture.set(CV_CAP_PROP_FRAME_HEIGHT, frameHeight); }
+	bool setFrameWidth (int frameWidth);
+	bool setFrameHeight(int frameHeight);
+	bool setROI(const Rect& roi);
 
 private:
 
@@ -44,8 +48,10 @@ private:
 	int fps = 30;
 	int sourceType;
 	bool opened = false;
+	Rect roi;				// region of interest
+	Size res;				// resolution
 
-	bool constructor(const std::string &source, int type, const Size &frameSize, int fps) {
+	bool constructor(const std::string &source, int type) {
 		switch(type) {
 		case DEVICE:
 			sourceType = DEVICE;
@@ -67,28 +73,31 @@ private:
 			return false;
 		}
 
+		res = Size(getFrameWidth(),getFrameHeight());
+		roi = Rect(0, 0, res.width, res.height);
+
 		opened = true;
 		return true;
 	}
 
 	bool cleverConstr(const std::string &source, int type, const Size &frameSize, int fps) {
 
-		if(!constructor(source, type, frameSize, fps))
+		if(!constructor(source, type))
 			return false;
 
 		cout << "Found input, " << fps << "fps" << endl;
 
-		bool error = setFrameHeight(frameSize.height);
-		error = error && setFrameWidth(frameSize.width);
-		error = error && capture.set(CAP_PROP_FPS, fps);
-		error = error && capture.set(CAP_PROP_BRIGHTNESS, 0.0001);
+		bool success = 	 	 setFrameHeight(frameSize.height);
+		success = success && setFrameWidth(frameSize.width);
+		success = success && capture.set(CAP_PROP_FPS, fps);
+		success = success && capture.set(CAP_PROP_BRIGHTNESS, 0.0001);
 
 		// if an error occurs fall back to default camera parameters
-		if(error) {
+		if(!success) {
 			capture.release();
-			return constructor(source, type, frameSize, fps);
+			return constructor(source, type);
 		}
-		return error;
+		return success;
 	}
 };
 

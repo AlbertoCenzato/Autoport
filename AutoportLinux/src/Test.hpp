@@ -8,10 +8,7 @@
 #include <unistd.h>
 
 #include "GenPurpFunc.hpp"
-#include "ImgAnalysis.hpp"
-#include "ImgLoader.hpp"
-#include "PatternAnalysis.hpp"
-#include "PositionEstimation.hpp"
+#include "IPPAnalysis.hpp"
 
 using namespace cv;
 
@@ -295,27 +292,22 @@ namespace Test {
 		return;
 	}
 
-	void positionEstimation() {
+	void ippAnalysis(const string& path) {
+		ImgLoader loader;
+		if(path.compare("d") == 0)
+			loader = ImgLoader(path,ImgLoader::DEVICE);
+		else
+			loader = ImgLoader(path,ImgLoader::FILE);
 
-		auto ledPoints = vector<Point2f>(8);
-		ledPoints.at(0) = {576.71, 741.49};
-		ledPoints.at(1) = {247.17, 741.49};
-		ledPoints.at(2) = {-741.5, 741.5};
-		ledPoints.at(3) = {617.91, 441.37};
-		ledPoints.at(4) = {247.17, 441.94};
-		ledPoints.at(5) = {741.49, 441.94};
-		ledPoints.at(6) = {576.72, -741.49};
-		ledPoints.at(7) = {-741.5, -741.5};
+		cout << "LOADER OK" << endl;
 
-		auto posEstimator = PositionEstimation();
-		auto position = Matrix<double,3,2>();
-		posEstimator.setPointsToEvaluate(0xAB)->evaluate(ledPoints, position);
-		cout << "\nCurrent position is:\n";
-		GenPurpFunc::printMatrixd(position,3,2);
-
-		getchar();
-		return;
+		Mat extrinsicFactors;
+		auto ipp = IPPAnalysis(&loader);
+		char ch = 64;
+		while(ch != 23) {
+			ipp.evaluate(extrinsicFactors);
+			ch = waitKey(0);
+		}
 	}
-
 }
 

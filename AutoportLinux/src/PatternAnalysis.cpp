@@ -28,7 +28,7 @@ bool PatternAnalysis::evaluate(vector<Point2f> &ledPoints, int tolerance) {
 	bool matchFound = false;
 
 	if(blobNumber < 8 && blobNumber > 3) {
-		matchFound = ransac(ledPoints);
+		matchFound = firstPhase(ledPoints, 10);
 	}
 	else {
 		cout << "Blob detection didn't work properly!" << endl;
