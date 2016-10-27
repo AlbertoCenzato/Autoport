@@ -26,9 +26,9 @@ template<typename _Scalar, int NX = Dynamic, int NY = Dynamic> struct Functor {
 		InputsAtCompileTime = NX,
 		ValuesAtCompileTime = NY
 	};
-	typedef Matrix<Scalar, InputsAtCompileTime, 1> InputType;
-	typedef Matrix<Scalar, ValuesAtCompileTime, 1> ValueType;
-	typedef Matrix<Scalar, ValuesAtCompileTime, InputsAtCompileTime> JacobianType;
+	typedef Eigen::Matrix<Scalar, InputsAtCompileTime, 1> InputType;
+	typedef Eigen::Matrix<Scalar, ValuesAtCompileTime, 1> ValueType;
+	typedef Eigen::Matrix<Scalar, ValuesAtCompileTime, InputsAtCompileTime> JacobianType;
 
 	int m_inputs, m_values;
 
@@ -177,7 +177,7 @@ public:
 		delete pinHoleFunctor;
 	}
 
-	void evaluate(vector<Point2f> &, Matrix<double,3,2> &evaluatedPoints);
+	void evaluate(vector<Point2f> &, Eigen::Matrix<double,3,2> &evaluatedPoints);
 
 	PositionEstimation* setPointsToEvaluate(uchar pointsToEvaluate);
 

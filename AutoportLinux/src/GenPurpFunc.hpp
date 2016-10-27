@@ -1,6 +1,7 @@
 //Copyright (c) 2016 Alberto Cenzato. All rights reserved.
 
 #include <opencv2/opencv.hpp>
+#include "opencv2/flann.hpp"
 #include <Eigen/Dense>
 
 using namespace Eigen;
@@ -234,6 +235,15 @@ namespace GenPurpFunc {
 		}
 
 		return minIndex;
+	}
+
+	inline int findNearestPoint(const Mat_<float> &point, const flann::GenericIndex<cvflann::L2<float>> &index) {
+		//vector<float> query = {point.x,point.y};
+		vector<int>		indices(1);
+		vector<float>	dists(1);
+		cvflann::SearchParams searchParams;
+		//index.knnSearch(query,indices,dists, 1, searchParams);
+		return indices[0];
 	}
 
 	inline Point2f centroid(const vector<KeyPoint> &points) {

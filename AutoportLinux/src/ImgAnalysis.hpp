@@ -18,14 +18,13 @@ class ImgAnalysis {
 	int sizeSupTolerance;
 	SimpleBlobDetector::Params params;
 	int colorConversion;
-	PatternAnalysis patternAnalysis;
 
 	Interval<float> oldKeyPointSizeInterval;
 
 public:
 
-	ImgAnalysis(const Interval<Scalar> &colorInterval, LedColor ledColor, const PatternAnalysis &patternAnalysis, const Rect &regionOfInterest = Rect(0,0,0,0)) {
-		constructor(colorInterval, ledColor, patternAnalysis, regionOfInterest);
+	ImgAnalysis(const Interval<Scalar> &colorInterval, LedColor ledColor, const Rect &regionOfInterest = Rect(0,0,0,0)) {
+		constructor(colorInterval, ledColor, regionOfInterest);
 	}
 
 	ImgAnalysis() {
@@ -34,8 +33,8 @@ public:
 		Scalar low  = Scalar(settings.hue.low, settings.saturation.low, settings.value.low);
 		Scalar high = Scalar(settings.hue.high, settings.saturation.high, settings.value.high);
 
-		auto patternAnalysis = PatternAnalysis();
-		constructor(Interval<Scalar>(low,high), settings.patternColor, patternAnalysis);
+		//auto patternAnalysis = PatternAnalysis();
+		constructor(Interval<Scalar>(low,high), settings.patternColor);
 	}
 
 	~ImgAnalysis() {}
@@ -51,13 +50,12 @@ public:
 
 private:
 
-	void constructor(const Interval<Scalar> &colorInterval, LedColor ledColor, const PatternAnalysis &patternAnalysis, const Rect &regionOfInterest = Rect(0,0,0,0)) {
+	void constructor(const Interval<Scalar> &colorInterval, LedColor ledColor, const Rect &regionOfInterest = Rect(0,0,0,0)) {
 		this->colorInterval = colorInterval; //FIXME: what happens here? is it coping the object? Probably yes
 
 		if(ledColor == LedColor::RED) colorConversion = COLOR_RGB2HSV;
 		else						  colorConversion = COLOR_BGR2HSV;
 
-		this->patternAnalysis = patternAnalysis;
 		this->regionOfInterest = regionOfInterest;
 
 		params = SimpleBlobDetector::Params();

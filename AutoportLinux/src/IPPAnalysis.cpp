@@ -38,14 +38,29 @@ bool IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 	}
 	cout << "ImageAnalysis succeded!" << endl;
 
-	/*
-	success 	 = patternAnalyzer.evaluate(points, tolerance);
+	Scalar red(0,0,255);
+	for(uint i = 0; i < points.size(); ++i) {
+		string number = to_string(i);
+		putText(image, number, points[i], HersheyFonts::FONT_HERSHEY_PLAIN,
+				2,red,10,8);
+	}
+
+	success 	 = patternAnalyzer.evaluate(points, 10);
 	if(!success) {
 		cerr << "PatternAnalysis failed!" << endl;
 		return false;
 	}
 	cout << "PatternAnalysis succeded!" << endl;
-*/
+	/*
+	Scalar blue(255,0,0);
+	for(int i = 0; i < points.size(); ++i) {
+		string number = to_string(i);
+		putText(image, number, points[i], HersheyFonts::FONT_HERSHEY_PLAIN,
+				2,blue,10,8);
+	}
+	*/
+
+
 	Rect roi;
 	findROI(points, roi);
 	loader->setROI(roi);
