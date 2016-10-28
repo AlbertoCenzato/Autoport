@@ -145,16 +145,29 @@ private:
 	 *
 	 * @return: true if a match is found, false otherwise
 	 */
-	bool firstPhaseRansac(vector<Point2f> &ledPoints) {
+	bool firstPhase(vector<Point2f> &ledPoints) {
 
 		const int SIZE = ledPoints.size();
-		assert(SIZE == pattern.size() && "PatternAnalysis error! RANSAC ledPoints vector and pattern vector don't have the same size");
+		//assert(SIZE == pattern.size() && "PatternAnalysis error! RANSAC ledPoints vector and pattern vector don't have the same size");
 
+		/*
 		// find the homography that transforms ledPoints points in pattern points
 
 		//FIXME: can't find the homography! The difference between ledpoints and pattern
-		//		 is not a simple plane projection!
-		Mat_<float> H = findHomography(ledPoints, pattern, RANSAC);
+		//		 is not a simple plane projection?
+
+		cout << "ledPoints" << ledPoints << endl;
+		Point2f ledCenter = GenPurpFunc::centroid(ledPoints);
+		Point2f patCenter = GenPurpFunc::centroid(pattern);
+		cout << "ledCenter " << ledCenter << endl;
+		cout << "patCenter " << patCenter << endl;
+
+		Point2f dist = ledCenter - patCenter;
+		for(int i = 0; i < SIZE; ++i)
+			ledPoints[i] = ledPoints[i] - dist;
+		cout << "ledPoints" << ledPoints << endl;
+
+		Mat_<float> H = findHomography(pattern, ledPoints, RANSAC);
 
 		if(H.empty()) {
 			cout << "homography not found!" << endl;
@@ -196,6 +209,69 @@ private:
 
 		delete [] flag;
 		*/
+
+		int minIndex1 = 0;
+		int minIndex2 = 1;
+		float minDist = 100000;
+		for(int i = 0; i < SIZE; ++i) {
+			for(int j = 0; j < SIZE; j++) {
+				if(i != j) {
+					float distance = distPoint2Point(ledPoints[i],ledPoints[j]);
+					if(distance < minDist) {
+						minDist = distance;
+						minIndex1 = i;
+						minIndex2 = j;
+					}
+				}
+			}
+		}
+
+		Point2f ledA = ledPoints[minIndex1];
+		Point2f ledB = ledPoints[minIndex2];
+
+		if(minIndex1 == SIZE-1) {
+			removeFromVec(minIndex1,ledPoints);
+			removeFromVec(minIndex2,ledPoints);
+		}
+		else {
+			removeFromVec(minIndex2,ledPoints);
+			removeFromVec(minIndex1,ledPoints);
+		}
+
+		Line line(ledA,ledB);
+		int minIndex = 0;
+		minDist = 100000;
+		for(int i = 0; i < SIZE-2; ++i) {
+			float distance = distPoint2Line(ledPoints[i],line);
+			if(distance < minDist) {
+				minDist = distance;
+				minIndex = i;
+			}
+		}
+
+		vector<Point2f> sorted(SIZE);
+		if(distPoint2Point(ledPoints[minIndex], ledA) < distPoint2Point(ledPoints[minIndex], ledB)) {
+			sorted[2] = ledA;
+			sorted[3] = ledB;
+		}
+		else {
+			sorted[2] = ledB;
+			sorted[3] = ledA;
+		}
+
+		sorted[1] = ledPoints[minIndex];
+		removeFromVec(minIndex,ledPoints);
+
+		if(distPoint2Point(ledPoints[0], sorted[1]) < distPoint2Point(ledPoints[0], sorted[3])) {
+			sorted[0] = ledPoints[0];
+			sorted[4] = ledPoints[1];
+		}
+		else {
+			sorted[0] = ledPoints[1];
+			sorted[4] = ledPoints[0];
+		}
+
+		ledPoints = sorted;
 
 		return true;
 	}

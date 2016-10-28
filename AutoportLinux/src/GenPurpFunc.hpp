@@ -212,6 +212,14 @@ namespace GenPurpFunc {
 		return min;
 	}
 
+	template<typename T, typename A>
+	inline void removeFromVec(int index, vector<T,A> &vec) {
+		const int SIZE =  vec.size();
+		if(index < SIZE - 1)
+			vec[index] = vec[SIZE - 1];
+		vec.pop_back();
+	}
+
 
 	inline float distPoint2Point(const Point2f &p1, const Point2f &p2) {
 		return sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2));
