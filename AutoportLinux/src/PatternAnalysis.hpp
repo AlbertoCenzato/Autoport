@@ -11,6 +11,7 @@
 
 #include "GenPurpFunc.hpp"
 #include "Settings.hpp"
+#include "LedDescriptor.hpp"
 
 using namespace std;
 using namespace cv;
@@ -31,9 +32,9 @@ class PatternAnalysis {
 
 public:
 	PatternAnalysis() {
-		oldPoints = vector<Point2f>();
 		Settings& settings = Settings::getInstance();
 		const int SIZE = settings.realWorldPoints.size();
+		oldPoints = vector<LedDescriptor>(SIZE);
 
 		// TODO: check if this assumption is correct
 		// here the z-component is neglected because it is very small
@@ -42,13 +43,9 @@ public:
 		for(int i = 0; i < SIZE; ++i) {
 			pattern[i] = Point2f(settings.realWorldPoints[i].x,settings.realWorldPoints[i].y);
 		}
-
-		//kdTree = new flann::GenericIndex<cvflann::L2<float>>(pattern, params);
 	}
 
-	~PatternAnalysis() {
-		//delete kdTree;
-	}
+	~PatternAnalysis() {}
 
 	/*
 	 * The only one public method. Receives the points detected from the image
@@ -61,15 +58,15 @@ public:
 	 *
 	 * @return: true if a match is found, false otherwise
 	 */
-	bool evaluate(vector<Point2f> &ledPoints, int tolerance);
+	bool evaluate(vector<LedDescriptor> &ledPoints);
 
 private:
-	vector<Point2f> oldPoints;	// points at time t-1
-	vector<Point2f> pattern;	// model of the pattern, do not modify
-	//flann::GenericIndex<cvflann::L2<float>>* kdTree;
-	cvflann::LinearIndexParams params;
 
-	// TODO: use a KD-tree and simplify the code
+	vector<LedDescriptor> oldPoints;	// points at time t-1
+	vector<Point2f> pattern;	// model of the pattern, do not modify
+	float maxDistance = 75;
+	int minNumOfMatch = 4;
+
 	/*
 	 * WARNING! NOT WORKING by the moment. It was written for another led pattern!
 	 * Receives the points detected from the image
@@ -79,68 +76,47 @@ private:
 	 * @ledPoints: points to evaluate
 	 * @tolerance: temporarly unused parameter
 	 *
-	 * @return: true if a match is found, false otherwise
+	 * @return: the number of matched leds
 	 */
-	bool nearestPoints(vector<Point2f> &ledPoints, Mat &img, int tolerance) {
+	int nearestPoints(vector<LedDescriptor> &ledPoints) {
 
-		/*
-		vector<Point2f> orderedVector(8);
+		const int SIZE = ledPoints.size();
+		vector<LedDescriptor> matchedLeds(SIZE);
+		int matched = 0;
 
-		//looking for led 6
-		Point2f point = oldPoints[6];
+		char *flags = new char[SIZE];
+		for(int i = 0; i < SIZE; ++i)
+			flags = 0;
 
-		float minDist = GenPurpFunc::distPoint2Point(point,ledPoints[0]);
-		int minIndex = 0;
-		for (int i = 1; i < 8; i++) {
-			Point2f keyPoint = ledPoints[i];
-			float distance = GenPurpFunc::distPoint2Point(point,keyPoint);
-			if(distance < minDist) {
-				minDist = distance;
-				minIndex = i;
+		for(int i = 0; i < SIZE; ++i) {
+			int index = findNearestPoint(oldPoints[i], ledPoints);
+			if(index > -1) {
+				matchedLeds[i] = ledPoints[index];
+				oldPoints[i] = ledPoints[index];
+				GenPurpFunc::removeFromVec(index,ledPoints);
+				++matched;
 			}
 		}
 
-		orderedVector[6] = ledPoints[minIndex];
-		ledPoints[minIndex] = ledPoints[7];
-		ledPoints.pop_back();
+		ledPoints.clear();
+		ledPoints = matchedLeds;
 
-		//looking for led 7
-		point = oldPoints[7];
-
-		minDist = GenPurpFunc::distPoint2Point(point,ledPoints[0]);
-		minIndex = 0;
-		for (int i = 1; i < 7; i++) {
-			Point2f keyPoint = ledPoints[i];
-			float distance = GenPurpFunc::distPoint2Point(point, keyPoint);
-			if(distance < minDist) {
-				minDist = distance;
-				minIndex = i;
-			}
-		}
-
-		orderedVector[7] = ledPoints[minIndex];
-		ledPoints[minIndex] = ledPoints[6];
-		ledPoints.pop_back();
-		*/
-
-		vector<Point2f> prevLedPoints;
-
-		auto kdTree = flann::GenericIndex<cvflann::L2<float>>(Mat(prevLedPoints),params);
-
-		return true;
+		delete [] flags;
+		return matched;
 	}
 
 	/*
 	 * Receives the points detected from the image
 	 * and states if they represent a pattern or not.
-	 * Used at time t = 0 (the very first frame)
+	 * Used at time t = 0 (the very first frame) or when the drone
+	 * has lost track of the leds.
 	 *
 	 * @ledPoints: points to evaluate
 	 * @tolerance: temporarly unused parameter
 	 *
 	 * @return: true if a match is found, false otherwise
 	 */
-	bool firstPhase(vector<Point2f> &ledPoints) {
+	bool firstPhase(vector<LedDescriptor> &ledPoints) {
 
 		const int SIZE = ledPoints.size();
 
@@ -150,7 +126,7 @@ private:
 		for(int i = 0; i < SIZE; ++i) {
 			for(int j = 0; j < SIZE; j++) {
 				if(i != j) {
-					float distance = distPoint2Point(ledPoints[i],ledPoints[j]);
+					float distance = ledPoints[i].cartDist(ledPoints[j]);
 					if(distance < minDist) {
 						minDist = distance;
 						minIndex1 = i;
@@ -160,8 +136,8 @@ private:
 			}
 		}
 
-		Point2f ledA = ledPoints[minIndex1];
-		Point2f ledB = ledPoints[minIndex2];
+		LedDescriptor ledA = ledPoints[minIndex1];
+		LedDescriptor ledB = ledPoints[minIndex2];
 
 		if(minIndex1 == SIZE-1) {
 			removeFromVec(minIndex1,ledPoints);
@@ -172,19 +148,21 @@ private:
 			removeFromVec(minIndex1,ledPoints);
 		}
 
-		Line line(ledA,ledB);
+		Point2f posA = ledA.getPosition();
+		Point2f posB = ledB.getPosition();
+		Line line(posA,posB);
 		int minIndex = 0;
 		minDist = 100000;
 		for(int i = 0; i < SIZE-2; ++i) {
-			float distance = distPoint2Line(ledPoints[i],line);
+			float distance = distPoint2Line(ledPoints[i].getPosition(),line);
 			if(distance < minDist) {
 				minDist = distance;
 				minIndex = i;
 			}
 		}
 
-		vector<Point2f> sorted(SIZE);
-		if(distPoint2Point(ledPoints[minIndex], ledA) < distPoint2Point(ledPoints[minIndex], ledB)) {
+		vector<LedDescriptor> sorted(SIZE);
+		if(ledPoints[minIndex].cartDist(ledA) < ledPoints[minIndex].cartDist(ledB)) {
 			sorted[2] = ledA;
 			sorted[3] = ledB;
 		}
@@ -196,7 +174,7 @@ private:
 		sorted[1] = ledPoints[minIndex];
 		removeFromVec(minIndex,ledPoints);
 
-		if(distPoint2Point(ledPoints[0], sorted[1]) < distPoint2Point(ledPoints[0], sorted[3])) {
+		if(ledPoints[0].cartDist(sorted[1]) < ledPoints[0].cartDist(sorted[3])) {
 			sorted[0] = ledPoints[0];
 			sorted[4] = ledPoints[1];
 		}
@@ -206,8 +184,27 @@ private:
 		}
 
 		ledPoints = sorted;
+		oldPoints = sorted;
 
 		return true;
+	}
+
+	int findNearestPoint(const LedDescriptor &point, const vector<LedDescriptor> &vec) {
+		int minIndex = -1;
+		float minDist  = FLT_MAX;
+		const int SIZE = vec.size();
+		for(int i = 0; i < SIZE; ++i) {
+			float distance = point.L2Dist(vec[i]);
+			if(distance < minDist) {
+				minDist  = distance;
+				minIndex = i;
+			}
+		}
+
+		if(minDist > maxDistance)
+			return -1;
+
+		return minIndex;
 	}
 
 

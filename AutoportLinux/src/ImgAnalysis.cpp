@@ -7,7 +7,9 @@ using namespace cv;
 using namespace std;
 
 
-bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> &points, float downscalingFactor) {
+bool ImgAnalysis::evaluate(Mat &image, vector<LedDescriptor> &points, float downscalingFactor) {
+
+	originalImage = image;
 
 	Mat hsvImg(image.rows,image.cols,image.depth());
 	Mat colorFilteredImg(image.rows,image.cols,image.depth());
@@ -27,7 +29,7 @@ bool ImgAnalysis::evaluate(Mat &image, vector<Point2f> &points, float downscalin
 
 	//put in this->points detected blobs that satisfy this->params tolerance
 	begin = chrono::high_resolution_clock::now();
-	int blobNumber = findBlobs(colorFilteredImg, image, points, downscalingFactor);
+	int blobNumber = findBlobs(colorFilteredImg, points, downscalingFactor);
 	end = chrono::high_resolution_clock::now();
 	cout << "\nFound " << blobNumber << " blobs: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
 

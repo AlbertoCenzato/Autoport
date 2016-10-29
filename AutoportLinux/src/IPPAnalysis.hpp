@@ -31,7 +31,11 @@ private:
 	PositionEstimation positionEstimator;
 	int tol = 50;
 
-	void findROI(const vector<Point2f>& points, Rect& roi) {
+	void findROI(const vector<LedDescriptor>& descriptors, Rect& roi) {
+		const int SIZE = descriptors.size();
+		vector<Point2f> points(SIZE);
+		for(int i = 0; i < SIZE; ++i)
+			points[i] = descriptors[i].getPosition();
 		Rect boundBox = boundingRect(points);
 		int x = boundBox.x - tol;
 		int y = boundBox.y - tol;
