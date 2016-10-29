@@ -91,6 +91,7 @@ private:
 			int index = findNearestPoint(oldPoints[i], ledPoints);
 			if(index > -1) {
 				matchedLeds[i] = ledPoints[index];
+				oldPoints[i] = ledPoints[index];
 				GenPurpFunc::removeFromVec(index,ledPoints);
 				++matched;
 			}

@@ -27,6 +27,8 @@ public:
 	void    getColor(Scalar &color) const;
 	float   getSize() const;
 
+	bool isEmpty();
+
 	static Point2f centroid(const vector<LedDescriptor> &descriptors) {
 		float x = 0;
 		float y = 0;

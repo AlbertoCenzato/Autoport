@@ -63,6 +63,10 @@ float LedDescriptor::getSize() const{
 	return values[5];
 }
 
+bool LedDescriptor::isEmpty() {
+	return values[0] == 0 || values[1] == 0;
+}
+
 
 
 

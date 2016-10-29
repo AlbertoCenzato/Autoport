@@ -59,9 +59,11 @@ bool IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 	Scalar blue(255,0,0);
 	for(uint i = 0; i < points.size(); ++i) {
 		string number = to_string(i);
-		circle(image, points[i].getPosition(), 30, blue, 10);
-		putText(image, number, points[i].getPosition(), HersheyFonts::FONT_HERSHEY_PLAIN,
-				2,blue,10,8);
+		if(!points[i].isEmpty()) {
+			circle(image, points[i].getPosition(), 30, blue, 10);
+			putText(image, number, points[i].getPosition(), HersheyFonts::FONT_HERSHEY_PLAIN,
+					2,blue,10,8);
+		}
 	}
 
 	Rect roi;
@@ -76,7 +78,5 @@ bool IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 	success		 = positionEstimator.evaluate(points, extrinsicFactors);
 	if(!success) return false;
 */
-
-
 	return true;
 }
