@@ -109,7 +109,7 @@ namespace Test {
 		ImgLoader loader(workingDir+"video.mp4", ImgLoader::DEVICE, frameSize, fps);
 		cout << "done" << endl;
 		imgAnalyzer = ImgAnalysis();
-		vector<Point2f> ledPoints(7);
+		vector<LedDescriptor> ledPoints(7);
 
 		const string settingsWindow("Settings");
 		const string processedFrame("Processed stream");
@@ -208,7 +208,7 @@ namespace Test {
 
 		auto posEstimator = PositionEstimation();
 		string imgName;
-		auto ledPoints = vector<Point2f>();
+		auto ledPoints = vector<LedDescriptor>();
 		ImgLoader loader;
 		if(path.compare("d") == 0)
 			loader = ImgLoader(path,ImgLoader::DEVICE);
@@ -256,7 +256,7 @@ namespace Test {
 
 			imgAnalyzer.evaluate(image, ledPoints, downscalingFactor);
 			for(uint i = 0; i < ledPoints.size(); ++i)
-				circle(image,ledPoints[i],20,Scalar(0,255,0),10);
+				circle(image,ledPoints[i].getPosition(),20,Scalar(0,255,0),10);
 
 			imshow("Original image", image);
 			ch = waitKey(0);

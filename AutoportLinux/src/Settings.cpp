@@ -37,16 +37,6 @@ Settings& Settings::getInstance() {
 	return *singleton;
 }
 
-/*
-Settings& Settings::getInstance(const string &configFilePath) {
-	if(singleton == nullptr)
-		singleton = new Settings(configFilePath);
-	else
-		singleton->loadConfiguration(configFilePath);
-	return *singleton;
-}
-*/
-
 bool Settings::loadConfiguration(const string &configFilePath) {
 
 	const char* path = configFilePath.c_str();

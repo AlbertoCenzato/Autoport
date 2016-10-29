@@ -22,18 +22,6 @@
 using namespace std;
 using namespace cv;
 
-enum Status {
-	LOOKING_FOR_TARGET,
-	FIRST_LANDING_PHASE,
-	SECOND_LANDING_PHASE,
-
-	HOVERING,
-	ERROR,
-	MANUAL_CONTROL,
-
-	LANDED
-};
-
 string workingDir;
 const string configFileName = "autoport.config";
 Status status = Status::LOOKING_FOR_TARGET;

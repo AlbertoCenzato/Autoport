@@ -7,6 +7,8 @@
 
 #include "IPPAnalysis.hpp"
 
+extern Status status;
+
 IPPAnalysis::IPPAnalysis(ImgLoader* loader) {
 	this->loader = loader;
 	imageAnalyzer 	  = ImgAnalysis();
@@ -29,7 +31,7 @@ bool IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 		return false;
 	}
 
-	vector<Point2f> points = vector<Point2f>(10);
+	vector<LedDescriptor> points(10);
 
 	bool success = imageAnalyzer.evaluate(image, points, 1);
 	if(!success) {
@@ -38,28 +40,21 @@ bool IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 	}
 	cout << "ImageAnalysis succeded!" << endl;
 
-	Scalar red(0,0,255);
-	for(uint i = 0; i < points.size(); ++i) {
-		string number = to_string(i);
-		putText(image, number, points[i], HersheyFonts::FONT_HERSHEY_PLAIN,
-				2,red,10,8);
-	}
-
-	success 	 = patternAnalyzer.evaluate(points, 10);
+	success = patternAnalyzer.evaluate(points, 10);
 	if(!success) {
+		status = Status::LOOKING_FOR_TARGET;
 		cerr << "PatternAnalysis failed!" << endl;
 		return false;
 	}
+	status = Status::FIRST_LANDING_PHASE;
 	cout << "PatternAnalysis succeded!" << endl;
 
 	Scalar blue(255,0,0);
-	for(int i = 0; i < points.size(); ++i) {
+	for(uint i = 0; i < points.size(); ++i) {
 		string number = to_string(i);
-		putText(image, number, points[i], HersheyFonts::FONT_HERSHEY_PLAIN,
+		putText(image, number, points[i].getPosition(), HersheyFonts::FONT_HERSHEY_PLAIN,
 				2,blue,10,8);
 	}
-
-
 
 	Rect roi;
 	findROI(points, roi);

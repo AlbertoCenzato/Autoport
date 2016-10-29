@@ -12,6 +12,18 @@ using namespace std;
 
 extern string workingDir;
 
+enum Status {
+	LOOKING_FOR_TARGET,
+	FIRST_LANDING_PHASE,
+	SECOND_LANDING_PHASE,
+
+	HOVERING,
+	ERROR,
+	MANUAL_CONTROL,
+
+	LANDED
+};
+
 template<typename varType> struct Interval {
 
 public:
@@ -230,52 +242,16 @@ namespace GenPurpFunc {
 		return abs(point.y - (line.m*(point.x) + line.q)) / sqrt(1 + pow(line.m, 2));
 	}
 
-	inline int findNearestPoint(const Point2f &point, const vector<Point2f> &vec) {
-		int minIndex = -1;
-		float minDist  = FLT_MAX;
-		const int SIZE = vec.size();
-		for(int i = 0; i < SIZE; ++i) {
-			float distance = distPoint2Point(point, vec[i]);
-			if(distance < minDist) {
-				minDist  = distance;
-				minIndex = i;
-			}
-		}
-
-		return minIndex;
-	}
-
-	inline int findNearestPoint(const Mat_<float> &point, const flann::GenericIndex<cvflann::L2<float>> &index) {
-		//vector<float> query = {point.x,point.y};
-		vector<int>		indices(1);
-		vector<float>	dists(1);
-		cvflann::SearchParams searchParams;
-		//index.knnSearch(query,indices,dists, 1, searchParams);
-		return indices[0];
-	}
-
-	inline Point2f centroid(const vector<KeyPoint> &points) {
-		float x = 0;
-		float y = 0;
-		uint size = points.size();
-		for (uint i = 0; i < size; i++) {
-			Point2f p = points.at(i).pt;
-			x += p.x;
-			y += p.y;
-		}
-		return Point2f(x/size, y/size);
-	}
-
 	inline Point2f centroid(const vector<Point2f> &points) {
 		float x = 0;
 		float y = 0;
-		uint size = points.size();
-		for (uint i = 0; i < size; i++) {
+		const int SIZE = points.size();
+		for (int i = 0; i < SIZE; i++) {
 			Point2f p = points.at(i);
 			x += p.x;
 			y += p.y;
 		}
-		return Point2f(x/size, y/size);
+		return Point2f(x/SIZE, y/SIZE);
 	}
 
 	inline void drawDetectedLed(Mat &image, const Point2f &keyPoint, const string &number) {

@@ -15,6 +15,8 @@
 using namespace std;
 using namespace cv;
 
+extern Status status;
+
 // Led recognition algorithm. Gives a number to every led using the numbering convention
 // in patterns' file (see "Sensori" folder in dropbox).
 // @points: vector of Point2f of the leds' blob centroid.
@@ -22,16 +24,21 @@ using namespace cv;
 // @tolerance: tolerance in the alignement (in pixels).
 //returns: vector of Point2f ordered with the numbering convention
 
-bool PatternAnalysis::evaluate(vector<Point2f> &ledPoints, int tolerance) {
+bool PatternAnalysis::evaluate(vector<LedDescriptor> &ledPoints, int tolerance) {
 
 	int blobNumber = ledPoints.size();
 	bool matchFound = false;
 
-	if(blobNumber < 8 && blobNumber > 3) {
-		matchFound = firstPhase(ledPoints);
+	if(status == Status::LOOKING_FOR_TARGET) {
+		if(blobNumber < 8 && blobNumber > 3) {
+			matchFound = firstPhase(ledPoints);
+		}
+		else {
+			cout << "Blob detection didn't work properly!" << endl;
+		}
 	}
-	else {
-		cout << "Blob detection didn't work properly!" << endl;
+	else if(status == Status::FIRST_LANDING_PHASE) {
+		matchFound = nearestPoints(ledPoints, 10);
 	}
 
 	return matchFound;
