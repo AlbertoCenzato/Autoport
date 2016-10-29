@@ -35,6 +35,8 @@ LedDescriptor::LedDescriptor(float x, float y, float hue, float saturation, floa
 
 LedDescriptor::~LedDescriptor() {}
 
+//TODO: maybe it would be better to give higher weight in the sum to led position
+//		maybe not
 float LedDescriptor::L2Dist(const LedDescriptor &ledDesc) const {
 	float sqSum = 0;
 	for(int i = 0; i < 6; ++i)

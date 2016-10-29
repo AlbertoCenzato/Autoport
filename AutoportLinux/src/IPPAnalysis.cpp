@@ -24,6 +24,9 @@ IPPAnalysis::~IPPAnalysis() {
 
 bool IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 
+	cout << "\n-----------------------------------------\n" << endl;
+
+	// retieve image from camera or video
 	Mat image;
 	bool retrieved = loader->getNextFrame(image);
 	if(!retrieved) {
@@ -33,16 +36,20 @@ bool IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 
 	vector<LedDescriptor> points(10);
 
+	// find leds
 	bool success = imageAnalyzer.evaluate(image, points, 1);
 	if(!success) {
 		cerr << "ImageAnalysis failed!" << endl;
 		return false;
 	}
-	cout << "ImageAnalysis succeded!" << endl;
 
-	success = patternAnalyzer.evaluate(points, 10);
+	// register leds to match pattern
+	success = patternAnalyzer.evaluate(points);
 	if(!success) {
-		status = Status::LOOKING_FOR_TARGET;
+		if(status == Status::FIRST_LANDING_PHASE || status == Status::SECOND_LANDING_PHASE) {
+			cout << "Target lost!" << endl;
+			status = Status::LOOKING_FOR_TARGET;
+		}
 		cerr << "PatternAnalysis failed!" << endl;
 		return false;
 	}
@@ -52,6 +59,7 @@ bool IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 	Scalar blue(255,0,0);
 	for(uint i = 0; i < points.size(); ++i) {
 		string number = to_string(i);
+		circle(image, points[i].getPosition(), 30, blue, 10);
 		putText(image, number, points[i].getPosition(), HersheyFonts::FONT_HERSHEY_PLAIN,
 				2,blue,10,8);
 	}
@@ -68,6 +76,7 @@ bool IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 	success		 = positionEstimator.evaluate(points, extrinsicFactors);
 	if(!success) return false;
 */
+
 
 	return true;
 }

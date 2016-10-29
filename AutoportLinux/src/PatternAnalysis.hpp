@@ -58,11 +58,13 @@ public:
 	 *
 	 * @return: true if a match is found, false otherwise
 	 */
-	bool evaluate(vector<LedDescriptor> &ledPoints, int tolerance);
+	bool evaluate(vector<LedDescriptor> &ledPoints);
 
 private:
 	vector<LedDescriptor> oldPoints;	// points at time t-1
 	vector<Point2f> pattern;	// model of the pattern, do not modify
+	float maxDistance = 75;
+	int minNumOfMatch = 4;
 
 	/*
 	 * WARNING! NOT WORKING by the moment. It was written for another led pattern!
@@ -73,29 +75,40 @@ private:
 	 * @ledPoints: points to evaluate
 	 * @tolerance: temporarly unused parameter
 	 *
-	 * @return: true if a match is found, false otherwise
+	 * @return: the number of matched leds
 	 */
-	bool nearestPoints(vector<LedDescriptor> &ledPoints, int tolerance) {
+	int nearestPoints(vector<LedDescriptor> &ledPoints) {
 
 		const int SIZE = ledPoints.size();
 		vector<LedDescriptor> matchedLeds(SIZE);
+		int matched = 0;
+
+		char *flags = new char[SIZE];
+		for(int i = 0; i < SIZE; ++i)
+			flags = 0;
 
 		for(int i = 0; i < SIZE; ++i) {
 			int index = findNearestPoint(oldPoints[i], ledPoints);
-			matchedLeds[i] = ledPoints[index];
+			if(index > -1) {
+				matchedLeds[i] = ledPoints[index];
+				GenPurpFunc::removeFromVec(index,ledPoints);
+				++matched;
+			}
 		}
 
 		ledPoints.clear();
 		ledPoints = matchedLeds;
 
-		return true;
+
+		delete [] flags;
+		return matched;
 	}
 
 	/*
 	 * Receives the points detected from the image
 	 * and states if they represent a pattern or not.
 	 * Used at time t = 0 (the very first frame) or when the drone
-	 * has lost track of the leds
+	 * has lost track of the leds.
 	 *
 	 * @ledPoints: points to evaluate
 	 * @tolerance: temporarly unused parameter
@@ -175,7 +188,7 @@ private:
 		return true;
 	}
 
-	inline int findNearestPoint(const LedDescriptor &point, const vector<LedDescriptor> &vec) {
+	int findNearestPoint(const LedDescriptor &point, const vector<LedDescriptor> &vec) {
 		int minIndex = -1;
 		float minDist  = FLT_MAX;
 		const int SIZE = vec.size();
@@ -186,6 +199,9 @@ private:
 				minIndex = i;
 			}
 		}
+
+		if(minDist > maxDistance)
+			return -1;
 
 		return minIndex;
 	}

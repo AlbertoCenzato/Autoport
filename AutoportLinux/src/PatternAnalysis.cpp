@@ -24,7 +24,7 @@ extern Status status;
 // @tolerance: tolerance in the alignement (in pixels).
 //returns: vector of Point2f ordered with the numbering convention
 
-bool PatternAnalysis::evaluate(vector<LedDescriptor> &ledPoints, int tolerance) {
+bool PatternAnalysis::evaluate(vector<LedDescriptor> &ledPoints) {
 
 	int blobNumber = ledPoints.size();
 	bool matchFound = false;
@@ -38,10 +38,11 @@ bool PatternAnalysis::evaluate(vector<LedDescriptor> &ledPoints, int tolerance) 
 		}
 	}
 	else if(status == Status::FIRST_LANDING_PHASE) {
-		matchFound = nearestPoints(ledPoints, 10);
+		int matched = nearestPoints(ledPoints);
+		if(matched >= minNumOfMatch)
+			matchFound = true;
 	}
 
 	return matchFound;
-
 }
 
