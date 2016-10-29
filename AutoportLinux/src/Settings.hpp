@@ -47,15 +47,11 @@ public:
 
 	Position_XYZ_YPR initialPosition = Position_XYZ_YPR(0,0,2000,0,0,0);
 
-	// TODO: change default led positions
-	vector<Point3d> realWorldPoints = {{90, 70,0},
-	                                   {90, 30,0},
-	                                   {90,-90,0},
-	                                   {50, 70,0},
-	                                   {50, 30,0},
-	                                   {50,-90,0},
-	                                  {-90, 70,0},
-	                                  {-90, 90,0}};
+	vector<Point3d> realWorldPoints = {{ 90,-90, 0},
+	                                   {-90, 70, 0},
+	                                   { 50, 70,20},
+	                                   { 90, 70, 0},
+	                                   { 90,-90, 0}};
 
 	double focalX = 3.59;
 	double focalY = 3.59;

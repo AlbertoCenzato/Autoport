@@ -15,9 +15,7 @@ IPPAnalysis::IPPAnalysis(ImgLoader* loader) {
 	tol = Settings::getInstance().ROITolerance;
 }
 
-IPPAnalysis::~IPPAnalysis() {
-	// TODO Auto-generated destructor stub
-}
+IPPAnalysis::~IPPAnalysis() {}
 
 
 bool IPPAnalysis::evaluate(Mat& extrinsicFactors) {

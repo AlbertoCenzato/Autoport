@@ -43,7 +43,6 @@ public:
 			pattern[i] = Point2f(settings.realWorldPoints[i].x,settings.realWorldPoints[i].y);
 		}
 
-		//FIXME: "pattern" must be a Mat object
 		//kdTree = new flann::GenericIndex<cvflann::L2<float>>(pattern, params);
 	}
 
@@ -65,7 +64,6 @@ public:
 	bool evaluate(vector<Point2f> &ledPoints, int tolerance);
 
 private:
-	// TODO: change with a KD-tree
 	vector<Point2f> oldPoints;	// points at time t-1
 	vector<Point2f> pattern;	// model of the pattern, do not modify
 	//flann::GenericIndex<cvflann::L2<float>>* kdTree;
@@ -129,9 +127,6 @@ private:
 
 		auto kdTree = flann::GenericIndex<cvflann::L2<float>>(Mat(prevLedPoints),params);
 
-
-
-		//FIXME: can't always return true!
 		return true;
 	}
 
@@ -148,67 +143,6 @@ private:
 	bool firstPhase(vector<Point2f> &ledPoints) {
 
 		const int SIZE = ledPoints.size();
-		//assert(SIZE == pattern.size() && "PatternAnalysis error! RANSAC ledPoints vector and pattern vector don't have the same size");
-
-		/*
-		// find the homography that transforms ledPoints points in pattern points
-
-		//FIXME: can't find the homography! The difference between ledpoints and pattern
-		//		 is not a simple plane projection?
-
-		cout << "ledPoints" << ledPoints << endl;
-		Point2f ledCenter = GenPurpFunc::centroid(ledPoints);
-		Point2f patCenter = GenPurpFunc::centroid(pattern);
-		cout << "ledCenter " << ledCenter << endl;
-		cout << "patCenter " << patCenter << endl;
-
-		Point2f dist = ledCenter - patCenter;
-		for(int i = 0; i < SIZE; ++i)
-			ledPoints[i] = ledPoints[i] - dist;
-		cout << "ledPoints" << ledPoints << endl;
-
-		Mat_<float> H = findHomography(pattern, ledPoints, RANSAC);
-
-		if(H.empty()) {
-			cout << "homography not found!" << endl;
-			return false;
-		}
-
-		cout << "Homography matrix: " << H << endl;
-
-		cout << "LedPoints: " << ledPoints << endl;
-		vector<Point3f> homogLedPoints(SIZE);
-		for(int i = 0; i < SIZE; ++i)
-			homogLedPoints[i] = Point3f(ledPoints[i].x, ledPoints[i].y, 1);
-
-		// apply the homography to each point
-		vector<Point3f> out(SIZE);
-		cv::transform(homogLedPoints,out,H);
-		//Point2f transPoints = H*ledPoints[0];
-
-		cout << "Transformed points: " << out << endl;
-		cout << "Pattern points: " 	   << pattern << endl;
-
-		// find the nearest point
-		// TODO: use a KD-tree
-
-		/*
-		int *flag = new int[SIZE];
-		for(int i = 0; i < SIZE; ++i)
-			flag[i] = -1;
-
-		for(int i = 0; i < SIZE; ++i) {
-			int index = GenPurpFunc::findNearestPoint(transPoints.col(i),*kdTree);
-			if(flag[i] == 1) {
-				cout << "ERROR!! overlapping points" << endl;
-				return false;
-			}
-			flag[i] = 1;
-			//ledPoints[index] = tmp[i];
-		}
-
-		delete [] flag;
-		*/
 
 		int minIndex1 = 0;
 		int minIndex2 = 1;
