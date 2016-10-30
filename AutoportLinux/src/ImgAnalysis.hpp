@@ -9,31 +9,25 @@ using namespace cv;
 
 class ImgAnalysis {
 
-	Rect regionOfInterest;
 	Interval<Scalar> colorInterval;
 
-	int colorTolerance;
-	int ROItolerance;	//region of interest cropping tolerance [px]
-	int sizeTolerance;
-	int sizeSupTolerance;
+	//int colorTolerance;
 	SimpleBlobDetector::Params params;
 	int colorConversion;
-
-	Interval<float> oldKeyPointSizeInterval;
 
 	Mat originalImage;
 
 public:
 
-	ImgAnalysis(const Interval<Scalar> &colorInterval, LedColor ledColor, const Rect &regionOfInterest = Rect(0,0,0,0)) {
-		constructor(colorInterval, ledColor, regionOfInterest);
+	ImgAnalysis(const Interval<Scalar> &colorInterval, LedColor ledColor) {
+		constructor(colorInterval, ledColor);
 	}
 
 	ImgAnalysis() {
 
 		Settings& settings = Settings::getInstance();
-		Scalar low  = Scalar(settings.hue.low, settings.saturation.low, settings.value.low);
-		Scalar high = Scalar(settings.hue.high, settings.saturation.high, settings.value.high);
+		Scalar low  = Scalar(settings.hue.min, settings.saturation.min, settings.value.min);
+		Scalar high = Scalar(settings.hue.max, settings.saturation.max, settings.value.max);
 
 		//auto patternAnalysis = PatternAnalysis();
 		constructor(Interval<Scalar>(low,high), settings.patternColor);
@@ -42,29 +36,27 @@ public:
 	~ImgAnalysis() {}
 
 	bool evaluate(Mat &image, vector<LedDescriptor> &points, float downscalingFactor);
-	ImgAnalysis* setROItolerance(int);
-	ImgAnalysis* setColorTolerance(int);
-	ImgAnalysis* setSizeTolerance(int);
+	//ImgAnalysis* setColorTolerance	(int);
+	ImgAnalysis* setSizeTolerance	(int);
 	ImgAnalysis* setSizeSupTolerance(int);
-	ImgAnalysis* setColorInterval(Interval<Scalar> &colorInterval);
+	ImgAnalysis* setColorInterval	(const Interval<Scalar> &colorInterval);
+	ImgAnalysis* setBlobSizeInterval(const Interval<int> 	&blobSizeInterval);
 
 	void getColorInterval(Interval<Scalar> &colorInterval);
 
 private:
 
-	void constructor(const Interval<Scalar> &colorInterval, LedColor ledColor, const Rect &regionOfInterest = Rect(0,0,0,0)) {
+	void constructor(const Interval<Scalar> &colorInterval, LedColor ledColor) {
 		this->colorInterval = colorInterval; //FIXME: what happens here? is it coping the object? Probably yes
 
 		if(ledColor == LedColor::RED) colorConversion = COLOR_RGB2HSV;
 		else						  colorConversion = COLOR_BGR2HSV;
 
-		this->regionOfInterest = regionOfInterest;
-
 		params = SimpleBlobDetector::Params();
 
 		params.filterByColor = true;
 		params.blobColor = 255;
-		params.filterByArea = false;
+		params.filterByArea = false;	//FIXME: set this to true and find default params
 		//params.minArea = 0;
 		//params.maxArea = 10000;
 		params.filterByInertia = false;
@@ -74,12 +66,7 @@ private:
 		//params.maxCircularity = 1;
 
 		Settings& settings = Settings::getInstance();
-		colorTolerance   = settings.colorTolerance;
-		ROItolerance     = settings.ROITolerance;
-		sizeTolerance    = settings.sizeTolerance;
-		sizeSupTolerance = settings.sizeSupTolerance;
-
-		oldKeyPointSizeInterval = Interval<float>(0,0);
+		//colorTolerance   = settings.colorTolerance;
 	}
 
 	// Processes the input image (in HSV color space) filtering out (setting to black)
@@ -91,7 +78,7 @@ private:
 	void filterByColor(const Mat &hsvImg, Mat &colorFilteredImg) {
 
 		// Sets to white all colors in the threshold interval [min,max] and to black the others
-		inRange(hsvImg, colorInterval.low, colorInterval.high, colorFilteredImg);
+		inRange(hsvImg, colorInterval.min, colorInterval.max, colorFilteredImg);
 
 		//morphological opening (remove small objects from the foreground)
 		erode (colorFilteredImg, colorFilteredImg, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
@@ -114,13 +101,6 @@ private:
 		//TODO: check this way of computing valid led sizes interval: it can lead to
 		//a degeneration of the interval amplitude continuously increasing it in presence
 		//of noise similar to leds, maybe it would be better to use the medium value of led sizes
-
-		/*
-		if(oldKeyPointSizeInterval.high != 0 && oldKeyPointSizeInterval.low != 0) {
-			params.maxArea = oldKeyPointSizeInterval.high;
-			params.minArea = oldKeyPointSizeInterval.low;
-		}
-		*/
 
 		ledPoints.clear();
 		vector<KeyPoint> keyPoints(10);
@@ -150,7 +130,7 @@ private:
 			}
 			meanDist = meanDist / SIZE;
 
-			// remove points
+			// remove points too far away points
 			int size = SIZE;
 			for (int i = 0; i < size; ) {
 				if (distances[i] > 2 * meanDist) {
@@ -161,19 +141,6 @@ private:
 				else i++;
 				size = ledPoints.size();
 			}
-
-			//TODO: remove this line
-			cout << "ledPoints length: " << size << endl;
-
-			float min = keyPoints[0].size;
-			float max = min;
-			for(uint i = 1; i < keyPoints.size(); i++) {
-				float newSize = keyPoints[i].size;
-				if(newSize < min)	min = newSize;
-				if(newSize > max)	max = newSize;
-			}
-			oldKeyPointSizeInterval.low  = min;
-			oldKeyPointSizeInterval.high = max;
 
 			delete [] distances;
 		}

@@ -106,7 +106,7 @@ namespace Test {
 		Size frameSize(800,600);
 		int fps = 25;
 		cout << "opening image loader" << endl;
-		ImgLoader loader(workingDir+"video.mp4", ImgLoader::DEVICE, frameSize, fps);
+		ImgLoader loader(workingDir+"video.mp4", SourceType::sDEVICE, frameSize, fps);
 		cout << "done" << endl;
 		imgAnalyzer = ImgAnalysis();
 		vector<LedDescriptor> ledPoints(7);
@@ -119,8 +119,8 @@ namespace Test {
 		Interval<Scalar> colorInterval;
 		imgAnalyzer.getColorInterval(colorInterval);
 
-		Scalar h = colorInterval.high;
-		Scalar l = colorInterval.low;
+		Scalar h = colorInterval.max;
+		Scalar l = colorInterval.min;
 
 		maxHue = h[0];
 		maxSat = h[1];
@@ -180,7 +180,7 @@ namespace Test {
 	void cameraCapture() {
 
 		//Size frameSize(800,600);
-		auto loader = ImgLoader("", ImgLoader::DEVICE);
+		auto loader = ImgLoader("", SourceType::sDEVICE);
 		const string windowName("Video stream");
 		namedWindow(windowName, WINDOW_AUTOSIZE);
 
@@ -211,16 +211,16 @@ namespace Test {
 		auto ledPoints = vector<LedDescriptor>();
 		ImgLoader loader;
 		if(path.compare("d") == 0)
-			loader = ImgLoader(path,ImgLoader::DEVICE);
+			loader = ImgLoader(path, SourceType::sDEVICE);
 		else
-			loader = ImgLoader(path,ImgLoader::FILE);
+			loader = ImgLoader(path, SourceType::sFILE);
 
 		Interval<Scalar> colorInterval;
 		imgAnalyzer = ImgAnalysis();
 		imgAnalyzer.getColorInterval(colorInterval);
 
-		Scalar h = colorInterval.high;
-		Scalar l = colorInterval.low;
+		Scalar h = colorInterval.max;
+		Scalar l = colorInterval.min;
 
 		maxHue = h[0];
 		maxSat = h[1];
@@ -295,9 +295,9 @@ namespace Test {
 	void ippAnalysis(const string& path) {
 		ImgLoader loader;
 		if(path.compare("d") == 0)
-			loader = ImgLoader(path,ImgLoader::DEVICE);
+			loader = ImgLoader(path, SourceType::sDEVICE);
 		else
-			loader = ImgLoader(path,ImgLoader::FILE);
+			loader = ImgLoader(path, SourceType::sFILE);
 
 		cout << "LOADER OK" << endl;
 
@@ -308,6 +308,7 @@ namespace Test {
 			ipp.evaluate(extrinsicFactors);
 			ch = waitKey(0);
 		}
+
 	}
 }
 

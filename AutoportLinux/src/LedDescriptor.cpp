@@ -53,10 +53,8 @@ Point2f LedDescriptor::getPosition() const {
 	return Point2f(values[0], values[1]);
 }
 
-void LedDescriptor::getColor(Scalar &color) const{
-	color[0] = values[2];
-	color[1] = values[3];
-	color[2] = values[4];
+Scalar LedDescriptor::getColor() const {
+	return Scalar(values[2],values[3],values[4]);
 }
 
 float LedDescriptor::getSize() const{

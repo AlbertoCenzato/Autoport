@@ -24,8 +24,8 @@ public:
 	float cartDist(const LedDescriptor &ledDesc) const;
 
 	Point2f getPosition() const;
-	void    getColor(Scalar &color) const;
-	float   getSize() const;
+	Scalar  getColor()    const;
+	float   getSize() 	  const;
 
 	bool isEmpty();
 
