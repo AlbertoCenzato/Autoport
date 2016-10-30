@@ -14,7 +14,7 @@ IPPAnalysis::IPPAnalysis(ImgLoader* loader) {
 	imageAnalyzer 	  = ImgAnalysis();
 	patternAnalyzer   = PatternAnalysis();
 	positionEstimator = PositionEstimation();
-	tol = Settings::getInstance().ROITolerance;
+	ROItolerance = Settings::getInstance().ROITolerance;
 }
 
 IPPAnalysis::~IPPAnalysis() {}
@@ -31,6 +31,10 @@ bool IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 		cerr << "Couldn't retrieve frame!" << endl;
 		return false;
 	}
+
+	imshow("Frame", image);
+
+	waitKey(1);
 
 	vector<LedDescriptor> points(10);
 
@@ -72,9 +76,13 @@ bool IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 	cout << roi << endl;
 	namedWindow("ROI",WINDOW_NORMAL);
 	imshow("ROI",image);
-/*
+
+	updateImgRes(points);
+
+	/*
 	success		 = positionEstimator.evaluate(points, extrinsicFactors);
 	if(!success) return false;
-*/
+	*/
+
 	return true;
 }

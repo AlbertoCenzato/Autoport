@@ -27,17 +27,17 @@ enum Status {
 template<typename varType> struct Interval {
 
 public:
-	varType low;
-	varType high;
+	varType min;
+	varType max;
 
 	Interval<varType>() {	}
 
-	Interval<varType>(varType low, varType high) : low(low), high(high) {}
+	Interval<varType>(varType min, varType max) : min(min), max(max) {}
 
 	//Interval<varType>& Interval<varType>::operator=(Interval<varType> interval) { return interval;}
 
 	string toString() {
-		return to_string(low) + " " + to_string(high);
+		return to_string(min) + " " + to_string(max);
 	}
 };
 

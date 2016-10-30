@@ -13,51 +13,74 @@
 using namespace std;
 using namespace cv;
 
-ImgLoader::ImgLoader(const string &source, int type, const Size &frameSize, int fps) {
+ImgLoader::ImgLoader(const string &source, SourceType type, const Size &frameSize, int fps) {
 	if(cleverConstr(source,type,frameSize,fps))
 		cerr << "Error setting capture parameters!" << endl;
 
 }
 
-ImgLoader::ImgLoader(const string &source, int type) {
+ImgLoader::ImgLoader(const string &source, SourceType type) {
 
-	Size frameSize(640,480);
-	if(cleverConstr(source, type, frameSize, capture.get(CAP_PROP_FPS)))
+	if(cleverConstr(source, type))
 		cerr << "Error setting capture parameters!" << endl;
 }
 
-ImgLoader::ImgLoader() : ImgLoader("",DEVICE) {}
+ImgLoader::ImgLoader() {}
 
 
 bool ImgLoader::getNextFrame(Mat &frame) {
 	capture >> frame;
-	if(!frame.empty() && sourceType == FILE)
+	if(frame.empty())
+		return false;
+
+	if(sourceType == sFILE) {
 		frame = frame(roi);
-	return !frame.empty();
+		if(resizeDynamically)
+			resize(frame,frame,res,0,0,INTER_LANCZOS4);
+	}
+
+	return true;
 }
 
 int  ImgLoader::getFrameWidth () {
-	if(sourceType == FILE && roi.width != 0 && roi.height != 0)
+	if(sourceType == sFILE && roi.width != 0 && roi.height != 0)
 		return roi.width;
 	return capture.get(CV_CAP_PROP_FRAME_WIDTH );
 }
 int  ImgLoader::getFrameHeight() {
-	if(sourceType == FILE && roi.width != 0 && roi.height != 0)
+	if(sourceType == sFILE && roi.width != 0 && roi.height != 0)
 			return roi.height;
 	return capture.get(CV_CAP_PROP_FRAME_HEIGHT);
 }
 
 bool ImgLoader::setFrameWidth (int frameWidth)  {
-	bool success = capture.set(CV_CAP_PROP_FRAME_WIDTH,  frameWidth);
-	if(success)
+	bool success = false;
+	if(sourceType == sFILE) {
+		resizeDynamically = true;
+		success = true;
+	}
+	else {
 		res.width = frameWidth;
+		success = capture.set(CV_CAP_PROP_FRAME_WIDTH,  frameWidth);
+	}
+	if(success) {
+		res.width = frameWidth;
+	}
 	return success;
 }
 
 bool ImgLoader::setFrameHeight(int frameHeight) {
-	bool success = capture.set(CV_CAP_PROP_FRAME_HEIGHT, frameHeight);
-	if(success)
+	bool success = false;
+	if(sourceType == sFILE) {
+		resizeDynamically = true;
+		success = true;
+	}
+	else {
+		success = capture.set(CV_CAP_PROP_FRAME_HEIGHT, frameHeight);
+	}
+	if(success) {
 		res.height = frameHeight;
+	}
 	return success;
 }
 
@@ -74,7 +97,7 @@ bool ImgLoader::setROI(const Rect& roi) {
 	if(roiHeight + y > res.height) roiHeight = res.height - y;
 	this->roi = Rect(x, y, roiWidth, roiHeight);
 
-	if(sourceType == DEVICE) {
+	if(sourceType == SourceType::sDEVICE) {
 		// TODO: set roi on the device
 	}
 	return true;
@@ -82,6 +105,10 @@ bool ImgLoader::setROI(const Rect& roi) {
 
 void ImgLoader::clearROI() {
 	roi = Rect(0, 0, res.width, res.height);
+}
+
+bool ImgLoader::halveRes() {
+	return setFrameHeight(res.height / 2) && setFrameWidth(res.width / 2);
 }
 
 

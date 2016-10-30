@@ -15,16 +15,20 @@
 using namespace std;
 using namespace cv;
 
+enum SourceType {
+	sNONE,
+	sFILE,
+	sDEVICE,
+	sSTREAM
+};
+
+
 class ImgLoader {
 public:
 
-	static const int FILE 	= 0;
-	static const int DEVICE = 1;
-	static const int STREAM	= 2;
-
 	ImgLoader();
-	ImgLoader(const std::string &source, int type);
-	ImgLoader(const std::string &source, int type, const Size &frameSize, int fps);	//FIXME setting frameSize throws an exception when reding frame
+	ImgLoader(const string &source, SourceType type);
+	ImgLoader(const string &source, SourceType type, const Size &frameSize, int fps);	//FIXME setting frameSize throws an exception when reding frame
 
 	void begin() { capture.set(CV_CAP_PROP_POS_FRAMES,0); }
 
@@ -42,34 +46,36 @@ public:
 	bool setFrameHeight(int frameHeight);
 	bool setROI(const Rect& roi);
 
+	bool halveRes();
+
 private:
 
 	VideoCapture capture;
 	int fps = 30;
-	int sourceType;
+	SourceType sourceType = sNONE;
 	bool opened = false;
 	Rect roi;				// region of interest
 	Size res;				// resolution
+	bool resizeDynamically = false;
 
-	bool constructor(const std::string &source, int type) {
+	bool constructor(const string &source, SourceType type) {
 		switch(type) {
-		case DEVICE:
-			sourceType = DEVICE;
+		case sDEVICE:
 			capture = VideoCapture(0);
 			break;
-		case FILE:
-			sourceType = FILE;
+		case sFILE:
 			capture = VideoCapture(source);
 			break;
-		case STREAM:	// TODO: never tested, may have some bugs...
-			sourceType = STREAM;
+		case sSTREAM:	// WARNING: never tested, may have some bugs...
 			capture = VideoCapture(source, CAP_FFMPEG);
 			break;
+		case sNONE:
+			return true;
 		}
+		sourceType = type;
 
 		if(!capture.isOpened()) {
 			opened = false;
-			cerr << "Cannot find input" << endl;
 			return false;
 		}
 
@@ -80,17 +86,22 @@ private:
 		return true;
 	}
 
-	bool cleverConstr(const std::string &source, int type, const Size &frameSize, int fps) {
+	bool cleverConstr(const string &source, SourceType type, const Size &frameSize = Size(0,0), int fps = 30) {
 
-		if(!constructor(source, type))
+		if(!constructor(source, type)) {
+			cerr << "Cannot find input" << endl;
 			return false;
+		}
 
-		cout << "Found input, " << fps << "fps" << endl;
+		cout << "Found input!" << endl;
 
-		bool success = 	 	 setFrameHeight(frameSize.height);
-		success = success && setFrameWidth(frameSize.width);
-		success = success && capture.set(CAP_PROP_FPS, fps);
-		success = success && capture.set(CAP_PROP_BRIGHTNESS, 0.0001);
+		bool success = true;
+		if(frameSize.height != 0 && frameSize.width != 0) {
+			success = 	 	 	 setFrameHeight(frameSize.height);
+			success = success && setFrameWidth (frameSize.width);
+		}
+		//success = success && capture.set(CAP_PROP_FPS, fps);
+		//success = success && capture.set(CAP_PROP_BRIGHTNESS, 0.0001);
 
 		// if an error occurs fall back to default camera parameters
 		if(!success) {
