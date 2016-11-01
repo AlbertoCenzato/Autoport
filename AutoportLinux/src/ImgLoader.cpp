@@ -34,9 +34,9 @@ bool ImgLoader::getNextFrame(Mat &frame) {
 		return false;
 
 	if(sourceType == sFILE) {
-		frame = frame(roi);
 		if(resizeDynamically)
 			resize(frame,frame,res,0,0,INTER_LANCZOS4);
+		frame = frame(roi);
 	}
 
 	return true;
@@ -97,18 +97,31 @@ bool ImgLoader::setROI(const Rect& roi) {
 	if(roiHeight + y > res.height) roiHeight = res.height - y;
 	this->roi = Rect(x, y, roiWidth, roiHeight);
 
+	bool success = true;
 	if(sourceType == SourceType::sDEVICE) {
-		// TODO: set roi on the device
+		// TODO: add the code for change device resolution here
+		success = false;
 	}
-	return true;
+	return success;
 }
 
-void ImgLoader::clearROI() {
+bool ImgLoader::resetRes() {
+	bool success = setFrameWidth( defRes.width);
+	success = success && setFrameHeight(defRes.height);
+	resizeDynamically = !success;
+	return success;
+}
+
+void ImgLoader::resetROI() {
 	roi = Rect(0, 0, res.width, res.height);
 }
 
 bool ImgLoader::halveRes() {
 	return setFrameHeight(res.height / 2) && setFrameWidth(res.width / 2);
+}
+
+bool ImgLoader::doubleRes() {
+	return setFrameHeight(res.height * 2) && setFrameWidth(res.width * 2);
 }
 
 

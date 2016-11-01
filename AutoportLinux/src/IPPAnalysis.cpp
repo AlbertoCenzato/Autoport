@@ -11,10 +11,16 @@ extern Status status;
 
 IPPAnalysis::IPPAnalysis(ImgLoader* loader) {
 	this->loader = loader;
+	Settings& settings =  Settings::getInstance();
 	imageAnalyzer 	  = ImgAnalysis();
 	patternAnalyzer   = PatternAnalysis();
 	positionEstimator = PositionEstimation();
-	ROItolerance = Settings::getInstance().ROITolerance;
+
+	ROITol     = settings.ROITolerance;
+	sizeInfTol = 4;							//FIXME: add this to Settings
+	sizeSupTol = settings.sizeSupTolerance;
+	sizeTol    = settings.sizeTolerance;
+	colorTol   = settings.colorTolerance;
 }
 
 IPPAnalysis::~IPPAnalysis() {}
@@ -31,10 +37,6 @@ bool IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 		cerr << "Couldn't retrieve frame!" << endl;
 		return false;
 	}
-
-	imshow("Frame", image);
-
-	waitKey(1);
 
 	vector<LedDescriptor> points(10);
 
@@ -68,16 +70,13 @@ bool IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 		}
 	}
 
-	Rect roi;
-	findROI(points, roi);
-	loader->setROI(roi);
-	roi = loader->getROI();
-	rectangle(image,roi,Scalar(255,255,255));
-	cout << roi << endl;
-	namedWindow("ROI",WINDOW_NORMAL);
-	imshow("ROI",image);
+	if(success) {
+		updateROI(points);
+		updateImgRes(points);
 
-	updateImgRes(points);
+		//TODO: find an adequate tolerance for each color channel
+		//updateColor(points);
+	}
 
 	/*
 	success		 = positionEstimator.evaluate(points, extrinsicFactors);
@@ -85,4 +84,8 @@ bool IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 	*/
 
 	return true;
+}
+
+bool IPPAnalysis::reset() {
+	return resetROIandRes() && resetColor();
 }

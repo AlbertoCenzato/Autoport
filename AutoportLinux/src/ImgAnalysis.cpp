@@ -9,10 +9,12 @@ using namespace std;
 
 bool ImgAnalysis::evaluate(Mat &image, vector<LedDescriptor> &points, float downscalingFactor) {
 
-	originalImage = image;
 
 	Mat hsvImg;
 	Mat colorFilteredImg;
+
+	namedWindow("Original image", WINDOW_NORMAL);
+	imshow("Original image", image);
 
 	//change color space: from BGR to HSV;
     //TODO: color conversion and filterByColor can be performed with a shader (?)
@@ -21,7 +23,8 @@ bool ImgAnalysis::evaluate(Mat &image, vector<LedDescriptor> &points, float down
 	auto end = chrono::high_resolution_clock::now();
 	cout << "\nConvert color: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
 
-	imshow("HSV image", hsvImg);
+	hsvImage = hsvImg;
+
 
 	//filter the color according to this->low and this->high tolerances
 	begin = chrono::high_resolution_clock::now();
@@ -29,6 +32,7 @@ bool ImgAnalysis::evaluate(Mat &image, vector<LedDescriptor> &points, float down
 	end = chrono::high_resolution_clock::now();
 	cout << "\nFilter color: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
 
+	namedWindow("Filtered image", WINDOW_NORMAL);
 	imshow("Filtered image", colorFilteredImg);
 
 	//put in this->points detected blobs that satisfy this->params tolerance
@@ -37,19 +41,10 @@ bool ImgAnalysis::evaluate(Mat &image, vector<LedDescriptor> &points, float down
 	end = chrono::high_resolution_clock::now();
 	cout << "\nFound " << blobNumber << " blobs: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
 
-	namedWindow("Blobs found", WINDOW_NORMAL);
-	imshow("Blobs found", colorFilteredImg);
 	waitKey(1);
 
 	return true;
 }
-
-/*
-ImgAnalysis* ImgAnalysis::setColorTolerance(int colorTolerance) {
-	this->colorTolerance = colorTolerance;
-	return this;
-}
-*/
 
 ImgAnalysis* ImgAnalysis::setColorInterval(const Interval<Scalar> &colorInterval) {
 	this->colorInterval.max[0] = colorInterval.max[0];

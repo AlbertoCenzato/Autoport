@@ -15,7 +15,7 @@ class ImgAnalysis {
 	SimpleBlobDetector::Params params;
 	int colorConversion;
 
-	Mat originalImage;
+	Mat hsvImage;
 
 public:
 
@@ -114,7 +114,7 @@ private:
 
 			for(int i = 0; i < SIZE; ++i) {
 				Point2f position = keyPoints[i].pt;
-				Scalar  color 	 = originalImage.at<Vec3b>(position);
+				Scalar  color 	 = hsvImage.at<Vec3b>(position);
 				ledPoints.push_back(LedDescriptor(position,color,keyPoints[i].size));
 			}
 

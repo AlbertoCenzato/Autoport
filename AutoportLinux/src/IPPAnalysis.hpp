@@ -22,6 +22,7 @@ public:
 	virtual ~IPPAnalysis();
 
 	bool evaluate(Mat& extrinsicFactors);
+	bool reset();
 
 private:
 
@@ -29,55 +30,87 @@ private:
 	ImgAnalysis imageAnalyzer;
 	PatternAnalysis patternAnalyzer;
 	PositionEstimation positionEstimator;
-	int ROItolerance = 50;
-	int sizeTolerance;
-	int sizeSupTolerance;
+	int ROITol = 50;
+	int sizeTol;
+	int sizeSupTol;
+	int sizeInfTol;
 	int colorTol;
 
-	void findROI(const vector<LedDescriptor>& descriptors, Rect& roi) {
+	bool updateROI(const vector<LedDescriptor>& descriptors) {
 		const int SIZE = descriptors.size();
 		vector<Point2f> points(SIZE);
 		for(int i = 0; i < SIZE; ++i)
 			points[i] = descriptors[i].getPosition();
 		Rect boundBox = boundingRect(points);
-		int x = boundBox.x - ROItolerance;
-		int y = boundBox.y - ROItolerance;
-		int roiWidth  = boundBox.width  + 2*ROItolerance;
-		int roiHeight = boundBox.height + 2*ROItolerance;
-		roi = Rect(x, y, roiWidth, roiHeight);
+		int x = boundBox.x - ROITol;
+		int y = boundBox.y - ROITol;
+		int roiWidth  = boundBox.width  + 2*ROITol;
+		int roiHeight = boundBox.height + 2*ROITol;
+
+		return loader->setROI(Rect(x, y, roiWidth, roiHeight));
 	}
 
-	void updateImgRes(const vector<LedDescriptor> &descriptors) {
+	bool updateImgRes(const vector<LedDescriptor> &descriptors) {
 		const int SIZE = descriptors.size();
 		float meanSize = 0;
 		for(int i = 0; i < SIZE; ++i)
 			meanSize += descriptors[i].getSize();
 		meanSize /= SIZE;
 
-		if(meanSize > sizeSupTolerance) {
-			loader->halveRes();
-			meanSize /= 4;
+		bool success = true;
+		if(meanSize > sizeSupTol) {
+			success = loader->halveRes();
+			if(success)
+				meanSize /= 4;
+		}
+		else if(meanSize < sizeInfTol) {
+			success = loader->doubleRes();
+			if(success)
+				meanSize *= 4;
 		}
 
-		imageAnalyzer.setBlobSizeInterval(Interval<int>(meanSize - sizeTolerance,meanSize + sizeTolerance));
+		imageAnalyzer.setBlobSizeInterval(Interval<int>(meanSize - sizeTol,meanSize + sizeTol));
+
+		return success;
 	}
 
-	void updateColor(const vector<LedDescriptor> &descriptors) {
+	bool updateColor(const vector<LedDescriptor> &descriptors) {
 		const int SIZE = descriptors.size();
-		int meanHue = 0, meanSat = 0, meanVal = 0;
+		float sum[] = {0,0,0};
 		for(int i = 0; i < SIZE; ++i) {
 			Scalar color = descriptors[i].getColor();
-			meanHue += color[0];
-			meanSat += color[1];
-			meanVal += color[2];
+			sum[0] += color[0];
+			sum[1] += color[1];
+			sum[2] += color[2];
 		}
-		meanHue /= SIZE;
-		meanSat /= SIZE;
-		meanVal /= SIZE;
 
-		Scalar minCol(meanHue - colorTol, meanSat - colorTol, meanVal - colorTol);
-		Scalar maxCol(meanHue + colorTol, meanSat + colorTol, meanVal + colorTol);
+		Scalar minCol, maxCol;
+		for(int i = 0; i < 3; ++i) {
+			float avrg = sum[i]/SIZE;
+			int x = avrg - colorTol;
+			if(x < 0) x = 0;
+			minCol[i] = x;
+			x = avrg + colorTol;
+			if(x > 255) x = 255;
+			maxCol[i] = x;
+		}
+
 		imageAnalyzer.setColorInterval(Interval<Scalar>(minCol,maxCol));
+
+		return true;
+	}
+
+	bool resetROIandRes() {
+		bool success = loader->resetRes();
+		if(!success)
+			return false;
+		loader->resetROI();
+		return true;
+	}
+
+	bool resetColor() {
+
+		return true;
 	}
 
 };

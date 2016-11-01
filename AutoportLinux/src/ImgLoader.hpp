@@ -38,7 +38,6 @@ public:
 	int  getFrameHeight();
 	Rect getROI() { return roi; }
 
-	void clearROI();
 
 	bool isOpen() { return capture.isOpened() && opened; }
 
@@ -46,7 +45,11 @@ public:
 	bool setFrameHeight(int frameHeight);
 	bool setROI(const Rect& roi);
 
+	bool resetRes();
+	void resetROI();
+
 	bool halveRes();
+	bool doubleRes();
 
 private:
 
@@ -56,6 +59,7 @@ private:
 	bool opened = false;
 	Rect roi;				// region of interest
 	Size res;				// resolution
+	Size defRes;			// default resolution
 	bool resizeDynamically = false;
 
 	bool constructor(const string &source, SourceType type) {
@@ -79,7 +83,10 @@ private:
 			return false;
 		}
 
-		res = Size(getFrameWidth(),getFrameHeight());
+		int width  = getFrameWidth();
+		int height = getFrameHeight();
+		res    = Size(width,height);
+		defRes = Size(width,height);
 		roi = Rect(0, 0, res.width, res.height);
 
 		opened = true;

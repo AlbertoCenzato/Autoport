@@ -24,21 +24,21 @@ extern Status status;
 // @tolerance: tolerance in the alignement (in pixels).
 //returns: vector of Point2f ordered with the numbering convention
 
-bool PatternAnalysis::evaluate(vector<LedDescriptor> &ledPoints) {
+bool PatternAnalysis::evaluate(vector<LedDescriptor> &descriptors) {
 
-	int blobNumber = ledPoints.size();
+	int blobNumber = descriptors.size();
 	bool matchFound = false;
 
 	if(status == Status::LOOKING_FOR_TARGET) {
-		if(blobNumber < 8 && blobNumber > 3) {
-			matchFound = firstPhase(ledPoints);
+		if(blobNumber == 5) {
+			matchFound = firstPhase(descriptors);
 		}
 		else {
-			cout << "Blob detection didn't work properly!" << endl;
+			cout << "Too much or not enough descriptors!" << endl;
 		}
 	}
 	else if(status == Status::FIRST_LANDING_PHASE) {
-		int matched = nearestPoints(ledPoints);
+		int matched = nearestPoints(descriptors);
 		if(matched >= minNumOfMatch)
 			matchFound = true;
 	}
