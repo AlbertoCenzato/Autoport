@@ -177,7 +177,7 @@ public:
 		delete pinHoleFunctor;
 	}
 
-	void evaluate(vector<Point2f> &, Eigen::Matrix<double,3,2> &evaluatedPoints);
+	bool evaluate(vector<Point2f> &, Eigen::Matrix<double,3,2> &evaluatedPoints);
 
 	PositionEstimation* setPointsToEvaluate(uchar pointsToEvaluate);
 

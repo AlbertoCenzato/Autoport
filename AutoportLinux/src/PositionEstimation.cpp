@@ -14,12 +14,12 @@ using namespace std;
 using namespace cv;
 using namespace Eigen;
 
-void PositionEstimation::evaluate(vector<Point2f> &cameraSystemPoints, Matrix<double,3,2> &evaluatedPoints) {
+bool PositionEstimation::evaluate(vector<Point2f> &cameraSystemPoints, Matrix<double,3,2> &evaluatedPoints) {
 
 	delete this->cameraSystemPoints;
 	this->cameraSystemPoints = new vector<Point2f>();
 	uchar pointsToEvaluate = this->pointsToEvaluate;
-	for(uint i = 0; i < 8; i++) {
+	for(uint i = 0; i < 5; i++) {
 		if((pointsToEvaluate & 0x80) != 0) {
 			this->cameraSystemPoints->push_back(cameraSystemPoints.at(i));
 			cout << this->cameraSystemPoints->size() << endl;
@@ -43,7 +43,7 @@ void PositionEstimation::evaluate(vector<Point2f> &cameraSystemPoints, Matrix<do
 	pos   << lastKnownPositions.front()->x,   lastKnownPositions.front()->y,     lastKnownPositions.front()->z;
 	angle << lastKnownPositions.front()->yaw, lastKnownPositions.front()->pitch, lastKnownPositions.front()->roll;
 	evaluatedPoints << pos, angle;
-	return;
+	return true;
 }
 
 

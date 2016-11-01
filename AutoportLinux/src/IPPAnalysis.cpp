@@ -78,10 +78,14 @@ bool IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 		//updateColor(points);
 	}
 
-	/*
-	success		 = positionEstimator.evaluate(points, extrinsicFactors);
+	Eigen::Matrix<double,3,2> evaluatedPosition;
+	vector<Point2f> positions(points.size());
+	for(uint i = 0; i < points.size(); ++i)
+		positions[i] = points[i].getPosition();
+
+	success = positionEstimator.evaluate(positions, evaluatedPosition);
+	cout << "Position:\n" << evaluatedPosition << endl;
 	if(!success) return false;
-	*/
 
 	return true;
 }
