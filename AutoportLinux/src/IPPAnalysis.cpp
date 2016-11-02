@@ -87,6 +87,10 @@ bool IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 	cout << "Position:\n" << evaluatedPosition << endl;
 	if(!success) return false;
 
+	namedWindow("Original image", WINDOW_NORMAL);
+	imshow("Original image", image);
+
+
 	return true;
 }
 

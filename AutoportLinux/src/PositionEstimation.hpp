@@ -43,6 +43,7 @@ template<typename _Scalar, int NX = Dynamic, int NY = Dynamic> struct Functor {
 class PositionEstimation {
 
 	//specific functor for PinHole
+	/*
 	struct PinHoleEquations : Functor<double> {
 
 		uint numberOfPoints;
@@ -57,13 +58,13 @@ class PositionEstimation {
 		double *realWorldY;
 		double *realWorldZ;
 
-		PinHoleEquations(vector<Point3d> &realWorldPoints, double focalX, double focalY, double pixelDimension)
+		PinHoleEquations(vector<Point3f> &realWorldPoints, double focalX, double focalY, double pixelDimension)
 		: Functor(6,2*realWorldPoints.size()), focalX(focalX), focalY(focalY), pixelDimension(pixelDimension), camSysX(NULL), camSysY(NULL) {
 
 			numberOfPoints = realWorldPoints.size();
-			realWorldX = new double[numberOfPoints];
-			realWorldY = new double[numberOfPoints];
-			realWorldZ = new double[numberOfPoints];
+			realWorldX = new float[numberOfPoints];
+			realWorldY = new float[numberOfPoints];
+			realWorldZ = new float[numberOfPoints];
 			for(uint i = 0; i < numberOfPoints; i++) {
 				realWorldX[i] = realWorldPoints.at(i).x;
 				realWorldY[i] = realWorldPoints.at(i).y;
@@ -96,7 +97,7 @@ class PositionEstimation {
 		}
 
 
-		int operator()(VectorXd &position, VectorXd &fvec) const {
+		int operator()(VectorXf &position, VectorXf &fvec) const {
 
 			double x 	 = position(0);
 			double y 	 = position(1);
@@ -140,27 +141,28 @@ class PositionEstimation {
 
 	PinHoleEquations *pinHoleFunctor;
 
-	vector<Point3d> *realWorldPoints;
+	vector<Point3f> *realWorldPoints;
 	vector<Point2f> *cameraSystemPoints;
 
-	vector<Point3d> *currRealWorldSet;
+	vector<Point3f> *currRealWorldSet;
 
 	list<Position_XYZ_YPR*> lastKnownPositions;
 	static const int MAX_LAST_KNOWN_POSITIONS_SIZE = 5;
 	uchar pointsToEvaluate;
 	uint numberOfUsedPoints;
 
+	*/
 
 public:
 
-
-	PositionEstimation(vector<Point3d> &realWorldPoints) {
+/*
+	PositionEstimation(vector<Point3f> &realWorldPoints) {
 		Settings &settings = Settings::getInstance();
 		focalX = settings.focalX;
 		focalY = settings.focalY;
 		pixelDimension = settings.pixelDimension;
 		this->realWorldPoints  = &realWorldPoints;
-		this->currRealWorldSet = new vector<Point3d>(realWorldPoints);
+		this->currRealWorldSet = new vector<Point3f>(realWorldPoints);
 		lastKnownPositions = list<Position_XYZ_YPR*>();
 		lastKnownPositions.push_front(&settings.initialPosition);
 		cameraSystemPoints = NULL;
@@ -170,11 +172,20 @@ public:
 	}
 
 	PositionEstimation() : PositionEstimation(Settings::getInstance().realWorldPoints) {}
+*/
+	PositionEstimation() {
+		Settings& settings = Settings::getInstance();
+		focalX = (float)settings.focalX;
+		focalY = (float)settings.focalY;
+		pixelDimension = (float)settings.pixelDimension;
+	}
 
 	~PositionEstimation() {
+		/*
 		delete cameraSystemPoints;
 		delete currRealWorldSet;
 		delete pinHoleFunctor;
+		*/
 	}
 
 	bool evaluate(vector<Point2f> &, Eigen::Matrix<double,3,2> &evaluatedPoints);
@@ -183,12 +194,21 @@ public:
 
 private:
 
+	/*
 	double focalX;
 	double focalY;
 	double pixelDimension;
+	*/
+
+	float focalX;
+	float focalY;
+	float pixelDimension;
+
+	float cx = 0;
+	float cy = 0;
 
 	void levenbergMarquardt() {
-
+/*
 		VectorXd &dynVar = *(new VectorXd(6));
 		Position_XYZ_YPR *lastKnownPos = lastKnownPositions.front();
 		dynVar(0) = lastKnownPos->x;
@@ -223,6 +243,22 @@ private:
 		lastKnownPositions.push_front(lastKnownPos);
 
 		return;
+		*/
+	}
+
+	void ransacHomography(Mat imagePoints) {
+		Mat objectPoints(Settings::getInstance().realWorldPoints);
+		Mat cameraMatrix(Size(3,3), CV_32F);
+		cameraMatrix.at<float>(0,0) = focalX;
+		cameraMatrix.at<float>(1,1) = focalY;
+		cameraMatrix.at<float>(0,2) = cx;
+		cameraMatrix.at<float>(1,2) = cy;
+		cameraMatrix.at<float>(2,2) = 1;
+
+		Mat rvec, tvec;
+		solvePnPRansac(objectPoints,imagePoints,cameraMatrix, vector<float>(0), rvec, tvec);
+		cout << "rvec:\n" << rvec;
+		cout << "\n\ntvec:\n" << tvec;
 	}
 
 	void lowPassFilter() {

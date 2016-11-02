@@ -13,8 +13,6 @@ bool ImgAnalysis::evaluate(Mat &image, vector<LedDescriptor> &points, float down
 	Mat hsvImg;
 	Mat colorFilteredImg;
 
-	namedWindow("Original image", WINDOW_NORMAL);
-	imshow("Original image", image);
 
 	//change color space: from BGR to HSV;
     //TODO: color conversion and filterByColor can be performed with a shader (?)

@@ -16,6 +16,7 @@ using namespace Eigen;
 
 bool PositionEstimation::evaluate(vector<Point2f> &cameraSystemPoints, Matrix<double,3,2> &evaluatedPoints) {
 
+	/*
 	delete this->cameraSystemPoints;
 	this->cameraSystemPoints = new vector<Point2f>();
 	uchar pointsToEvaluate = this->pointsToEvaluate;
@@ -26,9 +27,13 @@ bool PositionEstimation::evaluate(vector<Point2f> &cameraSystemPoints, Matrix<do
 		}
 		pointsToEvaluate = pointsToEvaluate << 1;
 	}
+	*/
 
 	//valuto posizione con Levenberg-Marquardt
-	levenbergMarquardt();
+	//levenbergMarquardt();
+
+	//valuto posizione con ransac
+	ransacHomography(Mat(cameraSystemPoints));
 
 	//filtro passa basso (opzionale)
 	lowPassFilter();
@@ -36,6 +41,7 @@ bool PositionEstimation::evaluate(vector<Point2f> &cameraSystemPoints, Matrix<do
 	//Kalman
 	kalmanFilter();
 
+	/*
 	if(lastKnownPositions.size() > MAX_LAST_KNOWN_POSITIONS_SIZE)
 		lastKnownPositions.pop_back();
 	Vector3d pos;
@@ -43,6 +49,7 @@ bool PositionEstimation::evaluate(vector<Point2f> &cameraSystemPoints, Matrix<do
 	pos   << lastKnownPositions.front()->x,   lastKnownPositions.front()->y,     lastKnownPositions.front()->z;
 	angle << lastKnownPositions.front()->yaw, lastKnownPositions.front()->pitch, lastKnownPositions.front()->roll;
 	evaluatedPoints << pos, angle;
+	*/
 	return true;
 }
 
@@ -51,7 +58,7 @@ bool PositionEstimation::evaluate(vector<Point2f> &cameraSystemPoints, Matrix<do
 // every bit represents the point in the corresponding position in the vector
 // a value of 1 means that the point must be used, 0 the point must be excluded
 PositionEstimation* PositionEstimation::setPointsToEvaluate(uchar pointsToEvaluate) {
-
+/*
 	this->pointsToEvaluate = pointsToEvaluate;
 	numberOfUsedPoints = 0;
 	for(uint i = 0; i < 8; i++) {
@@ -65,7 +72,7 @@ PositionEstimation* PositionEstimation::setPointsToEvaluate(uchar pointsToEvalua
 	currRealWorldSet = new vector<Point3d>();
 	for(uint i = 0; i < 8; i++) {
 		if((pointsToEvaluate & 0x80) != 0) {
-			Point3d &p = realWorldPoints->at(i);
+			Point3f &p = realWorldPoints->at(i);
 			currRealWorldSet->push_back(p);
 		}
 		pointsToEvaluate = pointsToEvaluate << 1;
@@ -75,6 +82,6 @@ PositionEstimation* PositionEstimation::setPointsToEvaluate(uchar pointsToEvalua
 
 	delete pinHoleFunctor;
 	pinHoleFunctor = new PinHoleEquations(*currRealWorldSet,focalX, focalY, pixelDimension);
-
+*/
 	return this;
 }

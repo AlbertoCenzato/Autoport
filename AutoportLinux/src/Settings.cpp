@@ -104,9 +104,9 @@ bool Settings::loadConfiguration(const string &configFilePath) {
 
 	realWorldPoints.clear();
 	for (xml_node iterNode = positionEstimation.child("real_world_points").first_child(); iterNode; iterNode = iterNode.next_sibling()) {
-		double x = iterNode.attribute("x").as_double();
-		double y = iterNode.attribute("y").as_double();
-		double z = iterNode.attribute("z").as_double();
+		float x = iterNode.attribute("x").as_float();
+		float y = iterNode.attribute("y").as_float();
+		float z = iterNode.attribute("z").as_float();
 		realWorldPoints.push_back({x,y,z});
 	}
 

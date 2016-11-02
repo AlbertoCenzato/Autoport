@@ -142,7 +142,7 @@ namespace GenPurpFunc {
 			str += "\nPoint " + to_string(i+1) + ": [" + to_string(vect.at(i).pt.x) + ", " + to_string(vect.at(i).pt.y) + "]";
 		return str;
 	}
-	inline string pointVectorToString(const vector<Point3d> &vect) {
+	inline string pointVectorToString(const vector<Point3f> &vect) {
 		string str = "";
 		uint size = vect.size();
 		for(uint i = 0; i < size; i++)
