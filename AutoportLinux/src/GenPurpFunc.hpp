@@ -1,14 +1,12 @@
 //Copyright (c) 2016 Alberto Cenzato. All rights reserved.
 
-#include <opencv2/opencv.hpp>
-#include "opencv2/flann.hpp"
-#include <Eigen/Dense>
+#pragma once
 
-using namespace Eigen;
+#include <opencv2/opencv.hpp>
+
 using namespace cv;
 using namespace std;
 
-#pragma once
 
 extern string workingDir;
 
@@ -83,50 +81,6 @@ enum LedColor {
 };
 
 namespace GenPurpFunc {
-	/* This function finds the angles (in RADIANS) of the yaw - pitch - roll sequence
-	R1(gamma)*R2(beta)*R3(alpha) from the direction cosine matrix
-	Q - direction cosine matrix
-	yaw - yaw angle(rad)
-	pitch - pitch angle(rad)
-	roll - roll angle(rad) */
-	inline void dcm_to_ypr(Matrix3d &R, double* ypr) {
-		ypr[0] = atan2((float)R(0, 1) , (float)R(0, 0));
-		ypr[1] = asin((float)-R(0, 2));
-		ypr[2] = atan2((float)R(1, 2) , (float)R(2, 2));
-		ypr[0] = 180 * ypr[0] / M_PI;
-		ypr[1] = 180 * ypr[1] / M_PI;
-		ypr[2] = 180 * ypr[2] / M_PI;
-	}
-
-	/* Function che risolve il prp con il metodo di Laurent Kneip
-	% Input:
-	%   P - Matrice 3x4 dei 4 punti nello spazio assoluto.Le colonne sono i
-	%       punti
-	%   f - Matrice 3x4 dei 4 versori nel sistema camera che individuano le
-	%       direzioni dei quattro punti fissi.Le colonne sono i versori
-	% Output :
-	%   C - Centro del sistema camera nel sistema di riferimento assoluto
-	%   R - Matrice di rotazione dal sistema assoluto a quello camera */
-	extern Matrix<double, 3, 4> p3p_solver(Matrix<double, 3, 4> &P, Matrix<double, 3, 4> &f);
-
-	inline void printMatrixf(MatrixXf mtrx, int n, int m) {
-		for (int i = 0; i < n; i++) {
-			printf("\n");
-			for (int j = 0; j < m; j++) {
-				printf("%f ", mtrx(i, j));
-			}
-		}
-		printf("\n");
-	}
-	inline void printMatrixd(MatrixXd mtrx, int n, int m) {
-		for (int i = 0; i < n; i++) {
-			printf("\n");
-			for (int j = 0; j < m; j++) {
-				printf("%f ", mtrx(i, j));
-			}
-		}
-		printf("\n");
-	}
 
 	inline string pointVectorToStrng(const vector<Point2f> &vect) {
 		string str = "";
@@ -149,33 +103,6 @@ namespace GenPurpFunc {
 			str += "\nPoint " + to_string(i+1) + ": [" + to_string(vect.at(i).x) + ", " + to_string(vect.at(i).y)
 				+ ", " + to_string(vect.at(i).z) + "]";
 		return str;
-	}
-
-	inline Point2f multiply2f(Matrix2d &R, Point2f &point) {
-		Point2f ret;
-		ret.x = R.row(0)[0] * point.x + R.row(0)[1] * point.y;
-		ret.y = R.row(1)[0] * point.x + R.row(1)[1] * point.y;
-		return ret;
-	}
-	inline Point2d multiply2d(Matrix2d &R, Point2d &point) {
-		Point2d ret;
-		ret.x = R.row(0)[0] * point.x + R.row(0)[1] * point.y;
-		ret.y = R.row(1)[0] * point.x + R.row(1)[1] * point.y;
-		return ret;
-	}
-	inline Point3f multiply3f(Matrix3d &R, Point3f &point) {
-		Point3f ret;
-		ret.x = R.row(0)[0] * point.x + R.row(0)[1] * point.y + R.row(0)[2] * point.z;
-		ret.y = R.row(1)[0] * point.x + R.row(1)[1] * point.y + R.row(1)[2] * point.z;
-		ret.z = R.row(2)[0] * point.x + R.row(2)[1] * point.y + R.row(2)[2] * point.z;
-		return ret;
-	}
-	inline Point3d multiply3d(Matrix3d &R, Point3d &point) {
-		Point3d ret;
-		ret.x = R.row(0)[0] * point.x + R.row(0)[1] * point.y + R.row(0)[2] * point.z;
-		ret.y = R.row(1)[0] * point.x + R.row(1)[1] * point.y + R.row(1)[2] * point.z;
-		ret.z = R.row(2)[0] * point.x + R.row(2)[1] * point.y + R.row(2)[2] * point.z;
-		return ret;
 	}
 
 	inline Point2f normalize(Point2f &p) {

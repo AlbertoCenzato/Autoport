@@ -6,7 +6,6 @@
 #include "GenPurpFunc.hpp"
 
 using namespace std;
-using namespace Eigen;
 using namespace pugi;
 
 class Settings {

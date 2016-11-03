@@ -7,17 +7,12 @@
 
 #pragma once
 
-#include <list>
 #include <chrono>
-#include <Eigen/Dense>
-#include <unsupported/Eigen/NumericalDiff>
-#include <unsupported/Eigen/NonLinearOptimization>
 #include "GenPurpFunc.hpp"
 #include "Settings.hpp"
 
 using namespace std;
 using namespace cv;
-using namespace Eigen;
 
 
 class PositionEstimation {
@@ -33,7 +28,7 @@ public:
 
 	~PositionEstimation() {	}
 
-	bool evaluate(vector<Point2f> &, Eigen::Matrix<double,3,2> &evaluatedPoints);
+	bool evaluate(vector<Point2f> &, Mat &evaluatedPoints);
 
 	PositionEstimation* setPointsToEvaluate(uchar pointsToEvaluate);
 

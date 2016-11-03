@@ -7,14 +7,12 @@
 
 #include "PositionEstimation.hpp"
 
-#include <Eigen/Dense>
 #include <opencv2/opencv.hpp>
 
 using namespace std;
 using namespace cv;
-using namespace Eigen;
 
-bool PositionEstimation::evaluate(vector<Point2f> &cameraSystemPoints, Eigen::Matrix<double,3,2> &evaluatedPoints) {
+bool PositionEstimation::evaluate(vector<Point2f> &cameraSystemPoints, Mat &evaluatedPoints) {
 
 	//valuto posizione con ransac
 	ransacPnP(Mat(cameraSystemPoints));

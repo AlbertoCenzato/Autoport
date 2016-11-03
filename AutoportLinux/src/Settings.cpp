@@ -1,9 +1,10 @@
 #include "Settings.hpp"
 
-#include <stdlib.h>
+//#include <stdlib.h>
 #include <string.h>
 #include <fstream>
 #include <algorithm>
+#include <unistd.h>
 
 using namespace std;
 using namespace pugi;

@@ -83,7 +83,6 @@ bool IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 		//updateColor(points);
 	}
 
-	Eigen::Matrix<double,3,2> evaluatedPosition;
 	vector<Point2f> positions(points.size());
 	for(uint i = 0; i < points.size(); ++i)
 		positions[i] = points[i].getPosition();
@@ -91,8 +90,8 @@ bool IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 	cout << "Frame points:\n" << GenPurpFunc::pointVectorToStrng(positions) << endl;
 	convertPointsToCamera(positions, t, resampleMat);
 	cout << "Camera points:\n" << GenPurpFunc::pointVectorToStrng(positions) << endl;
-	success = positionEstimator.evaluate(positions, evaluatedPosition);
-	cout << "Position:\n" << evaluatedPosition << endl;
+	success = positionEstimator.evaluate(positions, extrinsicFactors);
+	cout << "Position:\n" << extrinsicFactors << endl;
 	if(!success) return false;
 
 	namedWindow("Original image", WINDOW_NORMAL);
