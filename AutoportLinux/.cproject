@@ -170,6 +170,7 @@
 							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.linker.1335865596" name="Cross G++ Linker" superClass="cdt.managedbuild.tool.gnu.cross.cpp.linker">
 								<option id="gnu.cpp.link.option.libs.558809739" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" useByScannerDiscovery="false" valueType="libs">
 									<listOptionValue builtIn="false" value=":libopencv_core.so.3.1.0"/>
+									<listOptionValue builtIn="false" value=":libopencv_calib3d.so.3.1.0"/>
 									<listOptionValue builtIn="false" value=":libopencv_videoio.so.3.1.0"/>
 									<listOptionValue builtIn="false" value=":libopencv_imgcodecs.so.3.1.0"/>
 									<listOptionValue builtIn="false" value=":libopencv_imgproc.so.3.1.0"/>
@@ -233,4 +234,5 @@
 		</configuration>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 </cproject>

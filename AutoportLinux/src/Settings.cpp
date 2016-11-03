@@ -1,6 +1,5 @@
 #include "Settings.hpp"
 
-//#include <stdlib.h>
 #include <string.h>
 #include <fstream>
 #include <algorithm>

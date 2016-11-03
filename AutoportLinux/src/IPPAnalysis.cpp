@@ -6,6 +6,7 @@
  */
 
 #include "IPPAnalysis.hpp"
+#include <chrono>
 
 extern Status status;
 
@@ -45,15 +46,23 @@ bool IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 
 	vector<LedDescriptor> points(10);
 
-	// find leds
+	auto begin = chrono::high_resolution_clock::now();
 	bool success = imageAnalyzer.evaluate(image, points, 1);
+	auto end = chrono::high_resolution_clock::now();
+	cout << "\nImage analysis: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
+
+	// find leds
 	if(!success) {
 		cerr << "ImageAnalysis failed!" << endl;
 		return false;
 	}
 
 	// register leds to match pattern
+	begin = chrono::high_resolution_clock::now();
 	success = patternAnalyzer.evaluate(points);
+	end = chrono::high_resolution_clock::now();
+	cout << "\nPattern analysis: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
+
 	if(!success) {
 		if(status == Status::FIRST_LANDING_PHASE || status == Status::SECOND_LANDING_PHASE) {
 			cout << "Target lost!" << endl;
@@ -90,13 +99,20 @@ bool IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 	cout << "Frame points:\n" << GenPurpFunc::pointVectorToStrng(positions) << endl;
 	convertPointsToCamera(positions, t, resampleMat);
 	cout << "Camera points:\n" << GenPurpFunc::pointVectorToStrng(positions) << endl;
+
+
+	//estimate position
+	begin = chrono::high_resolution_clock::now();
 	success = positionEstimator.evaluate(positions, extrinsicFactors);
+	end = chrono::high_resolution_clock::now();
+	cout << "\nPosition estimation: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
+
 	cout << "Position:\n" << extrinsicFactors << endl;
 	if(!success) return false;
 
 	namedWindow("Original image", WINDOW_NORMAL);
 	imshow("Original image", image);
-	waitKey(0);
+	waitKey(1);
 
 	return true;
 }
