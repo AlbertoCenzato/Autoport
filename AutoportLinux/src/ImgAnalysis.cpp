@@ -13,7 +13,6 @@ bool ImgAnalysis::evaluate(Mat &image, vector<LedDescriptor> &points, float down
 	Mat hsvImg;
 	Mat colorFilteredImg;
 
-
 	//change color space: from BGR to HSV;
     //TODO: color conversion and filterByColor can be performed with a shader (?)
 	auto begin = chrono::high_resolution_clock::now();

@@ -53,6 +53,21 @@ int  ImgLoader::getFrameHeight() {
 	return capture.get(CV_CAP_PROP_FRAME_HEIGHT);
 }
 
+SourceType ImgLoader::getSourceType() {
+	return sourceType;
+}
+
+void ImgLoader::getResampleMat(Mat &resampleMat) {
+	resampleMat = Mat::zeros(2,2,CV_32FC1);
+	resampleMat.at<float>(0,0) = 2592/res.width;	// TODO
+	resampleMat.at<float>(1,1) = 1944/res.height;	// TODO
+}
+
+void ImgLoader::getCropVector(Point2f &t) {
+	t.x = roi.x;
+	t.y = roi.y;
+}
+
 bool ImgLoader::setFrameWidth (int frameWidth)  {
 	bool success = false;
 	if(sourceType == sFILE) {

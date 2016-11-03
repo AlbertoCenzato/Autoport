@@ -2,7 +2,9 @@
 
 #pragma once
 
-#include "PatternAnalysis.hpp"
+#include "GenPurpFunc.hpp"
+#include "Settings.hpp"
+#include "LedDescriptor.hpp"
 
 using namespace std;
 using namespace cv;

@@ -38,6 +38,11 @@ bool IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 		return false;
 	}
 
+	Mat resampleMat;
+	Point2f t;
+	loader->getResampleMat(resampleMat);
+	loader->getCropVector (t);
+
 	vector<LedDescriptor> points(10);
 
 	// find leds
@@ -83,13 +88,16 @@ bool IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 	for(uint i = 0; i < points.size(); ++i)
 		positions[i] = points[i].getPosition();
 
+	cout << "Frame points:\n" << GenPurpFunc::pointVectorToStrng(positions) << endl;
+	convertPointsToCamera(positions, t, resampleMat);
+	cout << "Camera points:\n" << GenPurpFunc::pointVectorToStrng(positions) << endl;
 	success = positionEstimator.evaluate(positions, evaluatedPosition);
 	cout << "Position:\n" << evaluatedPosition << endl;
 	if(!success) return false;
 
 	namedWindow("Original image", WINDOW_NORMAL);
 	imshow("Original image", image);
-
+	waitKey(0);
 
 	return true;
 }

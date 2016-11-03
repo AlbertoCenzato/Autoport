@@ -37,7 +37,9 @@ public:
 	int  getFrameWidth ();
 	int  getFrameHeight();
 	Rect getROI() { return roi; }
-
+	SourceType getSourceType();
+	void getResampleMat(Mat &resampleMat);
+	void getCropVector(Point2f &t);
 
 	bool isOpen() { return capture.isOpened() && opened; }
 

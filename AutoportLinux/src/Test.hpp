@@ -306,7 +306,7 @@ namespace Test {
 		char ch = 64;
 		bool success = false;
 		int count = 0, maxFramesToSkip = 5;
-		while(ch != 23) {
+		while(ch != 27) {
 			success = ipp.evaluate(extrinsicFactors);
 			if(!success) {
 				++count;

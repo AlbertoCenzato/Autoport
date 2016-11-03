@@ -113,6 +113,15 @@ private:
 		return true;
 	}
 
+	void convertPointsToCamera(vector<Point2f> &points, Point2f &t, Mat &resampleMat) {
+		const int SIZE = points.size();
+		for(int i = 0; i < SIZE; ++i) {
+			Point2f trasl = points[i] + t;
+			points[i] = Point2f(trasl.x*resampleMat.at<float>(0,0),
+								trasl.y*resampleMat.at<float>(1,1));
+		}
+	}
+
 };
 
 #endif /* IPPANALYSIS_HPP_ */
