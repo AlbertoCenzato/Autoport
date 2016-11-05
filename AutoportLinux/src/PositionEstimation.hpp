@@ -10,10 +10,13 @@
 #include <chrono>
 #include "GenPurpFunc.hpp"
 #include "Settings.hpp"
+#include <iostream>
+#include <fstream>
 
 using namespace std;
 using namespace cv;
 
+extern ofstream stream;
 
 class PositionEstimation {
 
@@ -24,6 +27,7 @@ public:
 		focalX = (float)settings.focalX;
 		focalY = (float)settings.focalY;
 		pixelDimension = (float)settings.pixelDimension;
+
 	}
 
 	~PositionEstimation() {	}
@@ -41,7 +45,7 @@ private:
 	float cx = 1.3081e+03;
 	float cy = 964.6396;
 
-	void ransacPnP(Mat imagePoints) {
+	void ransacPnP(Mat imagePoints, Mat &extrinsicFactors) {
 		Mat objectPoints(Settings::getInstance().realWorldPoints);
 		Mat cameraMatrix(Size(3,3), CV_32F);
 		cameraMatrix.at<float>(0,0) = 2.0504e+03;
@@ -50,15 +54,18 @@ private:
 		cameraMatrix.at<float>(1,2) = 964.6396;
 		cameraMatrix.at<float>(2,2) = 1;
 
-		cout << "imagePoints:\n" << imagePoints << endl;
-
 		Mat distCoeffs = Mat::zeros(4, 1, CV_64FC1);  // vector of distortion coefficients
 		Mat rvec 	   = Mat::zeros(3, 1, CV_64FC1);          // output rotation vector
 		Mat tvec 	   = Mat::zeros(3, 1, CV_64FC1);    // output translation vector
 
 		solvePnPRansac(objectPoints,imagePoints,cameraMatrix, vector<float>(0), rvec, tvec);
-		cout << "rvec:\n" << rvec;
-		cout << "\n\ntvec:\n" << tvec;
+
+		Mat rotationMat;
+		Rodrigues(rvec,rotationMat);
+
+		for(int i = 0; i < 3; ++i)
+			rotationMat.col(i).copyTo(extrinsicFactors.col(i));
+		tvec.col(0).copyTo(extrinsicFactors.col(3));
 	}
 
 

@@ -21,7 +21,7 @@ public:
 	IPPAnalysis(ImgLoader* loader);
 	virtual ~IPPAnalysis();
 
-	bool evaluate(Mat& extrinsicFactors);
+	Result evaluate(Mat& extrinsicFactors);
 	bool reset();
 
 private:

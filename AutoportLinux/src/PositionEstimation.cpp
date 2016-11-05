@@ -12,13 +12,15 @@
 using namespace std;
 using namespace cv;
 
-bool PositionEstimation::evaluate(vector<Point2f> &cameraSystemPoints, Mat &evaluatedPoints) {
+bool PositionEstimation::evaluate(vector<Point2f> &cameraSystemPoints, Mat &extrinsicFactors) {
 
 	//valuto posizione con ransac
-	ransacPnP(Mat(cameraSystemPoints));
+	if(cameraSystemPoints.size() == 5) {
+		ransacPnP(Mat(cameraSystemPoints), extrinsicFactors);
 
-	//Kalman
-	kalmanFilter();
-
-	return true;
+		//Kalman
+		kalmanFilter();
+		return true;
+	}
+	return false;
 }

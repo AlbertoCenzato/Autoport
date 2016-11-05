@@ -22,6 +22,12 @@ enum Status {
 	LANDED
 };
 
+enum Result {
+	END,
+	SUCCESS,
+	FAILURE
+};
+
 template<typename varType> struct Interval {
 
 public:

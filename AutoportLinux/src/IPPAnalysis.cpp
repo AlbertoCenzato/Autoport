@@ -10,6 +10,7 @@
 
 extern Status status;
 
+
 IPPAnalysis::IPPAnalysis(ImgLoader* loader) {
 	this->loader = loader;
 	Settings& settings =  Settings::getInstance();
@@ -27,7 +28,7 @@ IPPAnalysis::IPPAnalysis(ImgLoader* loader) {
 IPPAnalysis::~IPPAnalysis() {}
 
 
-bool IPPAnalysis::evaluate(Mat& extrinsicFactors) {
+Result IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 
 	cout << "\n-----------------------------------------\n" << endl;
 
@@ -36,7 +37,7 @@ bool IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 	bool retrieved = loader->getNextFrame(image);
 	if(!retrieved) {
 		cerr << "Couldn't retrieve frame!" << endl;
-		return false;
+		return Result::END;
 	}
 
 	Mat resampleMat;
@@ -54,7 +55,7 @@ bool IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 	// find leds
 	if(!success) {
 		cerr << "ImageAnalysis failed!" << endl;
-		return false;
+		return Result::FAILURE;
 	}
 
 	// register leds to match pattern
@@ -69,7 +70,7 @@ bool IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 			status = Status::LOOKING_FOR_TARGET;
 		}
 		cerr << "PatternAnalysis failed!" << endl;
-		return false;
+		return Result::FAILURE;
 	}
 	status = Status::FIRST_LANDING_PHASE;
 	cout << "PatternAnalysis succeded!" << endl;
@@ -96,10 +97,7 @@ bool IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 	for(uint i = 0; i < points.size(); ++i)
 		positions[i] = points[i].getPosition();
 
-	cout << "Frame points:\n" << GenPurpFunc::pointVectorToStrng(positions) << endl;
 	convertPointsToCamera(positions, t, resampleMat);
-	cout << "Camera points:\n" << GenPurpFunc::pointVectorToStrng(positions) << endl;
-
 
 	//estimate position
 	begin = chrono::high_resolution_clock::now();
@@ -107,14 +105,13 @@ bool IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 	end = chrono::high_resolution_clock::now();
 	cout << "\nPosition estimation: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
 
-	cout << "Position:\n" << extrinsicFactors << endl;
-	if(!success) return false;
+	if(!success) return Result::FAILURE;
 
 	namedWindow("Original image", WINDOW_NORMAL);
 	imshow("Original image", image);
 	waitKey(1);
 
-	return true;
+	return Result::SUCCESS;
 }
 
 bool IPPAnalysis::reset() {

@@ -15,6 +15,8 @@ using namespace cv;
 extern string   workingDir;
 extern Settings settings;
 
+//ofstream stream;
+
 ImgAnalysis imgAnalyzer;
 const int MAX_VAL = 255;
 int minHue = 0, maxHue = 255;
@@ -301,23 +303,44 @@ namespace Test {
 
 		cout << "LOADER OK" << endl;
 
-		Mat extrinsicFactors;
+		Mat extrinsicFactors = Mat::zeros(3,4,CV_32FC1);
 		auto ipp = IPPAnalysis(&loader);
-		char ch = 64;
-		bool success = false;
 		int count = 0, maxFramesToSkip = 5;
+
+		ofstream stream("position7.txt");
+
+		if(!stream.is_open()) {
+			cout << "Couldn't open stream!";
+			return;
+		}
+
+		char ch = 64;
+		Result success;
+
 		while(ch != 27) {
 			success = ipp.evaluate(extrinsicFactors);
-			if(!success) {
+			if(success == Result::END)
+				break;
+			if(success == Result::FAILURE) {
 				++count;
 				if(count > maxFramesToSkip) {
 					ipp.reset();
 					count = 0;
 				}
+				extrinsicFactors = Mat::zeros(3,4,CV_32FC1);
+			}
+			cout << "Position:\n" << extrinsicFactors << endl;
+			for(int i = 0; i < 3; ++i) {
+				for(int j = 0; j < 4; ++j) {
+					stream << extrinsicFactors.at<float>(i,j);
+					stream << " ";
+				}
+				stream << "\n";
 			}
 			ch = waitKey(1);
 		}
 
+		stream.close();
 	}
 }
 
