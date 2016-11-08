@@ -79,8 +79,8 @@ Result IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 	for(uint i = 0; i < points.size(); ++i) {
 		string number = to_string(i);
 		if(!points[i].isEmpty()) {
-			circle(image, points[i].getPosition(), 30, blue, 10);
-			putText(image, number, points[i].getPosition(), HersheyFonts::FONT_HERSHEY_PLAIN,
+			circle(image, points[i].position, 30, blue, 10);
+			putText(image, number, points[i].position, HersheyFonts::FONT_HERSHEY_PLAIN,
 					2,blue,10,8);
 		}
 	}
@@ -93,15 +93,11 @@ Result IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 		//updateColor(points);
 	}
 
-	vector<Point2f> positions(points.size());
-	for(uint i = 0; i < points.size(); ++i)
-		positions[i] = points[i].getPosition();
-
-	convertPointsToCamera(positions, t, resampleMat);
+	convertPointsToCamera(points, t, resampleMat);
 
 	//estimate position
 	begin = chrono::high_resolution_clock::now();
-	success = positionEstimator.evaluate(positions, extrinsicFactors);
+	success = positionEstimator.evaluate(points, extrinsicFactors);
 	end = chrono::high_resolution_clock::now();
 	cout << "\nPosition estimation: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
 

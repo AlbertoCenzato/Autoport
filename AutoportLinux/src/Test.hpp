@@ -258,7 +258,7 @@ namespace Test {
 
 			imgAnalyzer.evaluate(image, ledPoints, downscalingFactor);
 			for(uint i = 0; i < ledPoints.size(); ++i)
-				circle(image,ledPoints[i].getPosition(),20,Scalar(0,255,0),10);
+				circle(image,ledPoints[i].position,20,Scalar(0,255,0),10);
 
 			imshow("Original image", image);
 			ch = waitKey(0);
@@ -307,7 +307,7 @@ namespace Test {
 		auto ipp = IPPAnalysis(&loader);
 		int count = 0, maxFramesToSkip = 5;
 
-		ofstream stream("position7.txt");
+		ofstream stream("position8.txt");
 
 		if(!stream.is_open()) {
 			cout << "Couldn't open stream!";

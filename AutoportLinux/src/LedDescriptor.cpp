@@ -11,26 +11,19 @@ using namespace std;
 using namespace cv;
 
 LedDescriptor::LedDescriptor() {
-	for(int i = 0; i < 6; ++i)
-		values[i] = 0;
+	size = 0;
 }
 
 LedDescriptor::LedDescriptor(Point2f &position, Scalar &color, float size) {
-	values[0] = position.x;
-	values[1] = position.y;
-	values[2] = color[0];
-	values[3] = color[1];
-	values[4] = color[2];
-	values[5] = size;
+	this->position = Point2f(position);
+	this->color	   = Scalar(color);
+	this->size 	   = size;
 }
 
 LedDescriptor::LedDescriptor(float x, float y, float hue, float saturation, float value, float size) {
-	values[0] = x;
-	values[1] = y;
-	values[2] = hue;
-	values[3] = saturation;
-	values[4] = value;
-	values[5] = size;
+	position   = Point2f(x,y);
+	color 	   = Scalar(hue,saturation,value);
+	this->size = size;
 }
 
 LedDescriptor::~LedDescriptor() {}
@@ -39,30 +32,21 @@ LedDescriptor::~LedDescriptor() {}
 //		maybe not
 float LedDescriptor::L2Dist(const LedDescriptor &ledDesc) const {
 	float sqSum = 0;
-	for(int i = 0; i < 6; ++i)
-		sqSum += pow(values[i] - ledDesc.values[i],2);
+	sqSum += pow(position.x - ledDesc.position.x,2);
+	sqSum += pow(position.y - ledDesc.position.y,2);
+	sqSum += pow(color[0]   - ledDesc.color[0],  2);
+	sqSum += pow(color[1]   - ledDesc.color[1],  2);
+	sqSum += pow(color[2]   - ledDesc.color[2],  2);
+	sqSum += pow(size	    - ledDesc.size,  	 2);
 	return sqrt(sqSum);
 }
 
 float LedDescriptor::cartDist(const LedDescriptor &ledDesc) const {
-	float sqSum = pow(values[0] - ledDesc.values[0],2) + pow(values[1] - ledDesc.values[1],2);
-	return sqrt(sqSum);
-}
-
-Point2f LedDescriptor::getPosition() const {
-	return Point2f(values[0], values[1]);
-}
-
-Scalar LedDescriptor::getColor() const {
-	return Scalar(values[2],values[3],values[4]);
-}
-
-float LedDescriptor::getSize() const{
-	return values[5];
+	return GenPurpFunc::distPoint2Point(this->position, ledDesc.position);
 }
 
 bool LedDescriptor::isEmpty() {
-	return values[0] == 0 || values[1] == 0;
+	return position.x == 0 || position.y == 0;
 }
 
 

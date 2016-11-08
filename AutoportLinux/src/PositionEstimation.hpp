@@ -12,6 +12,7 @@
 #include "Settings.hpp"
 #include <iostream>
 #include <fstream>
+#include "LedDescriptor.hpp"
 
 using namespace std;
 using namespace cv;
@@ -32,7 +33,7 @@ public:
 
 	~PositionEstimation() {	}
 
-	bool evaluate(vector<Point2f> &, Mat &evaluatedPoints);
+	bool evaluate(vector<LedDescriptor> &, Mat &evaluatedPoints);
 
 	PositionEstimation* setPointsToEvaluate(uchar pointsToEvaluate);
 
@@ -45,8 +46,18 @@ private:
 	float cx = 1.3081e+03;
 	float cy = 964.6396;
 
-	void ransacPnP(Mat imagePoints, Mat &extrinsicFactors) {
-		Mat objectPoints(Settings::getInstance().realWorldPoints);
+	void ransacPnP(vector<LedDescriptor> &ledPoints, Mat &extrinsicFactors) {
+
+		auto rwPoints = Settings::getInstance().realWorldPoints;
+		auto objectPoints = vector<Point3f>();
+		auto imagePoints  = vector<Point2f>();
+		for(int i = 0; i < ledPoints.size(); ++i) {
+			if(!ledPoints[i].isEmpty()) {
+				objectPoints.push_back(rwPoints[i]);
+				imagePoints .push_back(ledPoints[i].position);
+			}
+		}
+
 		Mat cameraMatrix(Size(3,3), CV_32F);
 		cameraMatrix.at<float>(0,0) = 2.0504e+03;
 		cameraMatrix.at<float>(1,1) = 2.0513e+03;

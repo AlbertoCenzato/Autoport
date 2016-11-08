@@ -126,7 +126,7 @@ private:
 			float meanDist = 0;
 			float *distances = new float[SIZE];	// TODO: try to use another way, dangerous pointer
 			for (int i = 0; i < SIZE; i++) {
-				float dist = GenPurpFunc::distPoint2Point(centr, ledPoints[i].getPosition());
+				float dist = GenPurpFunc::distPoint2Point(centr, ledPoints[i].position);
 				meanDist += dist;
 				distances[i] = dist;
 			}

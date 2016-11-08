@@ -9,12 +9,18 @@
 #define LEDDESCRIPTOR_HPP_
 
 #include "opencv2/opencv.hpp"
+#include "GenPurpFunc.hpp"
 
 using namespace std;
 using namespace cv;
 
 class LedDescriptor {
 public:
+
+	Point2f position;
+	Scalar 	color;
+	float	size;
+
 	LedDescriptor();
 	LedDescriptor(Point2f &position, Scalar &color, float size);
 	LedDescriptor(float x, float y, float hue, float saturation, float value, float size);
@@ -23,10 +29,6 @@ public:
 	float L2Dist  (const LedDescriptor &ledDesc) const;
 	float cartDist(const LedDescriptor &ledDesc) const;
 
-	Point2f getPosition() const;
-	Scalar  getColor()    const;
-	float   getSize() 	  const;
-
 	bool isEmpty();
 
 	static Point2f centroid(const vector<LedDescriptor> &descriptors) {
@@ -34,14 +36,12 @@ public:
 		float y = 0;
 		const int SIZE = descriptors.size();
 		for (int i = 0; i < SIZE; i++) {
-			x += descriptors[i].values[0];
-			y += descriptors[i].values[1];
+			x += descriptors[i].position.x;
+			y += descriptors[i].position.y;
 		}
 		return Point2f(x/SIZE, y/SIZE);
 	}
 
-private:
-	float values[6]; 	// {x, y, hue, saturation, value, size}
 };
 
 #endif /* LEDDESCRIPTOR_HPP_ */

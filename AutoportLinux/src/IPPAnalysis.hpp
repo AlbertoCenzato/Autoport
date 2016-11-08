@@ -40,7 +40,7 @@ private:
 		const int SIZE = descriptors.size();
 		vector<Point2f> points(SIZE);
 		for(int i = 0; i < SIZE; ++i)
-			points[i] = descriptors[i].getPosition();
+			points[i] = descriptors[i].position;
 		Rect boundBox = boundingRect(points);
 		int x = boundBox.x - ROITol;
 		int y = boundBox.y - ROITol;
@@ -54,7 +54,7 @@ private:
 		const int SIZE = descriptors.size();
 		float meanSize = 0;
 		for(int i = 0; i < SIZE; ++i)
-			meanSize += descriptors[i].getSize();
+			meanSize += descriptors[i].size;
 		meanSize /= SIZE;
 
 		bool success = true;
@@ -78,7 +78,7 @@ private:
 		const int SIZE = descriptors.size();
 		float sum[] = {0,0,0};
 		for(int i = 0; i < SIZE; ++i) {
-			Scalar color = descriptors[i].getColor();
+			Scalar color = descriptors[i].color;
 			sum[0] += color[0];
 			sum[1] += color[1];
 			sum[2] += color[2];
@@ -113,12 +113,14 @@ private:
 		return true;
 	}
 
-	void convertPointsToCamera(vector<Point2f> &points, Point2f &t, Mat &resampleMat) {
+	void convertPointsToCamera(vector<LedDescriptor> &points, Point2f &t, Mat &resampleMat) {
 		const int SIZE = points.size();
 		for(int i = 0; i < SIZE; ++i) {
-			Point2f trasl = points[i] + t;
-			points[i] = Point2f(trasl.x*resampleMat.at<float>(0,0),
-								trasl.y*resampleMat.at<float>(1,1));
+			if(!points[i].isEmpty()) {
+				Point2f trasl = points[i].position + t;
+				points[i].position = Point2f(trasl.x*resampleMat.at<float>(0,0),
+						trasl.y*resampleMat.at<float>(1,1));
+			}
 		}
 	}
 

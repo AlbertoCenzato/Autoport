@@ -12,11 +12,12 @@
 using namespace std;
 using namespace cv;
 
-bool PositionEstimation::evaluate(vector<Point2f> &cameraSystemPoints, Mat &extrinsicFactors) {
+bool PositionEstimation::evaluate(vector<LedDescriptor> &cameraSystemPoints, Mat &extrinsicFactors) {
+
 
 	//valuto posizione con ransac
-	if(cameraSystemPoints.size() == 5) {
-		ransacPnP(Mat(cameraSystemPoints), extrinsicFactors);
+	if(cameraSystemPoints.size() == 4 || cameraSystemPoints.size() == 5) {
+		ransacPnP(cameraSystemPoints, extrinsicFactors);
 
 		//Kalman
 		kalmanFilter();

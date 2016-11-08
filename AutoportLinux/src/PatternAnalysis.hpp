@@ -83,10 +83,6 @@ private:
 		vector<LedDescriptor> matchedLeds(SIZE);
 		int matched = 0;
 
-		char *flags = new char[SIZE];
-		for(int i = 0; i < SIZE; ++i)
-			flags = 0;
-
 		for(int i = 0; i < SIZE; ++i) {
 			int index = findNearestPoint(oldPoints[i], ledPoints);
 			if(index > -1) {
@@ -100,8 +96,6 @@ private:
 		ledPoints.clear();
 		ledPoints = matchedLeds;
 
-
-		delete [] flags;
 		return matched;
 	}
 
@@ -148,13 +142,13 @@ private:
 			removeFromVec(minIndex1,ledPoints);
 		}
 
-		Point2f posA = ledA.getPosition();
-		Point2f posB = ledB.getPosition();
+		Point2f posA = ledA.position;
+		Point2f posB = ledB.position;
 		Line line(posA,posB);
 		int minIndex = 0;
 		minDist = 100000;
 		for(int i = 0; i < SIZE-2; ++i) {
-			float distance = distPoint2Line(ledPoints[i].getPosition(),line);
+			float distance = distPoint2Line(ledPoints[i].position,line);
 			if(distance < minDist) {
 				minDist = distance;
 				minIndex = i;
