@@ -19,6 +19,11 @@ const char*	Settings::VALUE  = "value";
 const char* Settings::LOW 	 = "low";
 const char* Settings::HIGH 	 = "high";
 
+Settings::Settings(const string &configFilePath) {
+		loadConfiguration(configFilePath);
+	}
+
+
 Settings::~Settings() {
 	delete [] filePath;
 }

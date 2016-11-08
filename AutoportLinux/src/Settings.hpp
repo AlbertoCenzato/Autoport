@@ -19,10 +19,7 @@ private:
 
 	static Settings *singleton;
 
-	Settings(const string &configFilePath) {
-		loadConfiguration(configFilePath);
-	}
-
+	Settings(const string &configFilePath);
 
 public:
 

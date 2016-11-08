@@ -31,16 +31,7 @@ public:
 
 	bool isEmpty();
 
-	static Point2f centroid(const vector<LedDescriptor> &descriptors) {
-		float x = 0;
-		float y = 0;
-		const int SIZE = descriptors.size();
-		for (int i = 0; i < SIZE; i++) {
-			x += descriptors[i].position.x;
-			y += descriptors[i].position.y;
-		}
-		return Point2f(x/SIZE, y/SIZE);
-	}
+	static Point2f centroid(const vector<LedDescriptor> &descriptors);
 
 };
 

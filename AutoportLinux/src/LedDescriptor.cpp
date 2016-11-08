@@ -49,7 +49,16 @@ bool LedDescriptor::isEmpty() {
 	return position.x == 0 || position.y == 0;
 }
 
-
+Point2f LedDescriptor::centroid(const vector<LedDescriptor> &descriptors) {
+	float x = 0;
+	float y = 0;
+	const int SIZE = descriptors.size();
+	for (int i = 0; i < SIZE; i++) {
+		x += descriptors[i].position.x;
+		y += descriptors[i].position.y;
+	}
+	return Point2f(x/SIZE, y/SIZE);
+}
 
 
 

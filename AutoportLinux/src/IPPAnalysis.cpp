@@ -113,3 +113,95 @@ Result IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 bool IPPAnalysis::reset() {
 	return resetROIandRes() && resetColor();
 }
+
+// --- private members ---
+
+bool IPPAnalysis::updateROI(const vector<LedDescriptor>& descriptors) {
+	const int SIZE = descriptors.size();
+	vector<Point2f> points(SIZE);
+	for(int i = 0; i < SIZE; ++i)
+		points[i] = descriptors[i].position;
+	Rect boundBox = boundingRect(points);
+	int x = boundBox.x - ROITol;
+	int y = boundBox.y - ROITol;
+	int roiWidth  = boundBox.width  + 2*ROITol;
+	int roiHeight = boundBox.height + 2*ROITol;
+
+	return loader->setROI(Rect(x, y, roiWidth, roiHeight));
+}
+
+bool IPPAnalysis::updateImgRes(const vector<LedDescriptor> &descriptors) {
+	const int SIZE = descriptors.size();
+	float meanSize = 0;
+	for(int i = 0; i < SIZE; ++i)
+		meanSize += descriptors[i].size;
+	meanSize /= SIZE;
+
+	bool success = true;
+	if(meanSize > sizeSupTol) {
+		success = loader->halveRes();
+		if(success)
+			meanSize /= 4;
+	}
+	else if(meanSize < sizeInfTol) {
+		success = loader->doubleRes();
+		if(success)
+			meanSize *= 4;
+	}
+
+	imageAnalyzer.setBlobSizeInterval(Interval<int>(meanSize - sizeTol,meanSize + sizeTol));
+
+	return success;
+}
+
+bool IPPAnalysis::updateColor(const vector<LedDescriptor> &descriptors) {
+	const int SIZE = descriptors.size();
+	float sum[] = {0,0,0};
+	for(int i = 0; i < SIZE; ++i) {
+		Scalar color = descriptors[i].color;
+		sum[0] += color[0];
+		sum[1] += color[1];
+		sum[2] += color[2];
+	}
+
+	Scalar minCol, maxCol;
+	for(int i = 0; i < 3; ++i) {
+		float avrg = sum[i]/SIZE;
+		int x = avrg - colorTol;
+		if(x < 0) x = 0;
+		minCol[i] = x;
+		x = avrg + colorTol;
+		if(x > 255) x = 255;
+		maxCol[i] = x;
+	}
+
+	imageAnalyzer.setColorInterval(Interval<Scalar>(minCol,maxCol));
+
+	return true;
+}
+
+bool IPPAnalysis::resetROIandRes() {
+	bool success = loader->resetRes();
+	if(!success)
+		return false;
+	loader->resetROI();
+	return true;
+}
+
+bool IPPAnalysis::resetColor() {
+
+	return true;
+}
+
+void IPPAnalysis::convertPointsToCamera(vector<LedDescriptor> &points, Point2f &t, Mat &resampleMat) {
+	const int SIZE = points.size();
+	for(int i = 0; i < SIZE; ++i) {
+		if(!points[i].isEmpty()) {
+			Point2f trasl = points[i].position + t;
+			points[i].position = Point2f(trasl.x*resampleMat.at<float>(0,0),
+					trasl.y*resampleMat.at<float>(1,1));
+		}
+	}
+}
+
+

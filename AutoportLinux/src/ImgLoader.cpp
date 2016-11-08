@@ -28,6 +28,63 @@ ImgLoader::ImgLoader(const string &source, SourceType type) {
 ImgLoader::ImgLoader() {}
 
 
+bool ImgLoader::constructor(const string &source, SourceType type) {
+	switch(type) {
+	case sDEVICE:
+		capture = VideoCapture(0);
+		break;
+	case sFILE:
+		capture = VideoCapture(source);
+		break;
+	case sSTREAM:	// WARNING: never tested, may have some bugs...
+		capture = VideoCapture(source, CAP_FFMPEG);
+		break;
+	case sNONE:
+		return true;
+	}
+	sourceType = type;
+
+	if(!capture.isOpened()) {
+		opened = false;
+		return false;
+	}
+
+	int width  = getFrameWidth();
+	int height = getFrameHeight();
+	res    = Size(width,height);
+	defRes = Size(width,height);
+	roi = Rect(0, 0, res.width, res.height);
+
+	opened = true;
+	return true;
+}
+
+bool ImgLoader::cleverConstr(const string &source, SourceType type, const Size &frameSize, int fps) {
+
+	if(!constructor(source, type)) {
+		cerr << "Cannot find input" << endl;
+		return false;
+	}
+
+	cout << "Found input!" << endl;
+
+	bool success = true;
+	if(frameSize.height != 0 && frameSize.width != 0) {
+		success = 	 	 	 setFrameHeight(frameSize.height);
+		success = success && setFrameWidth (frameSize.width);
+	}
+	//success = success && capture.set(CAP_PROP_FPS, fps);
+	//success = success && capture.set(CAP_PROP_BRIGHTNESS, 0.0001);
+
+	// if an error occurs fall back to default camera parameters
+	if(!success) {
+		capture.release();
+		return constructor(source, type);
+	}
+	return success;
+}
+
+
 bool ImgLoader::getNextFrame(Mat &frame) {
 	capture >> frame;
 	if(frame.empty())
@@ -49,9 +106,11 @@ int  ImgLoader::getFrameWidth () {
 }
 int  ImgLoader::getFrameHeight() {
 	if(sourceType == sFILE && roi.width != 0 && roi.height != 0)
-			return roi.height;
+		return roi.height;
 	return capture.get(CV_CAP_PROP_FRAME_HEIGHT);
 }
+
+Rect ImgLoader::getROI() { return roi; }
 
 SourceType ImgLoader::getSourceType() {
 	return sourceType;
@@ -139,4 +198,5 @@ bool ImgLoader::doubleRes() {
 	return setFrameHeight(res.height * 2) && setFrameWidth(res.width * 2);
 }
 
+bool ImgLoader::isOpen() { return capture.isOpened() && opened; }
 
