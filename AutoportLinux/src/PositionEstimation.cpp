@@ -60,7 +60,8 @@ void PositionEstimation::ransacPnP(vector<LedDescriptor> &ledPoints, Mat &extrin
 		Mat rvec 	   = Mat::zeros(3, 1, CV_64FC1);          // output rotation vector
 		Mat tvec 	   = Mat::zeros(3, 1, CV_64FC1);    // output translation vector
 
-		solvePnPRansac(objectPoints,imagePoints,cameraMatrix, vector<float>(0), rvec, tvec);
+		vector<float> distCoeff = {0.1768, -0.3365, 0, 0};
+		solvePnPRansac(objectPoints,imagePoints,cameraMatrix, distCoeff, rvec, tvec);
 
 		Mat rotationMat;
 		Rodrigues(rvec,rotationMat);
