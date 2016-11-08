@@ -12,6 +12,7 @@ using namespace cv;
 class ImgAnalysis {
 
 	Interval<Scalar> colorInterval;
+	Interval<Scalar> defColorInterval;
 
 	//int colorTolerance;
 	SimpleBlobDetector::Params params;
@@ -34,6 +35,7 @@ public:
 	ImgAnalysis* setBlobSizeInterval(const Interval<int> 	&blobSizeInterval);
 
 	void getColorInterval(Interval<Scalar> &colorInterval);
+	void resetColorInterval();
 
 private:
 

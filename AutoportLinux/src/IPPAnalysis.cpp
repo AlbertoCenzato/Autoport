@@ -90,7 +90,7 @@ Result IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 		updateImgRes(points);
 
 		//TODO: find an adequate tolerance for each color channel
-		//updateColor(points);
+		updateColor(points);
 	}
 
 	convertPointsToCamera(points, t, resampleMat);
@@ -158,10 +158,9 @@ bool IPPAnalysis::updateColor(const vector<LedDescriptor> &descriptors) {
 	const int SIZE = descriptors.size();
 	float sum[] = {0,0,0};
 	for(int i = 0; i < SIZE; ++i) {
-		Scalar color = descriptors[i].color;
-		sum[0] += color[0];
-		sum[1] += color[1];
-		sum[2] += color[2];
+		sum[0] += descriptors[i].color[0];
+		sum[1] += descriptors[i].color[1];
+		sum[2] += descriptors[i].color[2];
 	}
 
 	Scalar minCol, maxCol;
@@ -173,6 +172,8 @@ bool IPPAnalysis::updateColor(const vector<LedDescriptor> &descriptors) {
 		x = avrg + colorTol;
 		if(x > 255) x = 255;
 		maxCol[i] = x;
+
+		cout << "AVG color channel " << i << ": " << avrg << endl;
 	}
 
 	imageAnalyzer.setColorInterval(Interval<Scalar>(minCol,maxCol));
@@ -189,7 +190,7 @@ bool IPPAnalysis::resetROIandRes() {
 }
 
 bool IPPAnalysis::resetColor() {
-
+	imageAnalyzer.resetColorInterval();
 	return true;
 }
 

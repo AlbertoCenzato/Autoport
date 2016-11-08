@@ -22,6 +22,7 @@ ImgAnalysis::ImgAnalysis() {
 
 void ImgAnalysis::constructor(const Interval<Scalar> &colorInterval, LedColor ledColor) {
 	this->colorInterval = colorInterval; //FIXME: what happens here? is it coping the object? Probably yes
+	defColorInterval = colorInterval;
 
 	if(ledColor == LedColor::RED) colorConversion = COLOR_RGB2HSV;
 	else						  colorConversion = COLOR_BGR2HSV;
@@ -44,7 +45,6 @@ void ImgAnalysis::constructor(const Interval<Scalar> &colorInterval, LedColor le
 }
 
 bool ImgAnalysis::evaluate(Mat &image, vector<LedDescriptor> &points, float downscalingFactor) {
-
 
 	Mat hsvImg;
 	Mat colorFilteredImg;
@@ -108,6 +108,9 @@ void ImgAnalysis::getColorInterval(Interval<Scalar> &colorInterval) {
 
 }
 
+void ImgAnalysis::resetColorInterval() {
+	colorInterval = defColorInterval;
+}
 
 // --- private members ---
 
