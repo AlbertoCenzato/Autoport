@@ -8,6 +8,8 @@
 #ifndef IPPANALYSIS_HPP_
 #define IPPANALYSIS_HPP_
 
+
+#include "GenPurpFunc.hpp"
 #include "ImgLoader.hpp"
 #include "ImgAnalysis.hpp"
 #include "PatternAnalysis.hpp"

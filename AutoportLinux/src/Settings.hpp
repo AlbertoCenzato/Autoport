@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SETTINGS_HPP_
+#define SETTINGS_HPP_
 
 #include <stdlib.h>
 
@@ -71,3 +72,5 @@ public:
 	string toString();
 
 };
+
+#endif

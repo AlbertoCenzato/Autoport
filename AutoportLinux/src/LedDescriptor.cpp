@@ -42,7 +42,7 @@ float LedDescriptor::L2Dist(const LedDescriptor &ledDesc) const {
 }
 
 float LedDescriptor::cartDist(const LedDescriptor &ledDesc) const {
-	return GenPurpFunc::distPoint2Point(this->position, ledDesc.position);
+	return sqrt(pow(position.x - ledDesc.position.x, 2) + pow(position.y - ledDesc.position.y, 2));
 }
 
 bool LedDescriptor::isEmpty() {

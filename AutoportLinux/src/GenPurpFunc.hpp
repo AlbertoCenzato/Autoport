@@ -1,14 +1,13 @@
 //Copyright (c) 2016 Alberto Cenzato. All rights reserved.
 
-#pragma once
+#ifndef GEN_PURP_FUNC_HPP_
+#define GEN_PURP_FUNC_HPP_
 
 #include <opencv2/opencv.hpp>
+#include "LedDescriptor.hpp"
 
 using namespace cv;
 using namespace std;
-
-
-extern string workingDir;
 
 enum Status {
 	LOOKING_FOR_TARGET,
@@ -45,6 +44,7 @@ public:
 	}
 };
 
+
 struct Position_XYZ_YPR {
 
 public:
@@ -62,6 +62,7 @@ public:
 	}
 
 };
+
 
 struct Line {
 
@@ -165,7 +166,6 @@ namespace GenPurpFunc {
 		vec.pop_back();
 	}
 
-
 	inline float distPoint2Point(const Point2f &p1, const Point2f &p2) {
 		return sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2));
 	}
@@ -187,13 +187,18 @@ namespace GenPurpFunc {
 		return Point2f(x/SIZE, y/SIZE);
 	}
 
-	inline void drawDetectedLed(Mat &image, const Point2f &keyPoint, const string &number) {
-		putText(image, number, keyPoint, FONT_HERSHEY_SIMPLEX, 1, Scalar(150, 150, 0),4);
-		namedWindow("Detected leds", WINDOW_NORMAL);
-		imshow("Detected leds", image);
-		waitKey(25);
-		imwrite(workingDir + "output/detectedLeds.jpg",image);
+	inline void drawDetectedPoints(Mat &image, vector<LedDescriptor> &descriptors, const Scalar &color) {
+		for(uint i = 0; i < descriptors.size(); ++i)
+			circle(image, descriptors[i].position, 30, color, 10);
+		return;
+	}
+
+	inline void numberDetectedPoints(Mat &image, vector<LedDescriptor> &descriptors, const Scalar &color) {
+		for(uint i = 0; i < descriptors.size(); ++i)
+			putText(image, to_string(i), descriptors[i].position, FONT_HERSHEY_SIMPLEX, 1, color, 4);
 		return;
 	}
 
 }
+
+#endif

@@ -9,7 +9,6 @@
 #define LEDDESCRIPTOR_HPP_
 
 #include "opencv2/opencv.hpp"
-#include "GenPurpFunc.hpp"
 
 using namespace std;
 using namespace cv;

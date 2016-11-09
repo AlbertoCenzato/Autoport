@@ -5,14 +5,14 @@
  *      Author: alberto
  */
 
-#pragma once
+#ifndef POSITION_ESTIMATION_HPP_
+#define POSITION_ESTIMATION_HPP_
 
 #include <chrono>
 #include "GenPurpFunc.hpp"
 #include "Settings.hpp"
 #include <iostream>
 #include <fstream>
-#include "LedDescriptor.hpp"
 
 using namespace std;
 using namespace cv;
@@ -43,3 +43,5 @@ private:
 	void kalmanFilter();
 
 };
+
+#endif

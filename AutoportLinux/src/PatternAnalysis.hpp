@@ -5,13 +5,13 @@
  *      Author: alberto
  */
 
-#pragma once
+#ifndef PATTERN_ANALYSIS_HPP_
+#define PATTERN_ANALYSIS_HPP_
 
 #include "assert.h"
 
 #include "GenPurpFunc.hpp"
 #include "Settings.hpp"
-#include "LedDescriptor.hpp"
 
 using namespace std;
 using namespace cv;
@@ -82,3 +82,5 @@ private:
 
 
 };
+
+#endif

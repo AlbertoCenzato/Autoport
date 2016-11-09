@@ -7,7 +7,6 @@
 #include <opencv2/core/core.hpp>
 #include <unistd.h>
 
-#include "GenPurpFunc.hpp"
 #include "IPPAnalysis.hpp"
 
 using namespace cv;
@@ -307,7 +306,7 @@ namespace Test {
 		auto ipp = IPPAnalysis(&loader);
 		int count = 0, maxFramesToSkip = 5;
 
-		ofstream stream("position8.txt");
+		ofstream stream("data.txt");
 
 		if(!stream.is_open()) {
 			cout << "Couldn't open stream!";

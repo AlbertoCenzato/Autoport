@@ -5,8 +5,8 @@
  *      Author: alberto
  */
 
-#include "IPPAnalysis.hpp"
 #include <chrono>
+#include "IPPAnalysis.hpp"
 
 extern Status status;
 
@@ -47,6 +47,9 @@ Result IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 
 	vector<LedDescriptor> points(10);
 
+	namedWindow("Original image", WINDOW_NORMAL);
+	imshow("Original image", image);
+
 	auto begin = chrono::high_resolution_clock::now();
 	bool success = imageAnalyzer.evaluate(image, points, 1);
 	auto end = chrono::high_resolution_clock::now();
@@ -58,11 +61,16 @@ Result IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 		return Result::FAILURE;
 	}
 
+	Scalar red(0,0,255);
+	drawDetectedPoints(image, points,red);
+	imshow("Original image", image);
+
 	// register leds to match pattern
 	begin = chrono::high_resolution_clock::now();
 	success = patternAnalyzer.evaluate(points);
 	end = chrono::high_resolution_clock::now();
 	cout << "\nPattern analysis: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
+
 
 	if(!success) {
 		if(status == Status::FIRST_LANDING_PHASE || status == Status::SECOND_LANDING_PHASE) {
@@ -75,23 +83,13 @@ Result IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 	status = Status::FIRST_LANDING_PHASE;
 	cout << "PatternAnalysis succeded!" << endl;
 
-	Scalar blue(255,0,0);
-	for(uint i = 0; i < points.size(); ++i) {
-		string number = to_string(i);
-		if(!points[i].isEmpty()) {
-			circle(image, points[i].position, 30, blue, 10);
-			putText(image, number, points[i].position, HersheyFonts::FONT_HERSHEY_PLAIN,
-					2,blue,10,8);
-		}
-	}
+	Scalar green(0,255,0);
+	GenPurpFunc::numberDetectedPoints(image, points,red);
+	imshow("Original image", image);
 
-	if(success) {
-		updateROI(points);
-		updateImgRes(points);
-
-		//TODO: find an adequate tolerance for each color channel
-		updateColor(points);
-	}
+	updateROI(points);
+	updateImgRes(points);
+	updateColor(points);
 
 	convertPointsToCamera(points, t, resampleMat);
 
@@ -102,10 +100,6 @@ Result IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 	cout << "\nPosition estimation: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
 
 	if(!success) return Result::FAILURE;
-
-	namedWindow("Original image", WINDOW_NORMAL);
-	imshow("Original image", image);
-	waitKey(1);
 
 	return Result::SUCCESS;
 }
