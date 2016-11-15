@@ -57,10 +57,10 @@ void PositionEstimation::ransacPnP(vector<LedDescriptor> &ledPoints, Mat &extrin
 		cameraMatrix.at<float>(2,2) = 1;
 
 		Mat distCoeffs = Mat::zeros(4, 1, CV_64FC1);  // vector of distortion coefficients
-		Mat rvec 	   = Mat::zeros(3, 1, CV_64FC1);          // output rotation vector
-		Mat tvec 	   = Mat::zeros(3, 1, CV_64FC1);    // output translation vector
+		Mat rvec 	   = Mat::zeros(3, 1, CV_64FC1);  // output rotation vector
+		Mat tvec 	   = Mat::zeros(3, 1, CV_64FC1);  // output translation vector
 
-		vector<float> distCoeff = {0.1768, -0.3365, 0, 0};
+		vector<float> distCoeff = {h1, h2, 0, 0};
 		solvePnPRansac(objectPoints,imagePoints,cameraMatrix, distCoeff, rvec, tvec);
 
 		Mat rotationMat;
