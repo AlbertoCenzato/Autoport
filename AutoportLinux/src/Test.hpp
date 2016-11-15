@@ -340,6 +340,8 @@ namespace Test {
 		}
 
 		stream.close();
+		waitKey(0);
+
 	}
 }
 

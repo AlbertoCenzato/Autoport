@@ -36,8 +36,8 @@ private:
 	float focalY;
 	float pixelDimension;
 
-	float cx = 1.3081e+03;
-	float cy = 964.6396;
+	float cx = 1.3081e+03;	// TODO: load the value from config file
+	float cy = 964.6396;	// TODO: load the value from config file
 
 	void ransacPnP(vector<LedDescriptor> &ledPoints, Mat &extrinsicFactors);
 	void kalmanFilter();

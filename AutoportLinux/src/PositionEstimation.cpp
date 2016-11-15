@@ -50,10 +50,10 @@ void PositionEstimation::ransacPnP(vector<LedDescriptor> &ledPoints, Mat &extrin
 		}
 
 		Mat cameraMatrix(Size(3,3), CV_32F);
-		cameraMatrix.at<float>(0,0) = 2.0504e+03;
-		cameraMatrix.at<float>(1,1) = 2.0513e+03;
-		cameraMatrix.at<float>(0,2) = 1.3081e+03;
-		cameraMatrix.at<float>(1,2) = 964.6396;
+		cameraMatrix.at<float>(0,0) = focalX;
+		cameraMatrix.at<float>(1,1) = focalY;
+		cameraMatrix.at<float>(0,2) = cx;
+		cameraMatrix.at<float>(1,2) = cy;
 		cameraMatrix.at<float>(2,2) = 1;
 
 		Mat distCoeffs = Mat::zeros(4, 1, CV_64FC1);  // vector of distortion coefficients

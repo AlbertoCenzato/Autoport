@@ -84,7 +84,7 @@ Result IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 	cout << "PatternAnalysis succeded!" << endl;
 
 	Scalar green(0,255,0);
-	GenPurpFunc::numberDetectedPoints(image, points,red);
+	GenPurpFunc::numberDetectedPoints(image, points,green);
 	imshow("Original image", image);
 
 	updateROI(points);
