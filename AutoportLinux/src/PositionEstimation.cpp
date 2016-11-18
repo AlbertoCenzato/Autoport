@@ -49,6 +49,7 @@ bool PositionEstimation::evaluate(const vector<LedDescriptor> &cameraSystemPoint
 
 		//Kalman
 		kalmanFilter();
+
 		return true;
 	}
 	return false;
