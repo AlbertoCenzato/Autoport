@@ -76,7 +76,7 @@ void PositionEstimation::ransacPnP(const vector<LedDescriptor> &ledPoints, Mat &
 		auto imagePoints  = vector<Point2f>();
 		for(uint i = 0; i < ledPoints.size(); ++i) {
 			if(!ledPoints[i].isEmpty()) {
-				 objectPoints.push_back(rwPoints[i]);
+				objectPoints.push_back(rwPoints[i]);
 				imagePoints .push_back(ledPoints[i].position);
 			}
 		}
