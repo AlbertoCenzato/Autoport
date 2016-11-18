@@ -18,7 +18,7 @@ ImgLoader::ImgLoader(const string &source, SourceType type, const Size &frameSiz
 
 ImgLoader::ImgLoader(const string &source, SourceType type) {
 
-	if(cleverConstr(source, type))
+	if(!cleverConstr(source, type))
 		cerr << "Error setting capture parameters!" << endl;
 }
 

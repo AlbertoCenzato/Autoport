@@ -16,7 +16,7 @@ extern ofstream times;
 
 IPPAnalysis::IPPAnalysis(ImgLoader* loader) {
 	this->loader = loader;
-	Settings *settings =  Settings::getInstance();
+	Settings *settings = Settings::getInstance();
 	imageAnalyzer 	   = ImgAnalysis();
 	patternAnalyzer    = PatternAnalysis();
 	positionEstimator  = PositionEstimation();
