@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-#include "ImgLoader.hpp"
+#include "ImgFileLoader.hpp"
 #include "IPPAnalysis.hpp"
 
 using namespace cv;
@@ -300,16 +300,18 @@ namespace Test {
 	*/
 
 	void ippAnalysis(const string& path) {
-		ImgLoader loader;
-		if(path.compare("d") == 0)
-			loader = ImgLoader(path, SourceType::sDEVICE);
-		else
-			loader = ImgLoader(path, SourceType::sFILE);
+		ImgLoader *loader;
+		if(path.compare("d") != 0) {
+			loader = new ImgFileLoader(path);
+		}
+		else {
+			//loader = new ImgDeviceLoader();
+		}
 
 		cout << "LOADER OK" << endl;
 
 		Mat extrinsicFactors = Mat::zeros(3,4,CV_32FC1);
-		auto ipp = IPPAnalysis(&loader);
+		auto ipp = IPPAnalysis(loader);
 		//int count = 0, maxFramesToSkip = 5;
 
 		ofstream stream("drone.txt");
@@ -348,6 +350,7 @@ namespace Test {
 		stream.close();
 		waitKey(0);
 
+		delete loader;
 	}
 
 	void positionSensitivity() {

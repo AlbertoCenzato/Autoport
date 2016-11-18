@@ -15,57 +15,38 @@
 using namespace std;
 using namespace cv;
 
-enum SourceType {
-	sNONE,
-	sFILE,
-	sDEVICE,
-	sSTREAM
-};
-
-
 class ImgLoader {
 public:
 
 	ImgLoader();
-	ImgLoader(const string &source, SourceType type);
-	ImgLoader(const string &source, SourceType type, const Size &frameSize, int fps);	//FIXME setting frameSize throws an exception when reding frame
+	ImgLoader(const string &source);
+	ImgLoader(int device);
 
-	void begin() { capture.set(CV_CAP_PROP_POS_FRAMES,0); }
+	~ImgLoader();
 
-	bool getNextFrame(Mat &frame);
+	virtual bool getNextFrame(Mat &frame) = 0;
 
-	int  getFrameWidth ();
-	int  getFrameHeight();
-	Rect getROI();
-	SourceType getSourceType();
-	Mat getResampleMat();
-	void getCropVector(Point2f &t);
+	virtual int  getFrameWidth () = 0;
+	virtual int  getFrameHeight() = 0;
+	virtual Rect getROI()  = 0;
+	virtual Mat getResampleMat() = 0;
+	virtual void getCropVector(Point2f &t) = 0;
+
+	virtual bool setFrameWidth (int frameWidth)  = 0;
+	virtual bool setFrameHeight(int frameHeight) = 0;
+	virtual bool setROI(const Rect& roi) = 0;
+
+	virtual bool resetRes() = 0;
+	virtual void resetROI() = 0;
 
 	bool isOpen();
-
-	bool setFrameWidth (int frameWidth);
-	bool setFrameHeight(int frameHeight);
-	bool setROI(const Rect& roi);
-
-	bool resetRes();
-	void resetROI();
-
 	bool halveRes();
 	bool doubleRes();
 
-private:
+protected:
 
 	VideoCapture capture;
-	int fps = 30;
-	SourceType sourceType = sNONE;
-	bool opened = false;
-	Rect roi;				// region of interest
-	Size res;				// resolution
-	Size defRes;			// default resolution
-	bool resizeDynamically = false;
 
-	bool constructor(const string &source, SourceType type);
-	bool cleverConstr(const string &source, SourceType type, const Size &frameSize = Size(0,0), int fps = 30);
 };
 
 
