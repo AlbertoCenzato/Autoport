@@ -27,7 +27,13 @@ enum Result {
 	FAILURE
 };
 
-template<typename varType> struct Interval {
+enum LedColor {
+	RED,
+	BLUE
+};
+
+template<typename varType>
+struct Interval {
 
 public:
 	varType min;
@@ -43,7 +49,6 @@ public:
 		return to_string(min) + " " + to_string(max);
 	}
 };
-
 
 struct Position_XYZ_YPR {
 
@@ -82,10 +87,7 @@ public:
 	}
 };
 
-enum LedColor {
-	RED,
-	BLUE
-};
+
 
 namespace GenPurpFunc {
 

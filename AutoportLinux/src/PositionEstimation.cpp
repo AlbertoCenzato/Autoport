@@ -16,7 +16,13 @@ PositionEstimation::PositionEstimation() {
 		Settings& settings = Settings::getInstance();
 		focalX = (float)settings.focalX;
 		focalY = (float)settings.focalY;
-		pixelDimension = (float)settings.pixelDimension;
+		//pixelDimension = (float)settings.pixelDimension;
+
+		resetInitialPosition();
+
+		distCoeffs = Mat::zeros(4, 1, CV_32FC1);
+		distCoeffs.at<float>(0,0) = h1;
+		distCoeffs.at<float>(1,0) = h2;
 
 	}
 
@@ -33,6 +39,19 @@ bool PositionEstimation::evaluate(vector<LedDescriptor> &cameraSystemPoints, Mat
 		return true;
 	}
 	return false;
+}
+
+bool PositionEstimation::resetInitialPosition() {
+	Settings& settings = Settings::getInstance();
+	tvec.at<float>(0,0) = settings.initialPosition.x;
+	tvec.at<float>(1,0) = settings.initialPosition.y;
+	tvec.at<float>(2,0) = settings.initialPosition.z;
+
+	rvec.at<float>(0,0) = 0;
+	rvec.at<float>(1,0) = 0;
+	rvec.at<float>(2,0) = 0;
+
+	return true;
 }
 
 // --- private members ---
@@ -56,12 +75,8 @@ void PositionEstimation::ransacPnP(vector<LedDescriptor> &ledPoints, Mat &extrin
 		cameraMatrix.at<float>(1,2) = cy;
 		cameraMatrix.at<float>(2,2) = 1;
 
-		Mat distCoeffs = Mat::zeros(4, 1, CV_64FC1);  // vector of distortion coefficients
-		Mat rvec 	   = Mat::zeros(3, 1, CV_64FC1);  // output rotation vector
-		Mat tvec 	   = Mat::zeros(3, 1, CV_64FC1);  // output translation vector
-
 		vector<float> distCoeff = {h1, h2, 0, 0};
-		solvePnPRansac(objectPoints,imagePoints,cameraMatrix, distCoeff, rvec, tvec);
+		solvePnPRansac(objectPoints,imagePoints,cameraMatrix, distCoeffs, rvec, tvec);
 
 		Mat rotationMat;
 		Rodrigues(rvec,rotationMat);

@@ -9,6 +9,7 @@
 #include "IPPAnalysis.hpp"
 
 extern Status status;
+extern ofstream ledStream;
 
 
 IPPAnalysis::IPPAnalysis(ImgLoader* loader) {
@@ -40,10 +41,9 @@ Result IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 		return Result::END;
 	}
 
-	Mat resampleMat;
 	Point2f t;
-	loader->getResampleMat(resampleMat);
-	loader->getCropVector (t);
+	loader->getCropVector(t);
+	Mat resampleMat = loader->getResampleMat();
 
 	vector<LedDescriptor> points(10);
 
@@ -51,13 +51,19 @@ Result IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 	imshow("Original image", image);
 
 	auto begin = chrono::high_resolution_clock::now();
-	bool success = imageAnalyzer.evaluate(image, points, 1);
+	bool success = imageAnalyzer.evaluate(image, points);
 	auto end = chrono::high_resolution_clock::now();
 	cout << "\nImage analysis: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
 
 	// find leds
 	if(!success) {
 		cerr << "ImageAnalysis failed!" << endl;
+		for(int i = 0; i < 2; ++i) {
+			for(int j = 0; j < 5; ++j) {
+				ledStream << 0 << " ";
+			}
+			ledStream << endl;
+		}
 		return Result::FAILURE;
 	}
 
@@ -78,10 +84,30 @@ Result IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 			status = Status::LOOKING_FOR_TARGET;
 		}
 		cerr << "PatternAnalysis failed!" << endl;
+		for(int i = 0; i < 2; ++i) {
+			for(int j = 0; j < 5; ++j) {
+				ledStream << 0 << " ";
+			}
+			ledStream << endl;
+		}
 		return Result::FAILURE;
 	}
-	status = Status::FIRST_LANDING_PHASE;
+	//status = Status::FIRST_LANDING_PHASE;
 	cout << "PatternAnalysis succeded!" << endl;
+
+	Mat ledPositions = Mat::zeros(2,5,CV_32FC1);
+	for(uint i = 0; i < points.size(); ++i) {
+		ledPositions.at<float>(0,i) = points[i].position.x;
+		ledPositions.at<float>(1,i) = points[i].position.y;
+	}
+
+	for(int i = 0; i < 2; ++i) {
+		for(int j = 0; j < 5; ++j) {
+			ledStream << ledPositions.at<float>(i,j) << " ";
+		}
+		ledStream << endl;
+	}
+
 
 	Scalar green(0,255,0);
 	GenPurpFunc::numberDetectedPoints(image, points,green);
@@ -105,7 +131,7 @@ Result IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 }
 
 bool IPPAnalysis::reset() {
-	return resetROIandRes() && resetColor();
+	return resetROIandRes() && resetColor() && positionEstimator.resetInitialPosition();
 }
 
 // --- private members ---

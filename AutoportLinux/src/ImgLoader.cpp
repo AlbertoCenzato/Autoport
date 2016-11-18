@@ -73,7 +73,7 @@ bool ImgLoader::cleverConstr(const string &source, SourceType type, const Size &
 	//success = success && capture.set(CAP_PROP_FPS, fps);
 	//success = success && capture.set(CAP_PROP_BRIGHTNESS, 0.0001);
 
-	// if an error occurs fall back to default camera parameters
+	// if an error occurs fall back to default capture parameters
 	if(!success) {
 		capture.release();
 		return constructor(source, type);
@@ -88,8 +88,8 @@ bool ImgLoader::getNextFrame(Mat &frame) {
 		return false;
 
 	if(sourceType == sFILE) {
-		if(resizeDynamically)
-			resize(frame,frame,res,0,0,INTER_LANCZOS4);
+		//if(resizeDynamically)
+		//	resize(frame,frame,res,0,0,INTER_LANCZOS4);
 		frame = frame(roi);
 	}
 
@@ -113,10 +113,12 @@ SourceType ImgLoader::getSourceType() {
 	return sourceType;
 }
 
-void ImgLoader::getResampleMat(Mat &resampleMat) {
-	resampleMat = Mat::zeros(2,2,CV_32FC1);
+Mat ImgLoader::getResampleMat() {
+	Mat resampleMat = Mat::zeros(2,2,CV_32FC1);
 	resampleMat.at<float>(0,0) = 2592/res.width;	// TODO
 	resampleMat.at<float>(1,1) = 1944/res.height;	// TODO
+
+	return resampleMat;
 }
 
 void ImgLoader::getCropVector(Point2f &t) {

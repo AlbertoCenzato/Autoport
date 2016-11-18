@@ -36,32 +36,26 @@ void ImgAnalysis::constructor(const Interval<Scalar> &colorInterval, LedColor le
 	//params.maxArea = 10000;
 	params.filterByInertia = false;
 	params.filterByConvexity = false;
-	params.filterByCircularity = false;
-	//params.minCircularity = 0.5;
-	//params.maxCircularity = 1;
+	params.filterByCircularity = true;
+	params.minCircularity = 0.5;
+	params.maxCircularity = 1;
 
 	//Settings& settings = Settings::getInstance();
 	//colorTolerance   = settings.colorTolerance;
 }
 
-bool ImgAnalysis::evaluate(Mat &image, vector<LedDescriptor> &points, float downscalingFactor) {
-
-	Mat hsvImg;
-	Mat colorFilteredImg;
+bool ImgAnalysis::evaluate(Mat &image, vector<LedDescriptor> &points) {
 
 	//change color space: from BGR to HSV;
 	//TODO: color conversion and filterByColor can be performed with a shader (?)
 	auto begin = chrono::high_resolution_clock::now();
-	cvtColor(image,hsvImg,colorConversion);
+	cvtColor(image,hsvImage,colorConversion);
 	auto end = chrono::high_resolution_clock::now();
 	cout << "\nConvert color: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
 
-	hsvImage = hsvImg;
-
-
 	//filter the color according to this->low and this->high tolerances
 	begin = chrono::high_resolution_clock::now();
-	filterByColor(hsvImg,colorFilteredImg);
+	Mat colorFilteredImg = filterByColor(hsvImage);
 	end = chrono::high_resolution_clock::now();
 	cout << "\nFilter color: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
 
@@ -70,7 +64,7 @@ bool ImgAnalysis::evaluate(Mat &image, vector<LedDescriptor> &points, float down
 
 	//put in this->points detected blobs that satisfy this->params tolerance
 	begin = chrono::high_resolution_clock::now();
-	int blobNumber = findBlobs(colorFilteredImg, points, downscalingFactor);
+	int blobNumber = findBlobs(colorFilteredImg, points);
 	end = chrono::high_resolution_clock::now();
 	cout << "\nFound " << blobNumber << " blobs: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
 
@@ -120,8 +114,9 @@ void ImgAnalysis::resetColorInterval() {
 // @min: the lower bound specified in the HSV color space.
 // @max: the upper bound specified in the HSV color space.
 // returns: black and white image as a Mat object.
-void ImgAnalysis::filterByColor(const Mat &hsvImg, Mat &colorFilteredImg) {
+Mat ImgAnalysis::filterByColor(const Mat &hsvImg) {
 
+	Mat colorFilteredImg;
 	// Sets to white all colors in the threshold interval [min,max] and to black the others
 	inRange(hsvImg, colorInterval.min, colorInterval.max, colorFilteredImg);
 
@@ -133,7 +128,7 @@ void ImgAnalysis::filterByColor(const Mat &hsvImg, Mat &colorFilteredImg) {
 	dilate(colorFilteredImg, colorFilteredImg, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
 	erode (colorFilteredImg, colorFilteredImg, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
 
-	return;
+	return colorFilteredImg;
 }
 
 // Finds all color blobs that fit the specified parameters. Blobs which distance
@@ -141,7 +136,7 @@ void ImgAnalysis::filterByColor(const Mat &hsvImg, Mat &colorFilteredImg) {
 // @img: image to analyze.
 // @blobParam: parameters to fit.
 // returns: a vector of Point2f containing centroids coordinates of detected blobs.
-int ImgAnalysis::findBlobs(const Mat &colorFilteredImg, vector<LedDescriptor>& ledPoints, float downscalingFactor) {
+int ImgAnalysis::findBlobs(const Mat &colorFilteredImg, vector<LedDescriptor>& ledPoints) {
 
 	//TODO: check this way of computing valid led sizes interval: it can lead to
 	//a degeneration of the interval amplitude continuously increasing it in presence

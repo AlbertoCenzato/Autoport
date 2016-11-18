@@ -39,7 +39,7 @@ int main() {
 	string path;
 	cin >> path;
 
-	Test::ippAnalysis(path);
+	Test::positionSensitivity();
 
 	getchar();
 	return 0;

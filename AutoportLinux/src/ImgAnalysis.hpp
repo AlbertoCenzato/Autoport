@@ -26,7 +26,7 @@ public:
 
 	~ImgAnalysis() {}
 
-	bool evaluate(Mat &image, vector<LedDescriptor> &points, float downscalingFactor);
+	bool evaluate(Mat &image, vector<LedDescriptor> &points);
 	//ImgAnalysis* setColorTolerance	(int);
 	ImgAnalysis* setSizeTolerance	(int);
 	ImgAnalysis* setSizeSupTolerance(int);
@@ -46,14 +46,14 @@ private:
 	// @min: the lower bound specified in the HSV color space.
 	// @max: the upper bound specified in the HSV color space.
 	// returns: black and white image as a Mat object.
-	void filterByColor(const Mat &hsvImg, Mat &colorFilteredImg);
+	Mat filterByColor(const Mat &hsvImg);
 
 	// Finds all color blobs that fit the specified parameters. Blobs which distance
 	// from the centroid of the blob set is grater than 2*meanDistance are ignored.
 	// @img: image to analyze.
 	// @blobParam: parameters to fit.
 	// returns: a vector of Point2f containing centroids coordinates of detected blobs.
-	int findBlobs(const Mat &colorFilteredImg, vector<LedDescriptor>& ledPoints, float downscalingFactor);
+	int findBlobs(const Mat &colorFilteredImg, vector<LedDescriptor>& ledPoints);
 
 };
 

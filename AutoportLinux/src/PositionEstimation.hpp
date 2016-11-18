@@ -28,19 +28,25 @@ public:
 
 	bool evaluate(vector<LedDescriptor> &, Mat &evaluatedPoints);
 
-	PositionEstimation* setPointsToEvaluate(uchar pointsToEvaluate);
+	bool resetInitialPosition();
+	//PositionEstimation* setPointsToEvaluate(uchar pointsToEvaluate);
 
 private:
 
 	float focalX;
 	float focalY;
-	float pixelDimension;
+	//float pixelDimension;
 
 	float cx = 1.3081e+03;	// TODO: load the value from config file
 	float cy = 	 964.6396;	// TODO: load the value from config file
 
 	float h1 =  0.1768;		// TODO: load the value from config file
 	float h2 = -0.3365;		// TODO: load the value from config file
+
+	Mat rvec = Mat::zeros(3, 1, CV_32FC1);  // output rotation vector
+	Mat tvec = Mat::zeros(3, 1, CV_32FC1);  // output translation vector
+
+	Mat distCoeffs = Mat::zeros(4, 1, CV_32FC1);
 
 	void ransacPnP(vector<LedDescriptor> &ledPoints, Mat &extrinsicFactors);
 	void kalmanFilter();

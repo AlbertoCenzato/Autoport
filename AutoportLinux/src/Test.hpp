@@ -22,15 +22,19 @@ int minHue = 0, maxHue = 255;
 int minSat = 0, maxSat = 255;
 int minVal = 0, maxVal = 255;
 
+ofstream ledStream("led.txt");
+
 namespace Test {
 
+/*
 	void on_trackbar(int, void*) {
 		Scalar low (minHue, minSat, minVal);
 		Scalar high(maxHue, maxSat, maxVal);
 		Interval<Scalar> colorInterval(low, high);
 		imgAnalyzer.setColorInterval(colorInterval);
 	}
-
+*/
+/*
 	void pointCloudRegister() {
 		srand (time(NULL));
 		Scalar white(255,255,255);
@@ -101,7 +105,8 @@ namespace Test {
 		cout << "Mean time elapsed: " << timeElapsed/1000/ITERATIONS << "us" << endl;
 		cout << "Mean error: " << meanError << endl;
 	}
-
+	*/
+/*
 	void notteDellaRicerca() {
 
 		Size frameSize(800,600);
@@ -177,7 +182,9 @@ namespace Test {
 
 		settings.saveConfig();
 	}
+	*/
 
+/*
 	void cameraCapture() {
 
 		//Size frameSize(800,600);
@@ -185,12 +192,11 @@ namespace Test {
 		const string windowName("Video stream");
 		namedWindow(windowName, WINDOW_AUTOSIZE);
 
-		/*
-		const string fileName = workingDir + "output.avi";
-		int frameWidht = loader.getFrameWidth();
-		int frameHeight = loader.getFrameHeight();
-		VideoWriter video(fileName, CV_FOURCC('M','J','P','G'),10, Size(frameWidht,frameHeight), true);
-		*/
+		//const string fileName = workingDir + "output.avi";
+		//int frameWidht = loader.getFrameWidth();
+		//int frameHeight = loader.getFrameHeight();
+		//VideoWriter video(fileName, CV_FOURCC('M','J','P','G'),10, Size(frameWidht,frameHeight), true);
+
 		Mat frame;
 		char c = 64;
 		while(c != 27) {
@@ -203,7 +209,9 @@ namespace Test {
 
 
 	}
+	*/
 
+/*
 	//--- Image analysis and position estimation test ----
 	void taraturaParametriChristian(const string &path) {
 
@@ -262,21 +270,20 @@ namespace Test {
 			imshow("Original image", image);
 			ch = waitKey(0);
 
-			/*
-			cout << "\n\nPunti traslati:";
-			Point2f trasl = Point2f(-1296,972);
-			for(int i = 0; i < 8; i++) {
-				ledPoints.at(i).y = -ledPoints.at(i).y;
-				ledPoints.at(i) = ledPoints.at(i) + trasl;
-				cout << "\nPunto " << i << ": [" << ledPoints.at(i).x << "," << ledPoints.at(i).y << "]";
-			}
 
-			cout << "\n\nEVALUATING POSITION...";
-			auto position = Matrix<double,3,2>();
-			posEstimator.evaluate(ledPoints, position);
-			cout << "\nCurrent position is:\n";
-			GenPurpFunc::printMatrixd(position,3,2);
-			*/
+			//cout << "\n\nPunti traslati:";
+			//Point2f trasl = Point2f(-1296,972);
+			//for(int i = 0; i < 8; i++) {
+			//	ledPoints.at(i).y = -ledPoints.at(i).y;
+			//	ledPoints.at(i) = ledPoints.at(i) + trasl;
+			//	cout << "\nPunto " << i << ": [" << ledPoints.at(i).x << "," << ledPoints.at(i).y << "]";
+			//}
+            //
+			//cout << "\n\nEVALUATING POSITION...";
+			//auto position = Matrix<double,3,2>();
+			//posEstimator.evaluate(ledPoints, position);
+			//cout << "\nCurrent position is:\n";
+			//GenPurpFunc::printMatrixd(position,3,2);
 
 		}
 
@@ -292,6 +299,7 @@ namespace Test {
 
 		return;
 	}
+	*/
 
 	void ippAnalysis(const string& path) {
 		ImgLoader loader;
@@ -304,9 +312,9 @@ namespace Test {
 
 		Mat extrinsicFactors = Mat::zeros(3,4,CV_32FC1);
 		auto ipp = IPPAnalysis(&loader);
-		int count = 0, maxFramesToSkip = 5;
+		//int count = 0, maxFramesToSkip = 5;
 
-		ofstream stream("data.txt");
+		ofstream stream("drone.txt");
 
 		if(!stream.is_open()) {
 			cout << "Couldn't open stream!";
@@ -320,12 +328,12 @@ namespace Test {
 			success = ipp.evaluate(extrinsicFactors);
 			if(success == Result::END)
 				break;
-			if(success == Result::FAILURE) {
-				++count;
-				if(count > maxFramesToSkip) {
 					ipp.reset();
-					count = 0;
-				}
+			if(success == Result::FAILURE) {
+				//++count;
+				//if(count > maxFramesToSkip) {
+				//	count = 0;
+				//}
 				extrinsicFactors = Mat::zeros(3,4,CV_32FC1);
 			}
 			cout << "Position:\n" << extrinsicFactors << endl;
@@ -336,12 +344,32 @@ namespace Test {
 				}
 				stream << "\n";
 			}
-			ch = waitKey(1);
+			ch = waitKey(0);
 		}
 
 		stream.close();
 		waitKey(0);
 
+	}
+
+	void positionSensitivity() {
+		auto positionEstimator = PositionEstimation();
+		Mat extrinsicFactors = Mat::zeros(3,4,CV_32FC1);
+		float f = 0;
+		Point2f p1 = Point2f(513,513);
+		Point2f p2 = Point2f(513,-513);
+		Point2f p3 = Point2f(-513,-513);
+		Point2f p4 = Point2f(-513,513);
+		Scalar color(0,0,0);
+		vector<LedDescriptor> points = {LedDescriptor(p1,color,f),
+								  	    LedDescriptor(p2,color,f),
+										LedDescriptor(p3,color,f),
+										LedDescriptor(p4,color,f)};
+		bool success = positionEstimator.evaluate(points,extrinsicFactors);
+		if(success)
+			cout << extrinsicFactors << endl;
+		else
+			cout << "Fallito" << endl;
 	}
 }
 

@@ -38,7 +38,7 @@ public:
 	int  getFrameHeight();
 	Rect getROI();
 	SourceType getSourceType();
-	void getResampleMat(Mat &resampleMat);
+	Mat getResampleMat();
 	void getCropVector(Point2f &t);
 
 	bool isOpen();
