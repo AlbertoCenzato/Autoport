@@ -7,18 +7,31 @@
 
 #include "PositionEstimation.hpp"
 
-#include <opencv2/opencv.hpp>
+#include <chrono>
+#include "GenPurpFunc.hpp"
+#include "Settings.hpp"
+#include <iostream>
+#include <fstream>
 
 using namespace std;
 using namespace cv;
 
+//--- public member functions ---
+
 PositionEstimation::PositionEstimation() {
-		Settings& settings = Settings::getInstance();
-		focalX = (float)settings.focalX;
-		focalY = (float)settings.focalY;
+		Settings *settings = Settings::getInstance();
+		focalX = (float)settings->focalX;
+		focalY = (float)settings->focalY;
 		//pixelDimension = (float)settings.pixelDimension;
 
 		resetInitialPosition();
+
+		Mat cameraMatrix(Size(3,3), CV_32F);
+		cameraMatrix.at<float>(0,0) = focalX;
+		cameraMatrix.at<float>(1,1) = focalY;
+		cameraMatrix.at<float>(0,2) = cx;
+		cameraMatrix.at<float>(1,2) = cy;
+		cameraMatrix.at<float>(2,2) = 1;
 
 		distCoeffs = Mat::zeros(4, 1, CV_32FC1);
 		distCoeffs.at<float>(0,0) = h1;
@@ -28,7 +41,7 @@ PositionEstimation::PositionEstimation() {
 
 PositionEstimation::~PositionEstimation() {}
 
-bool PositionEstimation::evaluate(vector<LedDescriptor> &cameraSystemPoints, Mat &extrinsicFactors) {
+bool PositionEstimation::evaluate(const vector<LedDescriptor> &cameraSystemPoints, Mat &extrinsicFactors) {
 
 	//valuto posizione con ransac
 	if(cameraSystemPoints.size() == 4 || cameraSystemPoints.size() == 5) {
@@ -42,10 +55,10 @@ bool PositionEstimation::evaluate(vector<LedDescriptor> &cameraSystemPoints, Mat
 }
 
 bool PositionEstimation::resetInitialPosition() {
-	Settings& settings = Settings::getInstance();
-	tvec.at<float>(0,0) = settings.initialPosition.x;
-	tvec.at<float>(1,0) = settings.initialPosition.y;
-	tvec.at<float>(2,0) = settings.initialPosition.z;
+	Settings *settings = Settings::getInstance();
+	tvec.at<float>(0,0) = settings->initialPosition.x;
+	tvec.at<float>(1,0) = settings->initialPosition.y;
+	tvec.at<float>(2,0) = settings->initialPosition.z;
 
 	rvec.at<float>(0,0) = 0;
 	rvec.at<float>(1,0) = 0;
@@ -54,28 +67,20 @@ bool PositionEstimation::resetInitialPosition() {
 	return true;
 }
 
-// --- private members ---
+// --- private member functions ---
 
-void PositionEstimation::ransacPnP(vector<LedDescriptor> &ledPoints, Mat &extrinsicFactors) {
+void PositionEstimation::ransacPnP(const vector<LedDescriptor> &ledPoints, Mat &extrinsicFactors) {
 
-		auto rwPoints = Settings::getInstance().realWorldPoints;
+		auto rwPoints = Settings::getInstance()->realWorldPoints;
 		auto objectPoints = vector<Point3f>();
 		auto imagePoints  = vector<Point2f>();
-		for(int i = 0; i < ledPoints.size(); ++i) {
+		for(uint i = 0; i < ledPoints.size(); ++i) {
 			if(!ledPoints[i].isEmpty()) {
-				objectPoints.push_back(rwPoints[i]);
+				 objectPoints.push_back(rwPoints[i]);
 				imagePoints .push_back(ledPoints[i].position);
 			}
 		}
 
-		Mat cameraMatrix(Size(3,3), CV_32F);
-		cameraMatrix.at<float>(0,0) = focalX;
-		cameraMatrix.at<float>(1,1) = focalY;
-		cameraMatrix.at<float>(0,2) = cx;
-		cameraMatrix.at<float>(1,2) = cy;
-		cameraMatrix.at<float>(2,2) = 1;
-
-		vector<float> distCoeff = {h1, h2, 0, 0};
 		solvePnPRansac(objectPoints,imagePoints,cameraMatrix, distCoeffs, rvec, tvec);
 
 		Mat rotationMat;

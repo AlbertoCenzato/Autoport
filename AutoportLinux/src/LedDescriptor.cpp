@@ -45,7 +45,7 @@ float LedDescriptor::cartDist(const LedDescriptor &ledDesc) const {
 	return sqrt(pow(position.x - ledDesc.position.x, 2) + pow(position.y - ledDesc.position.y, 2));
 }
 
-bool LedDescriptor::isEmpty() {
+bool LedDescriptor::isEmpty() const {
 	return position.x == 0 || position.y == 0;
 }
 

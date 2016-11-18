@@ -8,15 +8,18 @@
 #ifndef IPPANALYSIS_HPP_
 #define IPPANALYSIS_HPP_
 
+#include <opencv2/core.hpp>
 
-#include "GenPurpFunc.hpp"
-#include "ImgLoader.hpp"
+#include <fstream>
 #include "ImgAnalysis.hpp"
 #include "PatternAnalysis.hpp"
 #include "PositionEstimation.hpp"
 
 using namespace std;
 using namespace cv;
+
+class LedDescriptor;
+class ImgLoader;
 
 class IPPAnalysis {
 public:

@@ -28,7 +28,7 @@ Settings::~Settings() {
 	delete [] filePath;
 }
 
-Settings& Settings::getInstance() {
+Settings* Settings::getInstance() {
 	if(singleton == nullptr) {
 		const int bufferSize = 500;
 		char workDir[bufferSize];
@@ -39,7 +39,7 @@ Settings& Settings::getInstance() {
 		singleton = new Settings(configFilePath);
 		singleton->workingDir = workDir;
 	}
-	return *singleton;
+	return singleton;
 }
 
 bool Settings::loadConfiguration(const string &configFilePath) {

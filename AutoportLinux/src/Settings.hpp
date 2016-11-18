@@ -60,7 +60,7 @@ public:
 
 	virtual ~Settings();
 
-	static Settings& getInstance();
+	static Settings* getInstance();
 	//static Settings& getInstance(const string& configFilePath);
 
 	bool loadConfiguration(const string &configFilePath);

@@ -28,7 +28,7 @@ public:
 	float L2Dist  (const LedDescriptor &ledDesc) const;
 	float cartDist(const LedDescriptor &ledDesc) const;
 
-	bool isEmpty();
+	bool isEmpty() const;
 
 	static Point2f centroid(const vector<LedDescriptor> &descriptors);
 

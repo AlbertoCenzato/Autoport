@@ -18,8 +18,8 @@ extern Status status;
 
 
 PatternAnalysis::PatternAnalysis() {
-	Settings& settings = Settings::getInstance();
-	const int SIZE = settings.realWorldPoints.size();
+	Settings *settings = Settings::getInstance();
+	const int SIZE = settings->realWorldPoints.size();
 	oldPoints = vector<LedDescriptor>(SIZE);
 
 	// TODO: check if this assumption is correct
@@ -27,7 +27,8 @@ PatternAnalysis::PatternAnalysis() {
 
 	pattern = vector<Point2f>(SIZE);
 	for(int i = 0; i < SIZE; ++i) {
-		pattern[i] = Point2f(settings.realWorldPoints[i].x,settings.realWorldPoints[i].y);
+		pattern[i] = Point2f(settings->realWorldPoints[i].x,
+							 settings->realWorldPoints[i].y);
 	}
 }
 

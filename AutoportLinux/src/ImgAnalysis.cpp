@@ -12,12 +12,12 @@ ImgAnalysis::ImgAnalysis(const Interval<Scalar> &colorInterval, LedColor ledColo
 
 ImgAnalysis::ImgAnalysis() {
 
-	Settings& settings = Settings::getInstance();
-	Scalar low  = Scalar(settings.hue.min, settings.saturation.min, settings.value.min);
-	Scalar high = Scalar(settings.hue.max, settings.saturation.max, settings.value.max);
+	Settings *settings = Settings::getInstance();
+	Scalar low  = Scalar(settings->hue.min, settings->saturation.min, settings->value.min);
+	Scalar high = Scalar(settings->hue.max, settings->saturation.max, settings->value.max);
 
 	//auto patternAnalysis = PatternAnalysis();
-	constructor(Interval<Scalar>(low,high), settings.patternColor);
+	constructor(Interval<Scalar>(low,high), settings->patternColor);
 }
 
 void ImgAnalysis::constructor(const Interval<Scalar> &colorInterval, LedColor ledColor) {

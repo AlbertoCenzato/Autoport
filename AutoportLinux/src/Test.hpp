@@ -1,12 +1,9 @@
-#include <iostream>
-#include <stdlib.h>
-#include <opencv2/opencv.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/videoio.hpp>
-#include <opencv2/core/core.hpp>
-#include <unistd.h>
+#ifndef TEST_HPP_
+#define TEST_HPP_
 
+#include <iostream>
+
+#include "ImgLoader.hpp"
 #include "IPPAnalysis.hpp"
 
 using namespace cv;
@@ -23,6 +20,7 @@ int minSat = 0, maxSat = 255;
 int minVal = 0, maxVal = 255;
 
 ofstream ledStream("led.txt");
+ofstream times("times.txt");
 
 namespace Test {
 
@@ -373,3 +371,4 @@ namespace Test {
 	}
 }
 
+#endif

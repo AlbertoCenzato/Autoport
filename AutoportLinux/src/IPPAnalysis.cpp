@@ -7,23 +7,25 @@
 
 #include <chrono>
 #include "IPPAnalysis.hpp"
+#include "GenPurpFunc.hpp"
+#include "ImgLoader.hpp"
 
 extern Status status;
 extern ofstream ledStream;
-
+extern ofstream times;
 
 IPPAnalysis::IPPAnalysis(ImgLoader* loader) {
 	this->loader = loader;
-	Settings& settings =  Settings::getInstance();
-	imageAnalyzer 	  = ImgAnalysis();
-	patternAnalyzer   = PatternAnalysis();
-	positionEstimator = PositionEstimation();
+	Settings *settings =  Settings::getInstance();
+	imageAnalyzer 	   = ImgAnalysis();
+	patternAnalyzer    = PatternAnalysis();
+	positionEstimator  = PositionEstimation();
 
-	ROITol     = settings.ROITolerance;
+	ROITol     = settings->ROITolerance;
 	sizeInfTol = 4;							//FIXME: add this to Settings
-	sizeSupTol = settings.sizeSupTolerance;
-	sizeTol    = settings.sizeTolerance;
-	colorTol   = settings.colorTolerance;
+	sizeSupTol = settings->sizeSupTolerance;
+	sizeTol    = settings->sizeTolerance;
+	colorTol   = settings->colorTolerance;
 }
 
 IPPAnalysis::~IPPAnalysis() {}
@@ -53,7 +55,7 @@ Result IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 	auto begin = chrono::high_resolution_clock::now();
 	bool success = imageAnalyzer.evaluate(image, points);
 	auto end = chrono::high_resolution_clock::now();
-	cout << "\nImage analysis: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
+	times << chrono::duration_cast<chrono::milliseconds>(end-begin).count();
 
 	// find leds
 	if(!success) {
@@ -72,11 +74,7 @@ Result IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 	imshow("Original image", image);
 
 	// register leds to match pattern
-	begin = chrono::high_resolution_clock::now();
 	success = patternAnalyzer.evaluate(points);
-	end = chrono::high_resolution_clock::now();
-	cout << "\nPattern analysis: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
-
 
 	if(!success) {
 		if(status == Status::FIRST_LANDING_PHASE || status == Status::SECOND_LANDING_PHASE) {
@@ -123,7 +121,7 @@ Result IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 	begin = chrono::high_resolution_clock::now();
 	success = positionEstimator.evaluate(points, extrinsicFactors);
 	end = chrono::high_resolution_clock::now();
-	cout << "\nPosition estimation: " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << "ms" << endl;
+	times << " " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << endl;
 
 	if(!success) return Result::FAILURE;
 

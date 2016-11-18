@@ -8,16 +8,14 @@
 #ifndef POSITION_ESTIMATION_HPP_
 #define POSITION_ESTIMATION_HPP_
 
-#include <chrono>
-#include "GenPurpFunc.hpp"
-#include "Settings.hpp"
-#include <iostream>
-#include <fstream>
+#include <opencv2/opencv.hpp>
 
 using namespace std;
 using namespace cv;
 
 extern ofstream stream;
+
+class LedDescriptor;
 
 class PositionEstimation {
 
@@ -26,7 +24,7 @@ public:
 	PositionEstimation();
 	~PositionEstimation();
 
-	bool evaluate(vector<LedDescriptor> &, Mat &evaluatedPoints);
+	bool evaluate(const vector<LedDescriptor> &, Mat &evaluatedPoints);
 
 	bool resetInitialPosition();
 	//PositionEstimation* setPointsToEvaluate(uchar pointsToEvaluate);
@@ -46,9 +44,11 @@ private:
 	Mat rvec = Mat::zeros(3, 1, CV_32FC1);  // output rotation vector
 	Mat tvec = Mat::zeros(3, 1, CV_32FC1);  // output translation vector
 
+	Mat cameraMatrix;
+
 	Mat distCoeffs = Mat::zeros(4, 1, CV_32FC1);
 
-	void ransacPnP(vector<LedDescriptor> &ledPoints, Mat &extrinsicFactors);
+	void ransacPnP(const vector<LedDescriptor> &ledPoints, Mat &extrinsicFactors);
 	void kalmanFilter();
 
 };
