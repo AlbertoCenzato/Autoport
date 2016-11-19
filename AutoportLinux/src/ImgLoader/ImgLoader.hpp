@@ -22,14 +22,14 @@ public:
 	ImgLoader(const string &source);
 	ImgLoader(int device);
 
-	~ImgLoader();
+	virtual ~ImgLoader();
 
 	virtual bool getNextFrame(Mat &frame) = 0;
 
 	virtual int  getFrameWidth () = 0;
 	virtual int  getFrameHeight() = 0;
-	virtual Rect getROI()  = 0;
-	virtual Mat getResampleMat() = 0;
+	virtual Rect getROI() = 0;
+	virtual Mat  getResampleMat() = 0;
 	virtual void getCropVector(Point2f &t) = 0;
 
 	virtual bool setFrameWidth (int frameWidth)  = 0;

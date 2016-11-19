@@ -14,7 +14,7 @@ class ImgFileLoader: public ImgLoader {
 public:
 
 	ImgFileLoader();
-	ImgFileLoader(const string &source, const Size &frameSize = Size(0,0));
+	ImgFileLoader(const string &source, bool resizeDynamically = true, const Size &frameSize = Size(0,0));
 
 	~ImgFileLoader();
 
@@ -39,9 +39,8 @@ private:
 	Size res;				// resolution
 	Size defRes;			// default resolution
 	bool resizeDynamically = false;
+	Mat resampleMat;
 
-	bool constructor(const string &source);
-	bool cleverConstr(const string &source, const Size &frameSize);
 };
 
 #endif /* IMGFILELOADER_HPP_ */
