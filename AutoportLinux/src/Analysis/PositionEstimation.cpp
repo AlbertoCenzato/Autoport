@@ -8,8 +8,8 @@
 #include "PositionEstimation.hpp"
 
 #include <chrono>
-#include "GenPurpFunc.hpp"
-#include "Settings.hpp"
+#include "../Utils/GenPurpFunc.hpp"
+#include "../Utils/Settings.hpp"
 #include <iostream>
 #include <fstream>
 

@@ -3,8 +3,8 @@
 
 #include <iostream>
 
-#include "ImgFileLoader.hpp"
-#include "IPPAnalysis.hpp"
+#include "ImgLoader/ImgFileLoader.hpp"
+#include "Analysis/IPPAnalysis.hpp"
 
 using namespace cv;
 

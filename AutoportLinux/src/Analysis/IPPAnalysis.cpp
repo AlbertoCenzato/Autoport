@@ -7,8 +7,8 @@
 
 #include <chrono>
 #include "IPPAnalysis.hpp"
-#include "GenPurpFunc.hpp"
-#include "ImgLoader.hpp"
+#include "../Utils/GenPurpFunc.hpp"
+#include "../ImgLoader/ImgLoader.hpp"
 
 extern Status status;
 extern ofstream ledStream;

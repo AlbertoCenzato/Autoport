@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "GenPurpFunc.hpp"
-#include "Settings.hpp"
+#include "../Utils/GenPurpFunc.hpp"
+#include "../Utils/Settings.hpp"
 
 using namespace std;
 using namespace cv;
