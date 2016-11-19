@@ -302,12 +302,16 @@ namespace Test {
 	void ippAnalysis(const string& path) {
 		ImgLoader *loader;
 		if(path.compare("d") != 0) {
-			loader = new ImgFileLoader(path);
+			loader = new ImgFileLoader(path,false);
 		}
 		else {
 			//loader = new ImgDeviceLoader();
 		}
 
+		if(!loader->isOpen()) {
+			cerr << "Inptu not found!" << endl;
+			return;
+		}
 		cout << "LOADER OK" << endl;
 
 		Mat extrinsicFactors = Mat::zeros(3,4,CV_32FC1);

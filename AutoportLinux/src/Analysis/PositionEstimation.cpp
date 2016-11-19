@@ -26,7 +26,7 @@ PositionEstimation::PositionEstimation() {
 
 		resetInitialPosition();
 
-		Mat cameraMatrix(Size(3,3), CV_32F);
+		cameraMatrix = Mat(Size(3,3), CV_32F);
 		cameraMatrix.at<float>(0,0) = focalX;
 		cameraMatrix.at<float>(1,1) = focalY;
 		cameraMatrix.at<float>(0,2) = cx;

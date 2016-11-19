@@ -17,17 +17,21 @@ ImgFileLoader::ImgFileLoader(const string &source, bool resizeDynamically, const
 
 	cout << "Found input!" << endl;
 
-	int width  = getFrameWidth();
-	int height = getFrameHeight();
-	defRes = Size(width,height);
+	resampleMat = Mat::zeros(2,2,CV_32FC1);
+	this->resizeDynamically = resizeDynamically;
 
+	int width  = capture.get(CV_CAP_PROP_FRAME_WIDTH);
+	int height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
 	if(frameSize.height != 0 && frameSize.width != 0) {
-		setFrameHeight(frameSize.height);
-		setFrameWidth (frameSize.width);
+		height = frameSize.height;
+		width  = frameSize.width;
 	}
 
+	defRes = Size(width,height);
+	setResolutionWidth (width);
+	setResolutionHeight(height);
+
 	roi = Rect(0, 0, res.width, res.height);
-	this->resizeDynamically = resizeDynamically;
 }
 
 ImgFileLoader::~ImgFileLoader() { }
@@ -45,18 +49,15 @@ bool ImgFileLoader::getNextFrame(Mat &frame) {
 	return true;
 }
 
-int  ImgFileLoader::getFrameWidth () {
-	if(roi.width == 0 || roi.height == 0)
-		roi.width = capture.get(CV_CAP_PROP_FRAME_WIDTH );
-	return roi.width;
+Rect ImgFileLoader::getROI() {
+	if(roi.width == 0 || roi.height == 0) {
+		roi.x = 0;
+		roi.y = 0;
+		roi.width  = res.width;
+		roi.height = res.height;
+	}
+	return roi;
 }
-int  ImgFileLoader::getFrameHeight() {
-	if(roi.width == 0 || roi.height == 0)
-		roi.height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
-	return roi.height;
-}
-
-Rect ImgFileLoader::getROI() { return roi; }
 
 Mat ImgFileLoader::getResampleMat() {
 	if(resampleMat.empty()) {
@@ -72,13 +73,13 @@ void ImgFileLoader::getCropVector(Point2f &t) {
 	t.y = roi.y;
 }
 
-bool ImgFileLoader::setFrameWidth (int frameWidth)  {
+bool ImgFileLoader::setResolutionWidth (int frameWidth)  {
 	res.width = frameWidth;
 	resampleMat.at<float>(0,0) = 2592/frameWidth;
 	return true;
 }
 
-bool ImgFileLoader::setFrameHeight(int frameHeight) {
+bool ImgFileLoader::setResolutionHeight(int frameHeight) {
 	res.height = frameHeight;
 	resampleMat.at<float>(1,1) = 1944/frameHeight;
 	return true;
@@ -101,8 +102,8 @@ bool ImgFileLoader::setROI(const Rect& roi) {
 }
 
 bool ImgFileLoader::resetRes() {
-	setFrameWidth( defRes.width);
-	setFrameHeight(defRes.height);
+	setResolutionWidth( defRes.width);
+	setResolutionHeight(defRes.height);
 	return true;
 }
 

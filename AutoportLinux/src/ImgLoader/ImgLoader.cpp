@@ -23,11 +23,13 @@ ImgLoader::ImgLoader(int device) {
 ImgLoader::~ImgLoader() {}
 
 bool ImgLoader::halveRes() {
-	return setFrameHeight(getFrameHeight() / 2) && setFrameWidth(getFrameWidth() / 2);
+	Rect roi = getROI();
+	return setResolutionHeight(roi.height / 2) && setResolutionWidth(roi.width / 2);
 }
 
 bool ImgLoader::doubleRes() {
-	return setFrameHeight(getFrameHeight() * 2) && setFrameWidth(getFrameWidth() * 2);
+	Rect roi = getROI();
+	return setResolutionHeight(roi.height * 2) && setResolutionWidth(roi.width * 2);
 }
 
 bool ImgLoader::isOpen() { return capture.isOpened(); }

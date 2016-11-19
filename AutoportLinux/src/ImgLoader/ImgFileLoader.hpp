@@ -20,14 +20,12 @@ public:
 
 	bool getNextFrame(Mat &frame);
 
-	int  getFrameWidth ();
-	int  getFrameHeight();
 	Rect getROI();
 	Mat  getResampleMat();
 	void getCropVector(Point2f &t);
 
-	bool setFrameWidth (int frameWidth);
-	bool setFrameHeight(int frameHeight);
+	bool setResolutionWidth (int frameWidth);
+	bool setResolutionHeight(int frameHeight);
 	bool setROI(const Rect& roi);
 
 	bool resetRes();
