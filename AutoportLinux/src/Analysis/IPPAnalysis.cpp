@@ -117,6 +117,8 @@ Result IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 
 	convertPointsToCamera(points, t, resampleMat);
 
+	waitKey(0);
+
 	//estimate position
 	begin = chrono::high_resolution_clock::now();
 	success = positionEstimator.evaluate(points, extrinsicFactors);

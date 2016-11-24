@@ -309,7 +309,7 @@ namespace Test {
 		}
 
 		if(!loader->isOpen()) {
-			cerr << "Inptu not found!" << endl;
+			cerr << "Input not found!" << endl;
 			return;
 		}
 		cout << "LOADER OK" << endl;
@@ -361,15 +361,17 @@ namespace Test {
 		auto positionEstimator = PositionEstimation();
 		Mat extrinsicFactors = Mat::zeros(3,4,CV_32FC1);
 		float f = 0;
-		Point2f p1 = Point2f(513,513);
-		Point2f p2 = Point2f(513,-513);
-		Point2f p3 = Point2f(-513,-513);
-		Point2f p4 = Point2f(-513,513);
+		Point2f p1 = Point2f(1741,1108.42);
+		Point2f p2 = Point2f(1832.81,1110.54);
+		Point2f p3 = Point2f(1831.29,882.216);
+		Point2f p4 = Point2f(0,0);
+		Point2f p5 = Point2f(1684.48,790.512);
 		Scalar color(0,0,0);
 		vector<LedDescriptor> points = {LedDescriptor(p1,color,f),
 								  	    LedDescriptor(p2,color,f),
 										LedDescriptor(p3,color,f),
-										LedDescriptor(p4,color,f)};
+										LedDescriptor(p4,color,f),
+										LedDescriptor(p5,color,f)};
 		bool success = positionEstimator.evaluate(points,extrinsicFactors);
 		if(success)
 			cout << extrinsicFactors << endl;

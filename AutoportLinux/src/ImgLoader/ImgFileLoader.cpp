@@ -75,13 +75,13 @@ void ImgFileLoader::getCropVector(Point2f &t) {
 
 bool ImgFileLoader::setResolutionWidth (int frameWidth)  {
 	res.width = frameWidth;
-	resampleMat.at<float>(0,0) = 2592/frameWidth;
+	resampleMat.at<float>(0,0) = 2592/(float)frameWidth;
 	return true;
 }
 
 bool ImgFileLoader::setResolutionHeight(int frameHeight) {
 	res.height = frameHeight;
-	resampleMat.at<float>(1,1) = 1944/frameHeight;
+	resampleMat.at<float>(1,1) = 1944/(float)frameHeight;
 	return true;
 }
 
