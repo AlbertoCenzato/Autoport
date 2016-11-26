@@ -82,6 +82,8 @@ void PositionEstimation::ransacPnP(const vector<LedDescriptor> &ledPoints, Mat &
 			}
 		}
 
+		GenPurpFunc::addNoise(objectPoints, 0, 0.2);
+
 		solvePnPRansac(objectPoints,imagePoints,cameraMatrix, distCoeffs, rvec, tvec);
 
 		Mat rotationMat;

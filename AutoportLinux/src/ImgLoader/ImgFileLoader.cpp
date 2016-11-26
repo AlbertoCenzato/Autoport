@@ -37,9 +37,15 @@ ImgFileLoader::ImgFileLoader(const string &source, bool resizeDynamically, const
 ImgFileLoader::~ImgFileLoader() { }
 
 bool ImgFileLoader::getNextFrame(Mat &frame) {
+
+
 	capture >> frame;
 	if(frame.empty())
 		return false;
+
+	setResolutionWidth (frame.cols);
+		setResolutionHeight(frame.rows);
+		resetROI();
 
 	if(resizeDynamically) {
 		resize(frame,frame,res,0,0,INTER_LANCZOS4);

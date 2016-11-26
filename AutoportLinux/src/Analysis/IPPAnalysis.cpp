@@ -13,6 +13,7 @@
 extern Status status;
 extern ofstream ledStream;
 extern ofstream times;
+extern ofstream stream;
 
 IPPAnalysis::IPPAnalysis(ImgLoader* loader) {
 	this->loader = loader;
@@ -47,85 +48,106 @@ Result IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 	loader->getCropVector(t);
 	Mat resampleMat = loader->getResampleMat();
 
-	vector<LedDescriptor> points(10);
+	for(int i = 0; i < 20; ++i) {
 
-	namedWindow("Original image", WINDOW_NORMAL);
-	imshow("Original image", image);
+		cout << "\n\n*** ITERATION " << i << " ***" << endl;
 
-	auto begin = chrono::high_resolution_clock::now();
-	bool success = imageAnalyzer.evaluate(image, points);
-	auto end = chrono::high_resolution_clock::now();
-	times << chrono::duration_cast<chrono::milliseconds>(end-begin).count();
+		Mat tempImg;
+		image.copyTo(tempImg);
 
-	// find leds
-	if(!success) {
-		cerr << "ImageAnalysis failed!" << endl;
+		vector<LedDescriptor> points(10);
+
+		namedWindow("Original image", WINDOW_NORMAL);
+		imshow("Original image", tempImg);
+		waitKey(1);
+
+		auto begin = chrono::high_resolution_clock::now();
+		bool success = imageAnalyzer.evaluate(image, points);
+		auto end = chrono::high_resolution_clock::now();
+		times << chrono::duration_cast<chrono::milliseconds>(end-begin).count();
+
+		// find leds
+		if(!success) {
+			cerr << "ImageAnalysis failed!" << endl;
+			for(int i = 0; i < 2; ++i) {
+				for(int j = 0; j < 5; ++j) {
+					ledStream << 0 << " ";
+				}
+				ledStream << endl;
+			}
+			GenPurpFunc::printMat(Mat::zeros(3,4,CV_32FC1),stream);
+			waitKey(0);
+			continue;
+			//return Result::FAILURE;
+		}
+
+		GenPurpFunc::addNoise(points, 0, 0.22);
+
+		Scalar red(0,0,255);
+		drawDetectedPoints(tempImg, points,red);
+		imshow("Original image", tempImg);
+		waitKey(1);
+
+		// register leds to match pattern
+		success = patternAnalyzer.evaluate(points);
+
+		if(!success) {
+			if(status == Status::FIRST_LANDING_PHASE || status == Status::SECOND_LANDING_PHASE) {
+				cout << "Target lost!" << endl;
+				status = Status::LOOKING_FOR_TARGET;
+			}
+			cerr << "PatternAnalysis failed!" << endl;
+			for(int i = 0; i < 2; ++i) {
+				for(int j = 0; j < 5; ++j) {
+					ledStream << 0 << " ";
+				}
+				ledStream << endl;
+			}
+			GenPurpFunc::printMat(Mat::zeros(3,4,CV_32FC1),stream);
+			waitKey(0);
+			continue;
+			//return Result::FAILURE;
+		}
+		//status = Status::FIRST_LANDING_PHASE;
+		cout << "PatternAnalysis succeded!" << endl;
+
+		Mat ledPositions = Mat::zeros(2,5,CV_32FC1);
+		for(uint i = 0; i < points.size(); ++i) {
+			ledPositions.at<float>(0,i) = points[i].position.x;
+			ledPositions.at<float>(1,i) = points[i].position.y;
+		}
+
 		for(int i = 0; i < 2; ++i) {
 			for(int j = 0; j < 5; ++j) {
-				ledStream << 0 << " ";
+				ledStream << ledPositions.at<float>(i,j) << " ";
 			}
 			ledStream << endl;
 		}
-		return Result::FAILURE;
+
+
+		Scalar green(0,255,0);
+		GenPurpFunc::numberDetectedPoints(tempImg, points,green);
+		imshow("Original image", tempImg);
+		waitKey(1);
+
+		//updateROI(points);
+		//updateImgRes(points);
+		//updateColor(points);
+
+		convertPointsToCamera(points, t, resampleMat);
+
+
+		//estimate position
+		begin = chrono::high_resolution_clock::now();
+		success = positionEstimator.evaluate(points, extrinsicFactors);
+		end = chrono::high_resolution_clock::now();
+		times << " " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << endl;
+
+		GenPurpFunc::printMat(extrinsicFactors,stream);
+		waitKey(1);
+		//if(!success) return Result::FAILURE;
+
 	}
-
-	Scalar red(0,0,255);
-	drawDetectedPoints(image, points,red);
-	imshow("Original image", image);
-
-	// register leds to match pattern
-	success = patternAnalyzer.evaluate(points);
-
-	if(!success) {
-		if(status == Status::FIRST_LANDING_PHASE || status == Status::SECOND_LANDING_PHASE) {
-			cout << "Target lost!" << endl;
-			status = Status::LOOKING_FOR_TARGET;
-		}
-		cerr << "PatternAnalysis failed!" << endl;
-		for(int i = 0; i < 2; ++i) {
-			for(int j = 0; j < 5; ++j) {
-				ledStream << 0 << " ";
-			}
-			ledStream << endl;
-		}
-		return Result::FAILURE;
-	}
-	//status = Status::FIRST_LANDING_PHASE;
-	cout << "PatternAnalysis succeded!" << endl;
-
-	Mat ledPositions = Mat::zeros(2,5,CV_32FC1);
-	for(uint i = 0; i < points.size(); ++i) {
-		ledPositions.at<float>(0,i) = points[i].position.x;
-		ledPositions.at<float>(1,i) = points[i].position.y;
-	}
-
-	for(int i = 0; i < 2; ++i) {
-		for(int j = 0; j < 5; ++j) {
-			ledStream << ledPositions.at<float>(i,j) << " ";
-		}
-		ledStream << endl;
-	}
-
-
-	Scalar green(0,255,0);
-	GenPurpFunc::numberDetectedPoints(image, points,green);
-	imshow("Original image", image);
-
-	//updateROI(points);
-	//updateImgRes(points);
-	//updateColor(points);
-
-	convertPointsToCamera(points, t, resampleMat);
-
-	waitKey(0);
-
-	//estimate position
-	begin = chrono::high_resolution_clock::now();
-	success = positionEstimator.evaluate(points, extrinsicFactors);
-	end = chrono::high_resolution_clock::now();
-	times << " " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << endl;
-
-	if(!success) return Result::FAILURE;
 
 	return Result::SUCCESS;
 }

@@ -26,7 +26,7 @@ public:
 
 	~ImgAnalysis() {}
 
-	bool evaluate(Mat &image, vector<LedDescriptor> &points);
+	bool evaluate(const Mat &image, vector<LedDescriptor> &points);
 	//ImgAnalysis* setColorTolerance	(int);
 	ImgAnalysis* setSizeTolerance	(int);
 	ImgAnalysis* setSizeSupTolerance(int);

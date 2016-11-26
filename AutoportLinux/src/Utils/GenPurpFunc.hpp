@@ -5,6 +5,9 @@
 
 #include <opencv2/opencv.hpp>
 #include "LedDescriptor.hpp"
+#include <iostream>
+#include <fstream>
+#include <chrono>
 
 using namespace cv;
 using namespace std;
@@ -98,11 +101,11 @@ namespace GenPurpFunc {
 			str += "\nPoint " + to_string(i+1) + ": [" + to_string(vect.at(i).x) + ", " + to_string(vect.at(i).y) + "]";
 		return str;
 	}
-	inline string pointVectorToString(const vector<KeyPoint> &vect) {
+	inline string pointVectorToString(const vector<LedDescriptor> &vect) {
 		string str = "";
 		uint size = vect.size();
 		for(uint i = 0; i < size; i++)
-			str += "\nPoint " + to_string(i+1) + ": [" + to_string(vect.at(i).pt.x) + ", " + to_string(vect.at(i).pt.y) + "]";
+			str += "\nPoint " + to_string(i+1) + ": [" + to_string(vect[i].position.x) + ", " + to_string(vect[i].position.y) + "]";
 		return str;
 	}
 	inline string pointVectorToString(const vector<Point3f> &vect) {
@@ -201,6 +204,53 @@ namespace GenPurpFunc {
 		return;
 	}
 
+	inline void addNoise(vector<LedDescriptor> &points, float mean, float std) {
+		struct timespec ts;
+		clock_gettime(CLOCK_MONOTONIC, &ts);
+
+		default_random_engine generator = default_random_engine((time_t)ts.tv_nsec);
+		normal_distribution<float> distribution(mean,std);
+
+		//cout << "Before gaussian noise:\n" << pointVectorToString(points) << endl;
+
+		for(uint i = 0; i < points.size(); ++i) {
+			points[i].position.x += distribution(generator);
+			points[i].position.y += distribution(generator);
+		}
+
+		//cout << "After gaussian noise:\n" << pointVectorToString(points) << endl;
+
+		return;
+	}
+
+	inline void addNoise(vector<Point3f> &points, float mean, float std) {
+		struct timespec ts;
+		clock_gettime(CLOCK_MONOTONIC, &ts);
+		default_random_engine generator = default_random_engine((time_t)ts.tv_nsec);
+		normal_distribution<float> distribution(mean,std);
+
+		//cout << "Before gaussian noise:\n" << pointVectorToString(points) << endl;
+
+		for(uint i = 0; i < points.size(); ++i) {
+			points[i].x += distribution(generator);
+			points[i].y += distribution(generator);
+			points[i].z += distribution(generator);
+		}
+
+		//cout << "After gaussian noise:\n" << pointVectorToString(points) << endl;
+
+		return;
+	}
+
+	inline void printMat(const Mat &matrix, ofstream &stream) {
+		for(int i = 0; i < matrix.rows; ++i) {
+			for(int j = 0; j < matrix.cols; ++j) {
+				stream << matrix.at<float>(i,j);
+				stream << " ";
+			}
+			stream << endl;
+		}
+	}
 }
 
 #endif

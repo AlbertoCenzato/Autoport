@@ -21,6 +21,7 @@ int minVal = 0, maxVal = 255;
 
 ofstream ledStream("led.txt");
 ofstream times("times.txt");
+ofstream stream("drone.txt");
 
 namespace Test {
 
@@ -318,7 +319,7 @@ namespace Test {
 		auto ipp = IPPAnalysis(loader);
 		//int count = 0, maxFramesToSkip = 5;
 
-		ofstream stream("drone.txt");
+
 
 		if(!stream.is_open()) {
 			cout << "Couldn't open stream!";
@@ -332,7 +333,8 @@ namespace Test {
 			success = ipp.evaluate(extrinsicFactors);
 			if(success == Result::END)
 				break;
-					ipp.reset();
+
+			ipp.reset();
 			if(success == Result::FAILURE) {
 				//++count;
 				//if(count > maxFramesToSkip) {
@@ -341,6 +343,7 @@ namespace Test {
 				extrinsicFactors = Mat::zeros(3,4,CV_32FC1);
 			}
 			cout << "Position:\n" << extrinsicFactors << endl;
+			/*
 			for(int i = 0; i < 3; ++i) {
 				for(int j = 0; j < 4; ++j) {
 					stream << extrinsicFactors.at<float>(i,j);
@@ -348,7 +351,8 @@ namespace Test {
 				}
 				stream << "\n";
 			}
-			ch = waitKey(0);
+			*/
+			ch = waitKey(1);
 		}
 
 		stream.close();

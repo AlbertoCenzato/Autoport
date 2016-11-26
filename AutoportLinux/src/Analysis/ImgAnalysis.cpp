@@ -44,7 +44,7 @@ void ImgAnalysis::constructor(const Interval<Scalar> &colorInterval, LedColor le
 	//colorTolerance   = settings.colorTolerance;
 }
 
-bool ImgAnalysis::evaluate(Mat &image, vector<LedDescriptor> &points) {
+bool ImgAnalysis::evaluate(const Mat &image, vector<LedDescriptor> &points) {
 
 	//change color space: from BGR to HSV;
 	//TODO: color conversion and filterByColor can be performed with a shader (?)
