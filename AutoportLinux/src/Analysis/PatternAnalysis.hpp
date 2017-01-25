@@ -32,16 +32,8 @@ either expressed or implied, of the FreeBSD Project.
 #ifndef PATTERN_ANALYSIS_HPP_
 #define PATTERN_ANALYSIS_HPP_
 
+#include "../Utils/global_includes.hpp"
 #include "assert.h"
-
-#include "../Utils/GenPurpFunc.hpp"
-#include "../Utils/Settings.hpp"
-
-using namespace std;
-using namespace cv;
-using namespace flann;
-using namespace cvflann;
-using namespace GenPurpFunc;
 
 extern string workingDir;
 
@@ -73,7 +65,7 @@ public:
 
 private:
 	vector<LedDescriptor> oldPoints;	// points at time t-1
-	vector<Point2f> pattern;	// model of the pattern, do not modify
+	vector<cv::Point2f> pattern;	// model of the pattern, do not modify
 	float maxDistance = 75;
 	int minNumOfMatch = 4;
 

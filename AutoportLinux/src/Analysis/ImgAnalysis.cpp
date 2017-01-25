@@ -31,9 +31,11 @@ either expressed or implied, of the FreeBSD Project.
 
 #include "ImgAnalysis.hpp"
 #include <chrono>
+#include "../Utils/LedDescriptor.hpp"
+#include "../Utils/Settings.hpp"
 
-using namespace cv;
-using namespace std;
+//using namespace cv;
+//using namespace std;
 
 ImgAnalysis::ImgAnalysis(const Interval<Scalar> &colorInterval, LedColor ledColor) {
 	constructor(colorInterval, ledColor);

@@ -32,21 +32,19 @@ either expressed or implied, of the FreeBSD Project.
 #ifndef SETTINGS_HPP_
 #define SETTINGS_HPP_
 
-#include <stdlib.h>
-
+#include <opencv2/opencv.hpp>
 #include "pugixml.hpp"
 #include "GenPurpFunc.hpp"
 
 using namespace std;
-using namespace pugi;
 
 class Settings {
 
 private:
 
 	string workingDir;
-	char *filePath = nullptr;
-	xml_document doc;
+	char *filePath = nullptr;	// TODO: this static pointer is a bit dangerous,
+	pugi::xml_document doc;	 	//	     wrap it in a std::auto_ptr or in a manager class
 	bool docOpen = false;
 
 	static Settings *singleton;
@@ -76,14 +74,14 @@ public:
 	Position_XYZ_YPR initialPosition = Position_XYZ_YPR(0,0,2000,0,0,0);
 
 	// TODO: change default led positions
-	vector<Point3f> realWorldPoints = {{90, 70,0},
-	                                   {90, 30,0},
-	                                   {90,-90,0},
-	                                   {50, 70,0},
-	                                   {50, 30,0},
-	                                   {50,-90,0},
-	                                  {-90, 70,0},
-	                                  {-90, 90,0}};
+	vector<cv::Point3f> realWorldPoints = {{90, 70,0},
+	                                   	   {90, 30,0},
+										   {90,-90,0},
+										   {50, 70,0},
+										   {50, 30,0},
+										   {50,-90,0},
+										  {-90, 70,0},
+										  {-90, 90,0}};
 
 	double focalX = 3.59;
 	double focalY = 3.59;

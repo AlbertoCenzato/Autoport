@@ -35,8 +35,8 @@ either expressed or implied, of the FreeBSD Project.
 #include <fstream>
 #include <algorithm>
 #include <unistd.h>
+#include <stdlib.h>
 
-using namespace std;
 using namespace pugi;
 
 Settings* Settings::singleton = nullptr;
@@ -53,7 +53,6 @@ const char* Settings::HIGH 	 = "high";
 Settings::Settings(const string &configFilePath) {
 		loadConfiguration(configFilePath);
 	}
-
 
 Settings::~Settings() {
 	delete [] filePath;

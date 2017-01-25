@@ -32,15 +32,15 @@ either expressed or implied, of the FreeBSD Project.
 #ifndef IPPANALYSIS_HPP_
 #define IPPANALYSIS_HPP_
 
-#include <opencv2/core.hpp>
+#include "../Utils/global_includes.hpp"
 
 #include <fstream>
 #include "ImgAnalysis.hpp"
 #include "PatternAnalysis.hpp"
 #include "PositionEstimation.hpp"
 
-using namespace std;
-using namespace cv;
+//using namespace std;
+//using namespace cv;
 
 class LedDescriptor;
 class ImgLoader;

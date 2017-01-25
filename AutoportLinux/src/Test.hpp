@@ -32,10 +32,12 @@ either expressed or implied, of the FreeBSD Project.
 #ifndef TEST_HPP_
 #define TEST_HPP_
 
+#include "Utils/global_includes.hpp"
 #include <iostream>
 
 #include "ImgLoader/ImgFileLoader.hpp"
 #include "Analysis/IPPAnalysis.hpp"
+#include "Utils/LedDescriptor.hpp"
 
 using namespace cv;
 

@@ -32,10 +32,11 @@ either expressed or implied, of the FreeBSD Project.
 #ifndef GEN_PURP_FUNC_HPP_
 #define GEN_PURP_FUNC_HPP_
 
+#include <stdlib.h>
 #include <opencv2/opencv.hpp>
-#include "LedDescriptor.hpp"
 
-using namespace cv;
+class LedDescriptor;
+
 using namespace std;
 
 enum Status {
@@ -103,7 +104,7 @@ struct Line {
 public:
 	float m, q;
 
-	Line(Point2f &p1, Point2f &p2) {
+	Line(cv::Point2f &p1, cv::Point2f &p2) {
 		float dx = p1.x - p2.x;
 		if(dx == 0) {
 			m = numeric_limits<float>::infinity();
@@ -117,118 +118,37 @@ public:
 };
 
 
-
 namespace GenPurpFunc {
 
-	inline string pointVectorToStrng(const vector<Point2f> &vect) {
-		string str = "";
-		uint size = vect.size();
-		for(uint i = 0; i < size; i++)
-			str += "\nPoint " + to_string(i+1) + ": [" + to_string(vect.at(i).x) + ", " + to_string(vect.at(i).y) + "]";
-		return str;
-	}
-	inline string pointVectorToString(const vector<KeyPoint> &vect) {
-		string str = "";
-		uint size = vect.size();
-		for(uint i = 0; i < size; i++)
-			str += "\nPoint " + to_string(i+1) + ": [" + to_string(vect.at(i).pt.x) + ", " + to_string(vect.at(i).pt.y) + "]";
-		return str;
-	}
-	inline string pointVectorToString(const vector<Point3f> &vect) {
-		string str = "";
-		uint size = vect.size();
-		for(uint i = 0; i < size; i++)
-			str += "\nPoint " + to_string(i+1) + ": [" + to_string(vect.at(i).x) + ", " + to_string(vect.at(i).y)
-				+ ", " + to_string(vect.at(i).z) + "]";
-		return str;
-	}
+string pointVectorToString(const vector<cv::Point2f> &vect);
+string pointVectorToString(const vector<cv::KeyPoint> &vect);
+string pointVectorToString(const vector<cv::Point3f> &vect);
 
-	inline Point2f normalize(Point2f &p) {
-		double norm = sqrt(pow(p.x, 2) + pow(p.y, 2));
-		return Point2f(p.x / norm, p.y / norm);
-	}
-	inline Point2d normalize(Point2d &p) {
-		double norm = sqrt(pow(p.x, 2) + pow(p.y, 2));
-		return Point2d(p.x / norm, p.y / norm);
-	}
-	inline Point3f normalize(Point3f &p) {
-		double norm = sqrt(pow(p.x, 2) + pow(p.y, 2) + pow(p.z,2));
-		return Point3f(p.x / norm, p.y / norm, p.z/norm);
-	}
-	inline Point3d normalize(Point3d &p) {
-		double norm = sqrt(pow(p.x, 2) + pow(p.y, 2) + pow(p.z, 2));
-		return Point3d(p.x / norm, p.y / norm, p.z / norm);
-	}
+cv::Point2f normalize(cv::Point2f &p);
+cv::Point2d normalize(cv::Point2d &p);
+cv::Point3f normalize(cv::Point3f &p);
+cv::Point3d normalize(cv::Point3d &p);
 
-	inline Point2f* findMaxXInVec(vector<Point2f> &vec) {
-		Point2f *max = &vec[0];
-		for (uint i = 1; i < vec.size(); i++)
-			if (max->x < vec[i].x)
-				max = &vec[i];
-		return max;
-	}
-	inline Point2f* findMaxYInVec(vector<Point2f> &vec) {
-		Point2f *max = &vec[0];;
-		for (uint i = 1; i < vec.size(); i++)
-			if (max->y < vec[i].y)
-				max = &vec[i];
-		return max;
-	}
-	inline Point2f* findMinXInVec(vector<Point2f> &vec) {
-		Point2f *min = &vec[0];;
-		for (uint i = 1; i < vec.size(); i++)
-			if (min->x > vec[i].x)
-				min = &vec[i];
-		return min;
-	}
-	inline Point2f* findMinYInVec(vector<Point2f> &vec) {
-		Point2f *min = &vec[0];;
-		for (uint i = 1; i < vec.size(); i++)
-			if (min->y > vec[i].y)
-				min = &vec[i];
-		return min;
-	}
+cv::Point2f* findMaxXInVec(vector<cv::Point2f> &vec);
+cv::Point2f* findMaxYInVec(vector<cv::Point2f> &vec);
+cv::Point2f* findMinXInVec(vector<cv::Point2f> &vec);
+cv::Point2f* findMinYInVec(vector<cv::Point2f> &vec);
 
-	template<typename T, typename A>
-	inline void removeFromVec(int index, vector<T,A> &vec) {
-		const int SIZE =  vec.size();
-		if(index < SIZE - 1)
-			vec[index] = vec[SIZE - 1];
-		vec.pop_back();
-	}
+template<typename T, typename A>
+void removeFromVec(int index, vector<T,A> &vec) {
+	const int SIZE =  vec.size();
+	if(index < SIZE - 1)
+		vec[index] = vec[SIZE - 1];
+	vec.pop_back();
+}
 
-	inline float distPoint2Point(const Point2f &p1, const Point2f &p2) {
-		return sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2));
-	}
+float distPoint2Point(const cv::Point2f &p1,    const cv::Point2f &p2);
+float distPoint2Line (const cv::Point2f &point, const Line &line);
 
-	inline float distPoint2Line(const Point2f &point, const Line &line) {
-		// FIXME: if m = INF and q = NAN?
-		return abs(point.y - (line.m*(point.x) + line.q)) / sqrt(1 + pow(line.m, 2));
-	}
+cv::Point2f centroid(const vector<cv::Point2f> &points);
 
-	inline Point2f centroid(const vector<Point2f> &points) {
-		float x = 0;
-		float y = 0;
-		const int SIZE = points.size();
-		for (int i = 0; i < SIZE; i++) {
-			Point2f p = points.at(i);
-			x += p.x;
-			y += p.y;
-		}
-		return Point2f(x/SIZE, y/SIZE);
-	}
-
-	inline void drawDetectedPoints(Mat &image, vector<LedDescriptor> &descriptors, const Scalar &color) {
-		for(uint i = 0; i < descriptors.size(); ++i)
-			circle(image, descriptors[i].position, 30, color, 10);
-		return;
-	}
-
-	inline void numberDetectedPoints(Mat &image, vector<LedDescriptor> &descriptors, const Scalar &color) {
-		for(uint i = 0; i < descriptors.size(); ++i)
-			putText(image, to_string(i), descriptors[i].position, FONT_HERSHEY_SIMPLEX, 1, color, 4);
-		return;
-	}
+void drawDetectedPoints(cv::Mat &image, vector<LedDescriptor> &descriptors, const cv::Scalar &color);
+void numberDetectedPoints(cv::Mat &image, vector<LedDescriptor> &descriptors, const cv::Scalar &color);
 
 }
 

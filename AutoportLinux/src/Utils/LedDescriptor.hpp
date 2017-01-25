@@ -32,20 +32,18 @@ either expressed or implied, of the FreeBSD Project.
 #ifndef LEDDESCRIPTOR_HPP_
 #define LEDDESCRIPTOR_HPP_
 
-#include "opencv2/opencv.hpp"
-
-using namespace std;
-using namespace cv;
+#include <stdlib.h>
+#include <opencv2/opencv.hpp>
 
 class LedDescriptor {
 public:
 
-	Point2f position;
-	Scalar 	color;
+	cv::Point2f position;
+	cv::Scalar 	color;
 	float	size;
 
 	LedDescriptor();
-	LedDescriptor(Point2f &position, Scalar &color, float size);
+	LedDescriptor(cv::Point2f &position, cv::Scalar &color, float size);
 	LedDescriptor(float x, float y, float hue, float saturation, float value, float size);
 	virtual ~LedDescriptor();
 
@@ -54,7 +52,7 @@ public:
 
 	bool isEmpty() const;
 
-	static Point2f centroid(const vector<LedDescriptor> &descriptors);
+	static cv::Point2f centroid(const std::vector<LedDescriptor> &descriptors);
 
 };
 

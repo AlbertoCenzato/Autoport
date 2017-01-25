@@ -35,11 +35,9 @@ either expressed or implied, of the FreeBSD Project.
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/features2d/features2d.hpp>
 
-using namespace std;
-using namespace cv;
+#include <stdlib.h>
 
 extern Status status;
-
 
 PatternAnalysis::PatternAnalysis() {
 	Settings *settings = Settings::getInstance();
@@ -157,12 +155,12 @@ bool PatternAnalysis::firstPhase(vector<LedDescriptor> &ledPoints) {
 	LedDescriptor ledB = ledPoints[minIndex2];
 
 	if(minIndex1 == SIZE-1) {
-		removeFromVec(minIndex1,ledPoints);
-		removeFromVec(minIndex2,ledPoints);
+		GenPurpFunc::removeFromVec(minIndex1,ledPoints);
+		GenPurpFunc::removeFromVec(minIndex2,ledPoints);
 	}
 	else {
-		removeFromVec(minIndex2,ledPoints);
-		removeFromVec(minIndex1,ledPoints);
+		GenPurpFunc::removeFromVec(minIndex2,ledPoints);
+		GenPurpFunc::removeFromVec(minIndex1,ledPoints);
 	}
 
 	Point2f posA = ledA.position;
@@ -171,7 +169,7 @@ bool PatternAnalysis::firstPhase(vector<LedDescriptor> &ledPoints) {
 	int minIndex = 0;
 	minDist = 100000;
 	for(int i = 0; i < SIZE-2; ++i) {
-		float distance = distPoint2Line(ledPoints[i].position,line);
+		float distance = GenPurpFunc::distPoint2Line(ledPoints[i].position,line);
 		if(distance < minDist) {
 			minDist = distance;
 			minIndex = i;
@@ -189,7 +187,7 @@ bool PatternAnalysis::firstPhase(vector<LedDescriptor> &ledPoints) {
 	}
 
 	sorted[1] = ledPoints[minIndex];
-	removeFromVec(minIndex,ledPoints);
+	GenPurpFunc::removeFromVec(minIndex,ledPoints);
 
 	if(ledPoints[0].cartDist(sorted[1]) < ledPoints[0].cartDist(sorted[3])) {
 		sorted[0] = ledPoints[0];

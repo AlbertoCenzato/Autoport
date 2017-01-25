@@ -31,43 +31,39 @@ either expressed or implied, of the FreeBSD Project.
 
 #pragma once
 
-#include "../Utils/GenPurpFunc.hpp"
-#include "../Utils/Settings.hpp"
+#include "../Utils/global_includes.hpp"
 
-using namespace std;
-using namespace cv;
+class LedDescriptor;
 
 class ImgAnalysis {
 
-	Interval<Scalar> colorInterval;
-	Interval<Scalar> defColorInterval;
+	Interval<cv::Scalar> colorInterval;
+	Interval<cv::Scalar> defColorInterval;
 
-	//int colorTolerance;
-	SimpleBlobDetector::Params params;
+	cv::SimpleBlobDetector::Params params;
 	int colorConversion;
 
-	Mat hsvImage;
+	cv::Mat hsvImage;
 
 public:
 
-	ImgAnalysis(const Interval<Scalar> &colorInterval, LedColor ledColor);
+	ImgAnalysis(const Interval<cv::Scalar> &colorInterval, LedColor ledColor);
 	ImgAnalysis();
 
 	~ImgAnalysis() {}
 
-	bool evaluate(Mat &image, vector<LedDescriptor> &points);
-	//ImgAnalysis* setColorTolerance	(int);
+	bool evaluate(cv::Mat &image, vector<LedDescriptor> &points);
 	ImgAnalysis* setSizeTolerance	(int);
 	ImgAnalysis* setSizeSupTolerance(int);
-	ImgAnalysis* setColorInterval	(const Interval<Scalar> &colorInterval);
+	ImgAnalysis* setColorInterval	(const Interval<cv::Scalar> &colorInterval);
 	ImgAnalysis* setBlobSizeInterval(const Interval<int> 	&blobSizeInterval);
 
-	void getColorInterval(Interval<Scalar> &colorInterval);
+	void getColorInterval(Interval<cv::Scalar> &colorInterval);
 	void resetColorInterval();
 
 private:
 
-	void constructor(const Interval<Scalar> &colorInterval, LedColor ledColor);
+	void constructor(const Interval<cv::Scalar> &colorInterval, LedColor ledColor);
 
 	// Processes the input image (in HSV color space) filtering out (setting to black)
 	// all colors which are not in the interval [min,max], the others are set to white.
@@ -75,14 +71,14 @@ private:
 	// @min: the lower bound specified in the HSV color space.
 	// @max: the upper bound specified in the HSV color space.
 	// returns: black and white image as a Mat object.
-	Mat filterByColor(const Mat &hsvImg);
+	cv::Mat filterByColor(const cv::Mat &hsvImg);
 
 	// Finds all color blobs that fit the specified parameters. Blobs which distance
 	// from the centroid of the blob set is grater than 2*meanDistance are ignored.
 	// @img: image to analyze.
 	// @blobParam: parameters to fit.
 	// returns: a vector of Point2f containing centroids coordinates of detected blobs.
-	int findBlobs(const Mat &colorFilteredImg, vector<LedDescriptor>& ledPoints);
+	int findBlobs(const cv::Mat &colorFilteredImg, vector<LedDescriptor>& ledPoints);
 
 };
 

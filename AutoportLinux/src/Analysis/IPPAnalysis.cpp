@@ -29,14 +29,18 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the FreeBSD Project.
 //============================================================================ */
 
-#include <chrono>
 #include "IPPAnalysis.hpp"
-#include "../Utils/GenPurpFunc.hpp"
+
+#include <chrono>
+#include <opencv2/highgui.hpp>
+
 #include "../ImgLoader/ImgLoader.hpp"
 
 extern Status status;
 extern ofstream ledStream;
 extern ofstream times;
+
+//using namespace cv;
 
 IPPAnalysis::IPPAnalysis(ImgLoader* loader) {
 	this->loader = loader;
@@ -52,7 +56,9 @@ IPPAnalysis::IPPAnalysis(ImgLoader* loader) {
 	colorTol   = settings->colorTolerance;
 }
 
-IPPAnalysis::~IPPAnalysis() {}
+IPPAnalysis::~IPPAnalysis() {
+	delete loader;
+}
 
 
 Result IPPAnalysis::evaluate(Mat& extrinsicFactors) {
@@ -94,7 +100,7 @@ Result IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 	}
 
 	Scalar red(0,0,255);
-	drawDetectedPoints(image, points,red);
+	GenPurpFunc::drawDetectedPoints(image, points,red);
 	imshow("Original image", image);
 
 	// register leds to match pattern

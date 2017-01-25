@@ -83,17 +83,3 @@ Point2f LedDescriptor::centroid(const vector<LedDescriptor> &descriptors) {
 	}
 	return Point2f(x/SIZE, y/SIZE);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
