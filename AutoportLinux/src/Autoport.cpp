@@ -44,7 +44,7 @@ int main() {
 	cout << "****** AUTOPORT SOFTWARE ******\n" << endl;
 
 	cout << "\n*** Settings ***" << endl;
-	Settings *settings = Settings::getInstance();
+	Settings *settings = Settings::getInstance();	// loads settings from autoport.config
 	cout << settings->toString() << "\n\n" << endl;
 
 	cout << "Enter the path of the file to analyze [d for camera capture]" << endl;

@@ -41,55 +41,66 @@ either expressed or implied, of the FreeBSD Project.
 
 using namespace cv;
 
-extern string   workingDir;
-extern Settings settings;
+extern string   workingDir;			// -
+extern Settings settings;			//	|
+									//  |- shitty global variables, bad practice,
+ofstream ledStream("led.txt");		//  |  should be removed
+ofstream times("times.txt");		// -
 
-ofstream ledStream("led.txt");
-ofstream times("times.txt");
-
+/**
+ * This namespace collects a bunch of functions used to test the rest
+ * of the code. Put here all test functions.
+ */
 namespace Test {
 
+/**
+ * 	Gives in output the [R,t] matrixes computed from a sequence of images.
+ * 	The matrixes are written in "drone.txt" file.
+ * 	Every image is evaluated on its own, all feedback controls are suppressed
+ * 	as if every image is the first image of the sequence.
+ */
 void ippAnalysis(const string& path) {
 	ImgLoader *loader;
 	if(path.compare("d") != 0) {
-		loader = new ImgFileLoader(path,false);
+		loader = new ImgFileLoader(path,false);	// loads from file
 	}
 	else {
-		//loader = new ImgDeviceLoader();
+		// loads from device, once written sould be something like:
+		// loader = new ImgDeviceLoader();
 	}
 
-	if(!loader->isOpen()) {
+	if(!loader->isOpen()) {					// if load error, return
 		cerr << "Input not found!" << endl;
 		return;
 	}
 	cout << "LOADER OK" << endl;
 
-	Mat extrinsicFactors = Mat::zeros(3,4,CV_32FC1);
-	auto ipp = IPPAnalysis(loader);
-	//int count = 0, maxFramesToSkip = 5;
+
+	Mat extrinsicFactors = Mat::zeros(3,4,CV_32FC1); // initialize empty [R,t] matrix
+	auto ipp = IPPAnalysis(loader);					 // initialize IPPAnaysis
 
 	ofstream stream("drone.txt");
 
-	if(!stream.is_open()) {
+	if(!stream.is_open()) {					// if output stream error, return
 		cout << "Couldn't open stream!";
 		return;
 	}
 
-	char ch = 64;
 	Result success;
 
-	while(ch != 27) {
-		success = ipp.evaluate(extrinsicFactors);
-		if(success == Result::END)
+	// execute this loop until user press 'ESC'
+	for(char ch = 0; ch != 27; ch = waitKey(0)) {
+
+		success = ipp.evaluate(extrinsicFactors);	// compute [R,t] matrix on next image
+		if(success == Result::END)	// if last image, break loop
 			break;
-		ipp.reset();
-		if(success == Result::FAILURE) {
-			//++count;
-			//if(count > maxFramesToSkip) {
-			//	count = 0;
-			//}
+
+		ipp.reset();	// clears
+
+		if(success == Result::FAILURE)	// if ipp.evaluate() fails, [R,t] = 0
 			extrinsicFactors = Mat::zeros(3,4,CV_32FC1);
-		}
+
+		// output [R,t] on "drone.txt" file
 		cout << "Position:\n" << extrinsicFactors << endl;
 		for(int i = 0; i < 3; ++i) {
 			for(int j = 0; j < 4; ++j) {
@@ -98,7 +109,6 @@ void ippAnalysis(const string& path) {
 			}
 			stream << "\n";
 		}
-		ch = waitKey(0);
 	}
 
 	stream.close();
@@ -107,6 +117,9 @@ void ippAnalysis(const string& path) {
 	delete loader;
 }
 
+/**
+ * Old test function, almost useless
+ */
 void positionSensitivity() {
 	auto positionEstimator = PositionEstimation();
 	Mat extrinsicFactors = Mat::zeros(3,4,CV_32FC1);
@@ -118,10 +131,10 @@ void positionSensitivity() {
 	Point2f p5 = Point2f(1684.48,790.512);
 	Scalar color(0,0,0);
 	vector<LedDescriptor> points = {LedDescriptor(p1,color,f),
-			LedDescriptor(p2,color,f),
-			LedDescriptor(p3,color,f),
-			LedDescriptor(p4,color,f),
-			LedDescriptor(p5,color,f)};
+									LedDescriptor(p2,color,f),
+									LedDescriptor(p3,color,f),
+									LedDescriptor(p4,color,f),
+									LedDescriptor(p5,color,f)};
 	bool success = positionEstimator.evaluate(points,extrinsicFactors);
 	if(success)
 		cout << extrinsicFactors << endl;
