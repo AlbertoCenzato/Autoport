@@ -39,37 +39,110 @@ either expressed or implied, of the FreeBSD Project.
 #include "PatternAnalysis.hpp"
 #include "PositionEstimation.hpp"
 
-//using namespace std;
-//using namespace cv;
+class ImgLoader;	  // forward declaration
 
-class LedDescriptor;
-class ImgLoader;
-
+/**
+ * Image, Pattern and Position Analysis class. Performs this pipeline:
+ * load image -> extract led positions -> pattern matching -> compute [R,t]
+ * This is the main computation unit of the software.
+ * How the image is loaded depends on the ImgLoader object given to the
+ * class constructor.
+ */
 class IPPAnalysis {
 public:
-			 IPPAnalysis(ImgLoader* loader);
-	virtual ~IPPAnalysis();
 
-	Result evaluate(Mat& extrinsicFactors);
-	bool   reset();
+	// class constructor, receives the ImgLoader object
+	// that should be used to load images
+	IPPAnalysis(ImgLoader* loader);
+
+	// class destructor, it doesn't delete *loader
+    virtual ~IPPAnalysis();
+
+    /**
+     * Performs this pipeline:
+     * load image -> extract led positions -> pattern matching -> compute [R,t]
+     * @extrinsicFactors: input-output 3x4 [R,t] matrix
+     *
+     * @return: Result enum stating if the evaluation was successful
+     * 			see GenPurpFunc.hpp for Result definition
+     */
+	Result evaluate(Mat &extrinsicFactors);
+
+	/**
+	 * Resets all class members to their default values
+	 */
+	bool reset();
 
 private:
 
-	ImgLoader* loader;
-	ImgAnalysis imageAnalyzer;
-	PatternAnalysis patternAnalyzer;
+	// objects used by evaluate() to compute [R,t]
+	ImgLoader 		  *loader;
+	ImgAnalysis 	   imageAnalyzer;
+	PatternAnalysis    patternAnalyzer;
 	PositionEstimation positionEstimator;
+
+	// feedback tolerances
 	int ROITol = 50;
 	int sizeTol;
 	int sizeSupTol;
 	int sizeInfTol;
 	int colorTol;
 
+	/**
+	 * Sets "loader" Region Of Interest (ROI) according to points bounding box.
+	 * The new ROI is computed adding "ROITol" pixels of tolerance
+	 * to the descriptors bounding box.
+	 *
+	 * @descriptors: points to use
+	 * @return: true if "loader" successfully updates its ROI
+	 */
 	bool updateROI	 (const vector<LedDescriptor> &descriptors);
+
+	/**
+	 * Sets "loader" resolution according to points size, i.e.:
+	 * halves the resolution if size > sizeSupTol,
+	 * doubles the resolution if size < sizeInfTol.
+	 * Size is computed as the mean size of all the points
+	 *
+	 * @descriptors: points to use
+	 * @returns: true if "loader" successfully updates its resolution
+	 */
 	bool updateImgRes(const vector<LedDescriptor> &descriptors);
+
+	/**
+	 * Sets "imageAnalyzer" color filter interval according to points color.
+	 * The new filter interval is [averageColor - colorTol, averageColor + colorTol]
+	 * for each of the three color channels. The average is computed on all the points.
+	 *
+	 * @descriptors: points to use
+	 * @return: always true
+	 */
 	bool updateColor (const vector<LedDescriptor> &descriptors);
-	bool resetROIandRes();
-	bool resetColor();
+
+	/**
+	 * Sets "loader" resolution and ROI to their default value.
+	 *
+	 * @return: true if "loader" successfully updates its resolution and ROI
+	 */
+	bool resetResAndROI();
+
+	/**
+	 * Sets "imageAnalyzer" color filter interval to its default value.
+	 *
+	 * @return: always true
+	 */
+	bool resetColorInterval();
+
+	/**
+	 * Converts points from "loader" reference system (RS) to camera RS.
+	 * "loader"->getNextFrame() returns an image which pixels are in a
+	 * downscaled and translated RS wrt camera RS. Before points positions can
+	 * be used by "positionEstimator" they must be transformed back into camera RS.
+	 *
+	 * @points: points to transform
+	 * @t: translation vector from "loader" RS to camera RS
+	 * @resampleMat: upscaling matrix from "loader" RS to camera RS
+	 */
 	void convertPointsToCamera(vector<LedDescriptor> &points, Point2f &t, Mat &resampleMat);
 
 };

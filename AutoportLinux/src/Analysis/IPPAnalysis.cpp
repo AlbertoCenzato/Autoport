@@ -36,11 +36,10 @@ either expressed or implied, of the FreeBSD Project.
 
 #include "../ImgLoader/ImgLoader.hpp"
 
-extern Status status;
-extern ofstream ledStream;
-extern ofstream times;
+extern Status status;            // -
+extern ofstream ledStream;       //  |- shitty global variables, bad practice,
+extern ofstream times;           // -   should be removed
 
-//using namespace cv;
 
 IPPAnalysis::IPPAnalysis(ImgLoader* loader) {
 	this->loader = loader;
@@ -56,16 +55,14 @@ IPPAnalysis::IPPAnalysis(ImgLoader* loader) {
 	colorTol   = settings->colorTolerance;
 }
 
-IPPAnalysis::~IPPAnalysis() {
-	delete loader;
-}
+IPPAnalysis::~IPPAnalysis() {}
 
 
 Result IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 
 	cout << "\n-----------------------------------------\n" << endl;
 
-	// retieve image from camera or video
+	//----- retrieves image from camera or video ------
 	Mat image;
 	bool retrieved = loader->getNextFrame(image);
 	if(!retrieved) {
@@ -73,21 +70,21 @@ Result IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 		return Result::END;
 	}
 
-	Point2f t;
-	loader->getCropVector(t);
-	Mat resampleMat = loader->getResampleMat();
+	Point2f t;									// gets t and resampleMat, will be used
+	loader->getCropVector(t);					// later to transform points from "loader" RS
+	Mat resampleMat = loader->getResampleMat();	// to camera RS
 
 	vector<LedDescriptor> points(10);
 
 	namedWindow("Original image", WINDOW_NORMAL);
 	imshow("Original image", image);
 
+	//----- finds LEDs in image -----
 	auto begin = chrono::high_resolution_clock::now();
 	bool success = imageAnalyzer.evaluate(image, points);
 	auto end = chrono::high_resolution_clock::now();
 	times << chrono::duration_cast<chrono::milliseconds>(end-begin).count();
 
-	// find leds
 	if(!success) {
 		cerr << "ImageAnalysis failed!" << endl;
 		for(int i = 0; i < 2; ++i) {
@@ -103,7 +100,7 @@ Result IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 	GenPurpFunc::drawDetectedPoints(image, points,red);
 	imshow("Original image", image);
 
-	// register leds to match pattern
+	//----- registers LEDs to match pattern -----
 	success = patternAnalyzer.evaluate(points);
 
 	if(!success) {
@@ -141,72 +138,83 @@ Result IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 	GenPurpFunc::numberDetectedPoints(image, points,green);
 	imshow("Original image", image);
 
+	// useless lines by now, but don't remove them
+
 	//updateROI(points);
 	//updateImgRes(points);
 	//updateColor(points);
 
-	convertPointsToCamera(points, t, resampleMat);
+	convertPointsToCamera(points, t, resampleMat);	// "loader" RS -> camera RS
 
 	waitKey(0);
 
-	//estimate position
+	//----- estimates position -----
 	begin = chrono::high_resolution_clock::now();
 	success = positionEstimator.evaluate(points, extrinsicFactors);
 	end = chrono::high_resolution_clock::now();
 	times << " " << chrono::duration_cast<chrono::milliseconds>(end-begin).count() << endl;
 
-	if(!success) return Result::FAILURE;
+	if(!success)
+		return Result::FAILURE;
 
 	return Result::SUCCESS;
 }
 
 bool IPPAnalysis::reset() {
-	return resetROIandRes() && resetColor() && positionEstimator.resetInitialPosition();
+	return resetResAndROI() && resetColorInterval() && positionEstimator.resetInitialPosition();
 }
+
 
 // --- private members ---
 
 bool IPPAnalysis::updateROI(const vector<LedDescriptor>& descriptors) {
+
 	const int SIZE = descriptors.size();
 	vector<Point2f> points(SIZE);
-	for(int i = 0; i < SIZE; ++i)
+
+	for(int i = 0; i < SIZE; ++i)			// extract points coordinates from descriptors
 		points[i] = descriptors[i].position;
-	Rect boundBox = boundingRect(points);
+
+	Rect boundBox = boundingRect(points); // compute bounding box
+
 	int x = boundBox.x - ROITol;
 	int y = boundBox.y - ROITol;
 	int roiWidth  = boundBox.width  + 2*ROITol;
 	int roiHeight = boundBox.height + 2*ROITol;
 
-	return loader->setROI(Rect(x, y, roiWidth, roiHeight));
+	return loader->setROI(Rect(x, y, roiWidth, roiHeight));	// sets new ROI
 }
 
 bool IPPAnalysis::updateImgRes(const vector<LedDescriptor> &descriptors) {
 	const int SIZE = descriptors.size();
-	float meanSize = 0;
+
+	float avrgSize = 0;					// computes average points size
 	for(int i = 0; i < SIZE; ++i)
-		meanSize += descriptors[i].size;
-	meanSize /= SIZE;
+		avrgSize += descriptors[i].size;
+	avrgSize /= SIZE;
 
 	bool success = true;
-	if(meanSize > sizeSupTol) {
+	if(avrgSize > sizeSupTol) {			// if too big, half resolution
 		success = loader->halveRes();
 		if(success)
-			meanSize /= 4;
+			avrgSize /= 4;
 	}
-	else if(meanSize < sizeInfTol) {
+	else if(avrgSize < sizeInfTol) {	// if too small, double resolution
 		success = loader->doubleRes();
 		if(success)
-			meanSize *= 4;
+			avrgSize *= 4;
 	}
 
-	imageAnalyzer.setBlobSizeInterval(Interval<int>(meanSize - sizeTol,meanSize + sizeTol));
+	// updates tolerance interval for points size
+	imageAnalyzer.setBlobSizeInterval(Interval<int>(avrgSize - sizeTol,avrgSize + sizeTol));
 
 	return success;
 }
 
 bool IPPAnalysis::updateColor(const vector<LedDescriptor> &descriptors) {
 	const int SIZE = descriptors.size();
-	float sum[] = {0,0,0};
+
+	float sum[] = {0,0,0};			// for each channel sums up all color values...
 	for(int i = 0; i < SIZE; ++i) {
 		sum[0] += descriptors[i].color[0];
 		sum[1] += descriptors[i].color[1];
@@ -215,31 +223,34 @@ bool IPPAnalysis::updateColor(const vector<LedDescriptor> &descriptors) {
 
 	Scalar minCol, maxCol;
 	for(int i = 0; i < 3; ++i) {
-		float avrg = sum[i]/SIZE;
+		float avrg = sum[i]/SIZE;	//... to compute the average value
 		int x = avrg - colorTol;
-		if(x < 0) x = 0;
+		if(x < 0) x = 0;		// check if underflow (min value is 0)
 		minCol[i] = x;
 		x = avrg + colorTol;
-		if(x > 255) x = 255;
+		if(x > 255) x = 255;	// check if overflow (max value is 255)
 		maxCol[i] = x;
 
 		cout << "AVG color channel " << i << ": " << avrg << endl;
 	}
 
+	// updates color tolerance interval
 	imageAnalyzer.setColorInterval(Interval<Scalar>(minCol,maxCol));
 
 	return true;
 }
 
-bool IPPAnalysis::resetROIandRes() {
-	bool success = loader->resetRes();
-	if(!success)
+bool IPPAnalysis::resetResAndROI() {
+	bool success = loader->resetRes();	// reset resolution
+
+	if(!success)	// if fails doesn't update ROI
 		return false;
+
 	loader->resetROI();
 	return true;
 }
 
-bool IPPAnalysis::resetColor() {
+bool IPPAnalysis::resetColorInterval() {
 	imageAnalyzer.resetColorInterval();
 	return true;
 }
@@ -247,9 +258,9 @@ bool IPPAnalysis::resetColor() {
 void IPPAnalysis::convertPointsToCamera(vector<LedDescriptor> &points, Point2f &t, Mat &resampleMat) {
 	const int SIZE = points.size();
 	for(int i = 0; i < SIZE; ++i) {
-		if(!points[i].isEmpty()) {
-			Point2f trasl = points[i].position + t;
-			points[i].position = Point2f(trasl.x*resampleMat.at<float>(0,0),
+		if(!points[i].isEmpty()) {	// if is a valid point...
+			Point2f trasl = points[i].position + t;	//... translate...
+			points[i].position = Point2f(trasl.x*resampleMat.at<float>(0,0), //... and upscale
 					trasl.y*resampleMat.at<float>(1,1));
 		}
 	}
