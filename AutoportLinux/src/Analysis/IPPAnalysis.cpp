@@ -138,11 +138,9 @@ Result IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 	GenPurpFunc::numberDetectedPoints(image, points,green);
 	imshow("Original image", image);
 
-	// useless lines by now, but don't remove them
-
-	//updateROI(points);
-	//updateImgRes(points);
-	//updateColor(points);
+	updateROI(points);
+	updateImgRes(points);
+	updateColor(points);
 
 	convertPointsToCamera(points, t, resampleMat);	// "loader" RS -> camera RS
 
