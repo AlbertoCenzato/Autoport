@@ -33,15 +33,15 @@ either expressed or implied, of the FreeBSD Project.
 #define PATTERN_ANALYSIS_HPP_
 
 #include "../Utils/global_includes.hpp"
-#include "assert.h"
-
-extern string workingDir;
 
 /*
  * This class decides if a given vector of 2D points represents
- * the led pattern or not and, if yes, reorders the points properly
+ * the LED pattern or not and, if yes, reorders the points properly
  * as described by the pattern documentation (see Dropbox > AUTOPORT >
  * SENSORI MATERIALE > pattern.docx, "ottava geometria")
+ *
+ * TODO: this class should be abstract, leaving the implementation of
+ * 		 firstPhase and nearestPoints to its concrete classes.
  */
 
 class PatternAnalysis {
@@ -51,51 +51,57 @@ public:
 	~PatternAnalysis();
 
 	/*
-	 * The only one public method. Receives the points detected from the image
-	 * and states if they represent a pattern or not. Decides which
-	 * matching algorithm to use based on the moment: if t = 0
-	 * uses firstPhase, otherwise uses nearestPoints.
+	 * Receives the descriptors and states if they represent a pattern or not.
+	 * If they match the expected pattern they are reordered accordingly
+	 * to the pattern order.
+	 * Uses two different matching algorithms: if t = 0 uses firstPhase,
+	 * otherwise uses nearestPoints.
 	 *
-	 * @ledPoints: points to evaluate
-	 * @tolerance: temporarly unused parameter
-	 *
+	 * @descriptors: descriptors to evaluate
 	 * @return: true if a match is found, false otherwise
 	 */
-	bool evaluate(vector<LedDescriptor> &ledPoints);
+	bool evaluate(std::vector<LedDescriptor> &descriptors);
 
 private:
-	vector<LedDescriptor> oldPoints;	// points at time t-1
-	vector<cv::Point2f> pattern;	// model of the pattern, do not modify
-	float maxDistance = 75;
-	int minNumOfMatch = 4;
+	std::vector<LedDescriptor> oldDescriptors; // points at time t-1
+	std::vector<cv::Point2f>   pattern;	 	   // model of the pattern
+	float maxDistance   = 75;
+	int   minNumOfMatch = 4;
 
 	/*
-	 * WARNING! NOT WORKING by the moment. It was written for another led pattern!
-	 * Receives the points detected from the image
-	 * and states if they represent a pattern or not.
-	 * Used at time t > 0.
-	 *
-	 * @ledPoints: points to evaluate
-	 * @tolerance: temporarly unused parameter
-	 *
-	 * @return: the number of matched leds
-	 */
-	int nearestPoints(vector<LedDescriptor> &ledPoints);
-
-	/*
-	 * Receives the points detected from the image
-	 * and states if they represent a pattern or not.
+	 * Receives the descriptors and states if they represent
+	 * a pattern or not, using an algorithm specific for the pattern.
 	 * Used at time t = 0 (the very first frame) or when the drone
-	 * has lost track of the leds.
+	 * has lost track of the LEDs.
 	 *
-	 * @ledPoints: points to evaluate
-	 * @tolerance: temporarly unused parameter
-	 *
+	 * @descriptors: descriptors to evaluate
 	 * @return: true if a match is found, false otherwise
 	 */
-	bool firstPhase(vector<LedDescriptor> &ledPoints);
-	int findNearestPoint(const LedDescriptor &point, const vector<LedDescriptor> &vec);
+	bool firstPhase(std::vector<LedDescriptor> &descriptors);
 
+	/*
+	 * Receives the descriptors and states if they represent
+	 * a pattern or not, comparing them to "oldPoints".
+	 * Used at time t > 0.
+	 *
+	 * @descriptors: descriptors to evaluate
+	 * @return: the number of matched descriptors
+	 */
+	int secondPhase(std::vector<LedDescriptor> &descriptors);
+
+
+	/**
+	 * Find the element of the set nearest to the specified descriptor.
+	 * The algorithm used is a simple linear search on the set using
+	 * an L2 metric in the 6D space of the descriptors. Use only for
+	 * small sets.
+	 *
+	 * @oldDescriptor: reference descriptor.
+	 * @descriptors: set to look into.
+	 * @return: index of the nearest descriptor in the set.
+	 */
+	int findNearestPoint(const LedDescriptor &oldDescriptor,
+						 const std::vector<LedDescriptor> &descriptors);
 
 };
 

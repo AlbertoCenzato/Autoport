@@ -31,53 +31,45 @@ either expressed or implied, of the FreeBSD Project.
 
 #include "PatternAnalysis.hpp"
 
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/features2d/features2d.hpp>
-
-#include <stdlib.h>
-
 extern Status status;
+
+// ----- public members -----
 
 PatternAnalysis::PatternAnalysis() {
 	Settings *settings = Settings::getInstance();
 	const int SIZE = settings->realWorldPoints.size();
-	oldPoints = vector<LedDescriptor>(SIZE);
+	oldDescriptors = vector<LedDescriptor>(SIZE);
 
-	// TODO: check if this assumption is correct
-	// here the z-component is neglected because it is very small
-
-	pattern = vector<Point2f>(SIZE);
-	for(int i = 0; i < SIZE; ++i) {
-		pattern[i] = Point2f(settings->realWorldPoints[i].x,
-							 settings->realWorldPoints[i].y);
+	pattern = vector<Point2f>(SIZE);							// pattern description loaded
+	for(int i = 0; i < SIZE; ++i) {								// from config file is never
+		pattern[i] = Point2f(settings->realWorldPoints[i].x,	// used by PatternAnalysis for
+							 settings->realWorldPoints[i].y);	// the moment
 	}
 }
 
 PatternAnalysis::~PatternAnalysis() {}
-
-// Led recognition algorithm. Gives a number to every led using the numbering convention
-// in patterns' file (see "Sensori" folder in dropbox).
-// @points: vector of Point2f of the leds' blob centroid.
-// @img: image used to visualize identified leds' position and number.
-// @tolerance: tolerance in the alignement (in pixels).
-//returns: vector of Point2f ordered with the numbering convention
 
 bool PatternAnalysis::evaluate(vector<LedDescriptor> &descriptors) {
 
 	int blobNumber = descriptors.size();
 	bool matchFound = false;
 
+	// if "oldDescriptors" is empty or outdated perform a complete match...
 	if(status == Status::LOOKING_FOR_TARGET) {
-		if(blobNumber == 5) {
+		// if descriptors aren't the same number of the pattern points
+		// skip all evaluation and return false
+		//
+		// FIXME: this isn't robust, it's too specific
+		if(blobNumber == 5) {		// TODO: put the "magic number" somewhere else
 			matchFound = firstPhase(descriptors);
 		}
 		else {
 			cout << "Too much or not enough descriptors!" << endl;
 		}
 	}
+	// ... otherwise perform a quick nearest neighbor match
 	else if(status == Status::FIRST_LANDING_PHASE) {
-		int matched = nearestPoints(descriptors);
+		int matched = secondPhase(descriptors);
 		if(matched >= minNumOfMatch)
 			matchFound = true;
 	}
@@ -85,55 +77,14 @@ bool PatternAnalysis::evaluate(vector<LedDescriptor> &descriptors) {
 	return matchFound;
 }
 
-// --- private members ---
+// ----- private members -----
 
-/*
- * WARNING! NOT WORKING by the moment. It was written for another led pattern!
- * Receives the points detected from the image
- * and states if they represent a pattern or not.
- * Used at time t > 0.
- *
- * @ledPoints: points to evaluate
- * @tolerance: temporarly unused parameter
- *
- * @return: the number of matched leds
- */
-int PatternAnalysis::nearestPoints(vector<LedDescriptor> &ledPoints) {
+//  ----------------------------------------------------------------
+// | TODO: This algorithm is stupid, too specific, bad looking crap |
+//  ----------------------------------------------------------------
+bool PatternAnalysis::firstPhase(vector<LedDescriptor> &descriptors) {
 
-	const int SIZE = ledPoints.size();
-	vector<LedDescriptor> matchedLeds(SIZE);
-	int matched = 0;
-
-	for(int i = 0; i < SIZE; ++i) {
-		int index = findNearestPoint(oldPoints[i], ledPoints);
-		if(index > -1) {
-			matchedLeds[i] = ledPoints[index];
-			oldPoints[i] = ledPoints[index];
-			GenPurpFunc::removeFromVec(index,ledPoints);
-			++matched;
-		}
-	}
-
-	ledPoints.clear();
-	ledPoints = matchedLeds;
-
-	return matched;
-}
-
-/*
- * Receives the points detected from the image
- * and states if they represent a pattern or not.
- * Used at time t = 0 (the very first frame) or when the drone
- * has lost track of the leds.
- *
- * @ledPoints: points to evaluate
- * @tolerance: temporarly unused parameter
- *
- * @return: true if a match is found, false otherwise
- */
-bool PatternAnalysis::firstPhase(vector<LedDescriptor> &ledPoints) {
-
-	const int SIZE = ledPoints.size();
+	const int SIZE = descriptors.size();
 
 	int minIndex1 = 0;
 	int minIndex2 = 1;
@@ -141,7 +92,7 @@ bool PatternAnalysis::firstPhase(vector<LedDescriptor> &ledPoints) {
 	for(int i = 0; i < SIZE; ++i) {
 		for(int j = 0; j < SIZE; j++) {
 			if(i != j) {
-				float distance = ledPoints[i].cartDist(ledPoints[j]);
+				float distance = descriptors[i].cartDist(descriptors[j]);
 				if(distance < minDist) {
 					minDist = distance;
 					minIndex1 = i;
@@ -151,16 +102,16 @@ bool PatternAnalysis::firstPhase(vector<LedDescriptor> &ledPoints) {
 		}
 	}
 
-	LedDescriptor ledA = ledPoints[minIndex1];
-	LedDescriptor ledB = ledPoints[minIndex2];
+	LedDescriptor ledA = descriptors[minIndex1];
+	LedDescriptor ledB = descriptors[minIndex2];
 
 	if(minIndex1 == SIZE-1) {
-		GenPurpFunc::removeFromVec(minIndex1,ledPoints);
-		GenPurpFunc::removeFromVec(minIndex2,ledPoints);
+		GenPurpFunc::removeFromVec(minIndex1,descriptors);
+		GenPurpFunc::removeFromVec(minIndex2,descriptors);
 	}
 	else {
-		GenPurpFunc::removeFromVec(minIndex2,ledPoints);
-		GenPurpFunc::removeFromVec(minIndex1,ledPoints);
+		GenPurpFunc::removeFromVec(minIndex2,descriptors);
+		GenPurpFunc::removeFromVec(minIndex1,descriptors);
 	}
 
 	Point2f posA = ledA.position;
@@ -169,7 +120,7 @@ bool PatternAnalysis::firstPhase(vector<LedDescriptor> &ledPoints) {
 	int minIndex = 0;
 	minDist = 100000;
 	for(int i = 0; i < SIZE-2; ++i) {
-		float distance = GenPurpFunc::distPoint2Line(ledPoints[i].position,line);
+		float distance = GenPurpFunc::distPoint2Line(descriptors[i].position,line);
 		if(distance < minDist) {
 			minDist = distance;
 			minIndex = i;
@@ -177,7 +128,7 @@ bool PatternAnalysis::firstPhase(vector<LedDescriptor> &ledPoints) {
 	}
 
 	vector<LedDescriptor> sorted(SIZE);
-	if(ledPoints[minIndex].cartDist(ledA) < ledPoints[minIndex].cartDist(ledB)) {
+	if(descriptors[minIndex].cartDist(ledA) < descriptors[minIndex].cartDist(ledB)) {
 		sorted[2] = ledA;
 		sorted[3] = ledB;
 	}
@@ -186,37 +137,75 @@ bool PatternAnalysis::firstPhase(vector<LedDescriptor> &ledPoints) {
 		sorted[3] = ledA;
 	}
 
-	sorted[1] = ledPoints[minIndex];
-	GenPurpFunc::removeFromVec(minIndex,ledPoints);
+	sorted[1] = descriptors[minIndex];
+	GenPurpFunc::removeFromVec(minIndex,descriptors);
 
-	if(ledPoints[0].cartDist(sorted[1]) < ledPoints[0].cartDist(sorted[3])) {
-		sorted[0] = ledPoints[0];
-		sorted[4] = ledPoints[1];
+	if(descriptors[0].cartDist(sorted[1]) < descriptors[0].cartDist(sorted[3])) {
+		sorted[0] = descriptors[0];
+		sorted[4] = descriptors[1];
 	}
 	else {
-		sorted[0] = ledPoints[1];
-		sorted[4] = ledPoints[0];
+		sorted[0] = descriptors[1];
+		sorted[4] = descriptors[0];
 	}
 
-	ledPoints = sorted;
-	oldPoints = sorted;
+	descriptors = sorted;
+	oldDescriptors = sorted;
 
 	return true;
 }
 
-int PatternAnalysis::findNearestPoint(const LedDescriptor &point, const vector<LedDescriptor> &vec) {
+
+int PatternAnalysis::secondPhase(vector<LedDescriptor> &descriptors) {
+
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	// FIXME: WHAT IF descriptors.size() != oldDescriptors.size() ??????????
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+	const int SIZE = descriptors.size();
+	vector<LedDescriptor> matchedLeds(SIZE);
+	int matched = 0;
+
+	// for each old descriptor...
+	for(int i = 0; i < SIZE; ++i) {
+		// ... look for the nearest in the new descriptors set
+		int index = findNearestPoint(oldDescriptors[i], descriptors);
+		if(index > -1) {
+			matchedLeds[i] = descriptors[index];
+			oldDescriptors[i] = descriptors[index];
+			GenPurpFunc::removeFromVec(index,descriptors);
+			++matched;
+		}
+
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		// FIXME: else if index = -1 oldDescriptors[i] should be emptied
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	}
+
+	descriptors.clear();
+	descriptors = matchedLeds;	// TODO: assign by ref instead of copying everything!
+
+	return matched;
+}
+
+
+int PatternAnalysis::findNearestPoint(const LedDescriptor &oldDescriptor, const vector<LedDescriptor> &descriptors) {
 	int minIndex = -1;
 	float minDist  = FLT_MAX;
-	const int SIZE = vec.size();
+	const int SIZE = descriptors.size();
+
+	// for each descriptor in the set...
 	for(int i = 0; i < SIZE; ++i) {
-		float distance = point.L2Dist(vec[i]);
-		if(distance < minDist) {
+
+		// ... compute its L2 distance from oldDescriptor...
+		float distance = oldDescriptor.L2Dist(descriptors[i]);
+		if(distance < minDist) { // ... and keep the minimum distance
 			minDist  = distance;
 			minIndex = i;
 		}
 	}
 
-	if(minDist > maxDistance)
+	if(minDist > maxDistance) // check if minDist is beneath the tolerance value
 		return -1;
 
 	return minIndex;
