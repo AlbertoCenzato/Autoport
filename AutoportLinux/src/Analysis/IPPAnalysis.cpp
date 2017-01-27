@@ -71,7 +71,7 @@ Result IPPAnalysis::evaluate(Mat& extrinsicFactors) {
 	}
 
 	Point2f t;									// gets t and resampleMat, will be used
-	loader->getCropVector(t);					// later to transform points from "loader" RS
+	loader->getTranslVector(t);					// later to transform points from "loader" RS
 	Mat resampleMat = loader->getResampleMat();	// to camera RS
 
 	vector<LedDescriptor> points(10);

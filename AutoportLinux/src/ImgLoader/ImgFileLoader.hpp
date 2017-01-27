@@ -32,36 +32,117 @@ either expressed or implied, of the FreeBSD Project.
 #ifndef IMGFILELOADER_HPP_
 #define IMGFILELOADER_HPP_
 
+#include "../Utils/global_includes.hpp"
 #include "ImgLoader.hpp"
 
+/**
+ * Concrete class for ImgLoader abstract class.
+ * Provides support for loading image sequences from multiple files.
+ */
 class ImgFileLoader: public ImgLoader {
 public:
 
 	ImgFileLoader();
-	ImgFileLoader(const string &source, bool resizeDynamically = true, const Size &frameSize = Size(0,0));
+
+	/**
+	 * Class constructor. Opens a stream for the specified source.
+	 * It can read from a video file or image sequence.
+	 * If source is an image sequence it must be in the format "img_%02d.jpg",
+	 * this will make ImgLoader read samples like img_00.jpg, img_01.jpg, img_02.jpg...
+	 *
+	 * @source: path to video file or image sequence (as specified above).
+	 * @resizeDyn: states if "getNextFrame()" gives in output frames with resolution
+	 * 			   "res" or not. If false the original frame resolution is used.
+	 * @frameSize: specifies width and height of "res"; if (0,0) keeps image resolution.
+	 */
+	ImgFileLoader(const std::string &source, bool resizeDyn = true,
+			      const cv::Size &frameSize = cv::Size(0,0));
 
 	~ImgFileLoader();
 
-	bool getNextFrame(Mat &frame);
+	/**
+	 * Reads the next frame from the image sequence.
+	 *
+	 * @frame: the retrieved frame.
+	 * @return: true if the new frame is not empty.
+	 */
+	bool getNextFrame(cv::Mat &frame);
 
-	Rect getROI();
-	Mat  getResampleMat();
-	void getCropVector(Point2f &t);
+	/**
+	 * @return: "roi"
+	 */
+	cv::Rect getROI();
 
+	/**
+	 * Gives the resample matrix used to transform coordinates from
+	 * current ImgFileLoader reference system to camera reference system.
+	 * The reasmple matrix is given by the ratio of default camera resolution
+	 * and "res".
+	 * See IPPAnalysis::convertPointsToCamera() for further details.
+	 *
+	 * @return: resample matrix
+	 */
+	cv::Mat  getResampleMat();
+
+	/**
+	 * Gives the translation vector used to transform coordinates from
+	 * current ImgFileLoader reference system to camera reference system.
+	 * See IPPAnalysis::convertPointsToCamera() for further details.
+	 *
+	 * @t: returned translation vector
+	 */
+	void getTranslVector(cv::Point2f &t);
+
+	/**
+	 * Changes "res" width. Should be used carefully.
+	 * Prefer using ImgLoader::halveRes() and
+	 * ImgLoader::doubleRes() when possible.
+	 *
+	 * @frameWidth: new frame width.
+	 * @return: always true
+	 */
 	bool setResolutionWidth (int frameWidth);
-	bool setResolutionHeight(int frameHeight);
-	bool setROI(const Rect& roi);
 
+	/**
+	 * Changes "res" height. Should be used carefully.
+	 * Prefer using ImgLoader::halveRes() and
+	 * ImgLoader::doubleRes() when possible.
+	 *
+	 * @frameHeight: new frame height.
+	 * @return: always true
+	 */
+	bool setResolutionHeight(int frameHeight);
+
+	/**
+	 * Sets the region of interest of the image that
+	 * getNextFrame() retrieves.
+	 *
+	 * @roi: new region of interest
+	 * @return: always true
+	 */
+	bool setROI(const cv::Rect &roi);
+
+	/**
+	 * Sets "res" equal to "defRes", the default resolution
+	 * of the opened image stream.
+	 *
+	 * @return: always true
+	 */
 	bool resetRes();
+
+	/**
+	 * Sets "roi" equal to the maximum possible area.
+	 * getNextFrame will then return a full non cropped image
+	 */
 	void resetROI();
 
 private:
 
-	Rect roi;				// region of interest
-	Size res;				// resolution
-	Size defRes;			// default resolution
-	bool resizeDynamically = false;
-	Mat resampleMat;
+	cv::Rect roi;				// region of interest
+	cv::Size res;				// resolution
+	cv::Size defRes;			// default resolution
+	bool 	 resizeDyn = false;
+	cv::Mat  resampleMat;
 
 };
 

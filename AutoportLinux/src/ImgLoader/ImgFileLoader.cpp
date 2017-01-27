@@ -33,42 +33,47 @@ either expressed or implied, of the FreeBSD Project.
 
 ImgFileLoader::ImgFileLoader() : ImgLoader() { }
 
-ImgFileLoader::ImgFileLoader(const string &source, bool resizeDynamically, const Size &frameSize) : ImgLoader(source) {
-	if(!capture.isOpened()) {
+ImgFileLoader::ImgFileLoader(const string &source, bool resizeDyn, const Size &frameSize) : ImgLoader(source) {
+
+	if(!capture.isOpened()) { 							// if can't open the stream...
 		cerr << "Error opening image stream" << endl;
-		return;
+		return;											// ... return and do nothing
 	}
 
 	cout << "Found input!" << endl;
 
 	resampleMat = Mat::zeros(2,2,CV_32FC1);
-	this->resizeDynamically = resizeDynamically;
+	this->resizeDyn = resizeDyn;
 
-	int width  = capture.get(CV_CAP_PROP_FRAME_WIDTH);
+	int width  = capture.get(CV_CAP_PROP_FRAME_WIDTH);	// get native images resolution
 	int height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
-	if(frameSize.height != 0 && frameSize.width != 0) {
+
+	if(frameSize.height != 0 && frameSize.width != 0) { // reset resolution to frameSize
 		height = frameSize.height;
 		width  = frameSize.width;
 	}
 
-	defRes = Size(width,height);
-	setResolutionWidth (width);
+	defRes = Size(width,height);	// save default resolution
+	setResolutionWidth (width);		// and set stream resolution to default resolution
 	setResolutionHeight(height);
 
-	roi = Rect(0, 0, res.width, res.height);
+	roi = Rect(0, 0, res.width, res.height);	// roi is the entire image
 }
 
 ImgFileLoader::~ImgFileLoader() { }
 
 bool ImgFileLoader::getNextFrame(Mat &frame) {
-	capture >> frame;
+	capture >> frame;	// reads a frame from file
 	if(frame.empty())
 		return false;
 
-	if(resizeDynamically) {
+	if(resizeDyn) {
+		// resizes the image to desired resolution. If used for real-time
+		// purposes a simpler (and faster) interpolation algorithm can be used
+		// instead of Lanczos, for example INTER_NEAREST or INTER_LINEAR
 		resize(frame,frame,res,0,0,INTER_LANCZOS4);
 	}
-	frame = frame(roi);
+	frame = frame(roi); // crops the image according to "roi"
 
 	return true;
 }
@@ -92,7 +97,7 @@ Mat ImgFileLoader::getResampleMat() {
 	return resampleMat;
 }
 
-void ImgFileLoader::getCropVector(Point2f &t) {
+void ImgFileLoader::getTranslVector(Point2f &t) {
 	t.x = roi.x;
 	t.y = roi.y;
 }
@@ -116,6 +121,7 @@ bool ImgFileLoader::setROI(const Rect& roi) {
 	int roiWidth  = roi.width;
 	int roiHeight = roi.height;
 
+	// roi must be non negative and contained in the image resolution
 	if(x < 0) x = 0;
 	if(y < 0) y = 0;
 	if(roiWidth  + x > res.width)  roiWidth  = res.width  - x;

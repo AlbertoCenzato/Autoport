@@ -50,14 +50,6 @@ public:
 	 */
 	ImgLoader();
 
-	/**
-	 * Class constructor. Opens a stream for the specified source.
-	 * It can read from a video file or image sequence.
-	 * If source is an image sequence it must be in the format "img_%02d.jpg",
-	 * this will make ImgLoader read samples like img_00.jpg, img_01.jpg, img_02.jpg...
-	 *
-	 * @source: path to video file or image sequence (as specified above)
-	 */
 	ImgLoader(const std::string &source);
 
 	/**
@@ -74,7 +66,7 @@ public:
 
 	virtual cv::Rect getROI() = 0;
 	virtual cv::Mat  getResampleMat() = 0;
-	virtual void getCropVector(cv::Point2f &t) = 0;
+	virtual void getTranslVector(cv::Point2f &t) = 0;
 
 	virtual bool setResolutionWidth (int frameWidth)  = 0;
 	virtual bool setResolutionHeight(int frameHeight) = 0;
