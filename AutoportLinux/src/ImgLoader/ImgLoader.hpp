@@ -36,38 +36,75 @@ either expressed or implied, of the FreeBSD Project.
 #include <opencv2/opencv.hpp>
 #include <opencv2/videoio.hpp>
 
-using namespace std;
-using namespace cv;
-
+/**
+ * Abstract image loader class. This class provides a unique
+ * interface for all its derived classes
+ */
 class ImgLoader {
 public:
 
+	//----- FIXME: an abstract class with constructors is meaningless, isn't it? -----
+
+	/**
+	 * Class default constructor.
+	 */
 	ImgLoader();
-	ImgLoader(const string &source);
+
+	/**
+	 * Class constructor. Opens a stream for the specified source.
+	 * It can read from a video file or image sequence.
+	 * If source is an image sequence it must be in the format "img_%02d.jpg",
+	 * this will make ImgLoader read samples like img_00.jpg, img_01.jpg, img_02.jpg...
+	 *
+	 * @source: path to video file or image sequence (as specified above)
+	 */
+	ImgLoader(const std::string &source);
+
+	/**
+	 * Class constructor. Opens a stream from the specified video capture device.
+	 * If there is only one video capture device its id is 0.
+	 *
+	 * @device: id of the opened video capturing device
+	 */
 	ImgLoader(int device);
 
 	virtual ~ImgLoader();
 
-	virtual bool getNextFrame(Mat &frame) = 0;
+	virtual bool getNextFrame(cv::Mat &frame) = 0;
 
-	virtual Rect getROI() = 0;
-	virtual Mat  getResampleMat() = 0;
-	virtual void getCropVector(Point2f &t) = 0;
+	virtual cv::Rect getROI() = 0;
+	virtual cv::Mat  getResampleMat() = 0;
+	virtual void getCropVector(cv::Point2f &t) = 0;
 
 	virtual bool setResolutionWidth (int frameWidth)  = 0;
 	virtual bool setResolutionHeight(int frameHeight) = 0;
-	virtual bool setROI(const Rect& roi) = 0;
+	virtual bool setROI(const cv::Rect& roi) = 0;
 
 	virtual bool resetRes() = 0;
 	virtual void resetROI() = 0;
 
+	/**
+	 * @return: true if the image stream is open
+	 */
 	bool isOpen();
+
+	/**
+	 * Halves the resolution of frames given in output by ImgLoader
+	 *
+	 * @return: true if resolution changes after this function call
+	 */
 	bool halveRes();
+
+	/**
+	 * Doubles the resolution of frames given in output by ImgLoader
+	 *
+	 * @return: true if resolution changes after this function call
+	 */
 	bool doubleRes();
 
 protected:
 
-	VideoCapture capture;
+	cv::VideoCapture capture;
 
 };
 

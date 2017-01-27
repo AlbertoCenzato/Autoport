@@ -34,7 +34,9 @@ either expressed or implied, of the FreeBSD Project.
 using namespace std;
 using namespace cv;
 
-ImgLoader::ImgLoader() {}
+ImgLoader::ImgLoader() {
+	capture = VideoCapture();
+}
 
 ImgLoader::ImgLoader(const string &source) {
 	capture = VideoCapture(source);
