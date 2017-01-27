@@ -29,13 +29,85 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the FreeBSD Project.
 //============================================================================ */
 
-#pragma once
+#ifndef IMGANALYSIS_HPP_
+#define IMGANALYSIS_HPP_
 
 #include "../Utils/global_includes.hpp"
 
-class LedDescriptor;
-
+/**
+ * ImgAnalysis class extracts coordinates, color and size of
+ * all the LEDs in an image that match given criteria.
+ *
+ * WARNING!! At the moment LEDs can be filtered only according
+ * to their color; size and shape are disabled.
+ *
+ * TODO: add other filtering criteria.
+ */
 class ImgAnalysis {
+
+public:
+
+	/**
+	 * Default class constructor
+	 */
+	ImgAnalysis();
+
+	/**
+	 * Class constructor.
+	 *
+	 * @colorInterval: interval of valid colors for ImgAnalysis::filterByColor()
+	 * @ledColor: color of the LEDs to look for
+	 */
+	ImgAnalysis(const Interval<cv::Scalar> &colorInterval, LedColor ledColor);
+
+	~ImgAnalysis() {}
+
+	/**
+	 * Given an image in input returns a vector of descriptors representing
+	 * 2D coordinates, color and size of the LEDs in the image. Coordinates are in pixels.
+	 * Subsequent calls assume the color of LEDs to be similar to the
+	 * color of LEDs detected in the last call. To perform a clean execution
+	 * (without "feedback") call ImgAnalysis::resetColorInterval()
+	 * after every evaluate call.
+	 *
+	 * @image: image to evaluate.
+	 * @descriptors: descriptors representing LEDs in the image.
+	 * @return: always true.	// TODO: could be used in a better way...
+	 */
+	bool evaluate(cv::Mat &image, vector<LedDescriptor> &descriptors);
+
+	// These functions will be used when size "feedback" is ready
+	//
+	// ImgAnalysis* setSizeTolerance   (int);
+	// ImgAnalysis* setSizeSupTolerance(int);
+
+	/**
+	 * Sets interval of valid colors for ImgAnalysis::filterByColor()
+	 *
+	 * @colorInterval: interval of valid colors
+	 * @return: a pointer to this object
+	 */
+	ImgAnalysis* setColorInterval	(const Interval<cv::Scalar> &colorInterval);
+
+	/**
+	 * Sets interval of valid blob sizes for ImgAnalysis::findBlobs()
+	 *
+	 * @blobSizeInterval: interval of valid blob sizes
+	 * @return: a pointer to this object
+	 */
+	ImgAnalysis* setBlobSizeInterval(const Interval<int> &blobSizeInterval);
+
+	/**
+	 * Returns the current colorInterval used by ImgAnalysis::filterByColor()
+	 */
+	void getColorInterval(Interval<cv::Scalar> &colorInterval);
+
+	/**
+	 * Sets colorInterval used by ImgAnalysis::filterByColor() to its default value
+	 */
+	void resetColorInterval();
+
+private:
 
 	Interval<cv::Scalar> colorInterval;
 	Interval<cv::Scalar> defColorInterval;
@@ -45,40 +117,30 @@ class ImgAnalysis {
 
 	cv::Mat hsvImage;
 
-public:
-
-	ImgAnalysis(const Interval<cv::Scalar> &colorInterval, LedColor ledColor);
-	ImgAnalysis();
-
-	~ImgAnalysis() {}
-
-	bool evaluate(cv::Mat &image, vector<LedDescriptor> &points);
-	ImgAnalysis* setSizeTolerance	(int);
-	ImgAnalysis* setSizeSupTolerance(int);
-	ImgAnalysis* setColorInterval	(const Interval<cv::Scalar> &colorInterval);
-	ImgAnalysis* setBlobSizeInterval(const Interval<int> 	&blobSizeInterval);
-
-	void getColorInterval(Interval<cv::Scalar> &colorInterval);
-	void resetColorInterval();
-
-private:
-
+	/**
+	 * Private constructor used by the two public constructors
+	 */
 	void constructor(const Interval<cv::Scalar> &colorInterval, LedColor ledColor);
 
-	// Processes the input image (in HSV color space) filtering out (setting to black)
-	// all colors which are not in the interval [min,max], the others are set to white.
-	// @img: the Mat object (HSV color space) containing the image to process.
-	// @min: the lower bound specified in the HSV color space.
-	// @max: the upper bound specified in the HSV color space.
-	// returns: black and white image as a Mat object.
+	/**
+	 * Processes the input image (in HSV color space) filtering out (setting to black)
+	 * all colors which are not in the interval [min,max], the others are set to white.
+	 *
+	 * @hsvImg: the Mat object (HSV color space) containing the image to process.
+	 * @return: black and white image as a Mat object.
+	 */
 	cv::Mat filterByColor(const cv::Mat &hsvImg);
 
-	// Finds all color blobs that fit the specified parameters. Blobs which distance
-	// from the centroid of the blob set is grater than 2*meanDistance are ignored.
-	// @img: image to analyze.
-	// @blobParam: parameters to fit.
-	// returns: a vector of Point2f containing centroids coordinates of detected blobs.
-	int findBlobs(const cv::Mat &colorFilteredImg, vector<LedDescriptor>& ledPoints);
+	/*
+	 * Finds all color blobs that fit the specified parameters. Blobs which distance
+	 * from the centroid of the blob set is grater than 2*meanDistance are ignored.
+	 *
+	 * @img: image to analyze.
+	 * @blobParam: parameters to fit.
+	 * @return: a vector of Point2f containing centroids coordinates of detected blobs.
+	 */
+	int findBlobs(const cv::Mat &bwImage, vector<LedDescriptor>& descriptors);
 
 };
 
+#endif  // IMGANALYSIS_HPP_
