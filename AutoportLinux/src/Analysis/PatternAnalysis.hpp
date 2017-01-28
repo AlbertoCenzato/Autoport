@@ -41,7 +41,7 @@ either expressed or implied, of the FreeBSD Project.
  * SENSORI MATERIALE > pattern.docx, "ottava geometria")
  *
  * TODO: this class should be abstract, leaving the implementation of
- * 		 firstPhase and nearestPoints to its concrete classes.
+ * 		 firstPhase and secondPhase to its concrete classes.
  */
 
 class PatternAnalysis {
@@ -74,8 +74,11 @@ private:
 	 * Used at time t = 0 (the very first frame) or when the drone
 	 * has lost track of the LEDs.
 	 *
-	 * @descriptors: descriptors to evaluate
-	 * @return: true if a match is found, false otherwise
+	 * @descriptors: descriptors to evaluate.
+	 * @return: true if a match is found, false otherwise.
+	 *
+	 * TODO: should return the number of matched descriptors
+	 * 		 as PatternAnalysis::secondPhase() does.
 	 */
 	bool firstPhase(std::vector<LedDescriptor> &descriptors);
 

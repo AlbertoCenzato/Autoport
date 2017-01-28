@@ -31,48 +31,39 @@ either expressed or implied, of the FreeBSD Project.
 
 #include "PositionEstimation.hpp"
 
-#include <iostream>
-#include <fstream>
-#include <chrono>
-#include "../Utils/Settings.hpp"
-#include "../Utils/LedDescriptor.hpp"
-
-//using namespace std;
-//using namespace cv;
 
 //--- public member functions ---
 
 PositionEstimation::PositionEstimation() {
-		Settings *settings = Settings::getInstance();
-		focalX = (float)settings->focalX;
-		focalY = (float)settings->focalY;
-		//pixelDimension = (float)settings.pixelDimension;
+	Settings *settings = Settings::getInstance();
+	focalX = (float)settings->focalX;
+	focalY = (float)settings->focalY;
 
-		resetInitialPosition();
+	resetInitialPosition();
 
-		cameraMatrix = Mat(Size(3,3), CV_32F);
-		cameraMatrix.at<float>(0,0) = focalX;
-		cameraMatrix.at<float>(1,1) = focalY;
-		cameraMatrix.at<float>(0,2) = cx;
-		cameraMatrix.at<float>(1,2) = cy;
-		cameraMatrix.at<float>(2,2) = 1;
+	cameraMatrix = Mat(Size(3,3), CV_32F);
+	cameraMatrix.at<float>(0,0) = focalX;
+	cameraMatrix.at<float>(1,1) = focalY;
+	cameraMatrix.at<float>(0,2) = cx;
+	cameraMatrix.at<float>(1,2) = cy;
+	cameraMatrix.at<float>(2,2) = 1;
 
-		distCoeffs = Mat::zeros(4, 1, CV_32FC1);
-		distCoeffs.at<float>(0,0) = h1;
-		distCoeffs.at<float>(1,0) = h2;
+	distCoeffs = Mat::zeros(4, 1, CV_32FC1);
+	distCoeffs.at<float>(0,0) = h1;
+	distCoeffs.at<float>(1,0) = h2;
 
-	}
+}
 
 PositionEstimation::~PositionEstimation() {}
 
 bool PositionEstimation::evaluate(const vector<LedDescriptor> &cameraSystemPoints, Mat &extrinsicFactors) {
 
-	//valuto posizione con ransac
+	// if has enough points...
 	if(cameraSystemPoints.size() == 4 || cameraSystemPoints.size() == 5) {
-		ransacPnP(cameraSystemPoints, extrinsicFactors);
 
-		//Kalman
-		kalmanFilter();
+		ransacPnP(cameraSystemPoints, extrinsicFactors); // ... computes [R,t] using Ransac...
+
+		kalmanFilter(); // ... then filters the result with Kalman
 
 		return true;
 	}
@@ -96,27 +87,32 @@ bool PositionEstimation::resetInitialPosition() {
 
 void PositionEstimation::ransacPnP(const vector<LedDescriptor> &ledPoints, Mat &extrinsicFactors) {
 
-		auto rwPoints = Settings::getInstance()->realWorldPoints;
-		auto objectPoints = vector<Point3f>();
-		auto imagePoints  = vector<Point2f>();
-		for(uint i = 0; i < ledPoints.size(); ++i) {
-			if(!ledPoints[i].isEmpty()) {
-				objectPoints.push_back(rwPoints[i]);
-				imagePoints .push_back(ledPoints[i].position);
-			}
+	auto rwPoints = Settings::getInstance()->realWorldPoints; // gets pattern points
+	auto objectPoints = vector<Point3f>();
+	auto imagePoints  = vector<Point2f>();
+	for(uint i = 0; i < ledPoints.size(); ++i) {
+
+		// ransac wants two sets of the same size, here it keeps
+		// only valid points and discards the others
+		if(!ledPoints[i].isEmpty()) {
+			objectPoints.push_back(rwPoints[i]);
+			imagePoints .push_back(ledPoints[i].position);
 		}
-
-		solvePnPRansac(objectPoints,imagePoints,cameraMatrix, distCoeffs, rvec, tvec);
-
-		Mat rotationMat;
-		Rodrigues(rvec,rotationMat);
-
-		for(int i = 0; i < 3; ++i)
-			rotationMat.col(i).copyTo(extrinsicFactors.col(i));
-		tvec.col(0).copyTo(extrinsicFactors.col(3));
 	}
 
+	// compute R and t, see OpenCV documentation about solvePnPRansac()
+	solvePnPRansac(objectPoints,imagePoints,cameraMatrix, distCoeffs, rvec, tvec);
 
-	void PositionEstimation::kalmanFilter() {
-		return;
-	}
+	Mat rotationMat;			 // transform the rotation vector in a rotation matrix
+	Rodrigues(rvec,rotationMat); // see OpenCV documentation about Rodrigues()
+
+	// copies the results to output matrix
+	for(int i = 0; i < 3; ++i)
+		rotationMat.col(i).copyTo(extrinsicFactors.col(i));
+	tvec.col(0).copyTo(extrinsicFactors.col(3));
+}
+
+
+void PositionEstimation::kalmanFilter() {
+	return;
+}

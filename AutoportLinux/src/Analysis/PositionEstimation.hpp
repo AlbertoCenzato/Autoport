@@ -36,8 +36,13 @@ either expressed or implied, of the FreeBSD Project.
 
 extern ofstream stream;
 
-class LedDescriptor;
-
+/**
+ * PositionEstimation class computes the rotation matrix R and the translation vector t
+ * that transform the input points reference system to the target pattern reference system.
+ *
+ * TODO: this class should be abstract, leaving the implementation of
+ * 		 ransacPnP and kalmanFilter to its concrete classes.
+ */
 class PositionEstimation {
 
 public:
@@ -45,8 +50,22 @@ public:
 	PositionEstimation();
 	~PositionEstimation();
 
-	bool evaluate(const vector<LedDescriptor> &, cv::Mat &evaluatedPoints);
+	/**
+	 * Computes the rotation matrix R and the translation vector t that
+	 * transform the input points reference system to the target pattern reference system.
+	 *
+	 * @cameraSystemPoints: input points.
+	 * @extrinsicFactors: output 3x4 [R,t] matrix.
+	 * @return: true if [R,t] is computed without errors.
+	 */
+	bool evaluate(const std::vector<LedDescriptor> &cameraSystemPoints, cv::Mat &extrinsicFactors);
 
+	/**
+	 * Sets the initial suggested position for the iterative algorithm used
+	 * by PositionEstimation::ransacPnP() to its default value.
+	 *
+	 * @return: always true.
+	 */
 	bool resetInitialPosition();
 
 private:
@@ -54,11 +73,12 @@ private:
 	float focalX;
 	float focalY;
 
-	float cx = 1.3081e+03;	// TODO: load the value from config file
-	float cy = 	 964.6396;	// TODO: load the value from config file
+	// TODO: put these "magic numbers" in configuration file
+	float cx = 1.3081e+03;	// optical axis coordinates
+	float cy = 	 964.6396;
 
-	float h1 =  0.1768;		// TODO: load the value from config file
-	float h2 = -0.3365;		// TODO: load the value from config file
+	float h1 =  0.1768;		// lens distortion coefficients
+	float h2 = -0.3365;
 
 	cv::Mat rvec = cv::Mat::zeros(3, 1, CV_32FC1);  // output rotation vector
 	cv::Mat tvec = cv::Mat::zeros(3, 1, CV_32FC1);  // output translation vector
@@ -67,7 +87,20 @@ private:
 
 	cv::Mat distCoeffs = cv::Mat::zeros(4, 1, CV_32FC1);
 
-	void ransacPnP(const vector<LedDescriptor> &ledPoints, cv::Mat &extrinsicFactors);
+	/**
+	 * Registers detected points descriptors on the expected LED pattern
+	 * (loaded from configuration file) using an iterative ransac approach.
+	 * See OpenCV documentation about solvePnPRansac.
+	 *
+	 * @descriptors: input detected points
+	 * @extrinsicFactors: output [R,t] matrix
+	 */
+	void ransacPnP(const std::vector<LedDescriptor> &descriptors, cv::Mat &extrinsicFactors);
+
+	/**
+	 * Empty function, does nothing. In future will be used to merge
+	 * IMU and camera data to improve accuracy
+	 */
 	void kalmanFilter();
 
 };
