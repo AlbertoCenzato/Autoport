@@ -37,7 +37,8 @@ either expressed or implied, of the FreeBSD Project.
 
 /**
  * This class is a descriptor for the LEDs detected in an image.
- * Contains informations about their
+ * Contains informations about their coordinates on the image plane
+ * (in pixels), their color and their size.
  */
 class LedDescriptor {
 public:
@@ -52,8 +53,14 @@ public:
 	virtual ~LedDescriptor();
 
 	float L2Dist  (const LedDescriptor &ledDesc) const;
-	float cartDist(const LedDescriptor &ledDesc) const;
+	float euclidDist(const LedDescriptor &ledDesc) const;
 
+	/**
+	 * returns true if a descriptor is empty. It is empty if
+	 * position.x = 0 or position.y = 0. Every descriptor position is
+	 * computed as the centroid of a blob on the image plane
+	 * and therefore it can't have position.x = 0 or position.y = 0
+	 */
 	bool isEmpty() const;
 
 	static cv::Point2f centroid(const std::vector<LedDescriptor> &descriptors);

@@ -99,7 +99,7 @@ bool PatternAnalysis::firstPhase(vector<LedDescriptor> &descriptors) {
 	for(int i = 0; i < SIZE; ++i) {
 		for(int j = 0; j < SIZE; j++) {
 			if(i != j) {
-				float distance = descriptors[i].cartDist(descriptors[j]);
+				float distance = descriptors[i].euclidDist(descriptors[j]);
 				if(distance < minDist) {
 					minDist = distance;
 					minIndex1 = i;
@@ -135,7 +135,7 @@ bool PatternAnalysis::firstPhase(vector<LedDescriptor> &descriptors) {
 	}
 
 	vector<LedDescriptor> sorted(SIZE);
-	if(descriptors[minIndex].cartDist(ledA) < descriptors[minIndex].cartDist(ledB)) {
+	if(descriptors[minIndex].euclidDist(ledA) < descriptors[minIndex].euclidDist(ledB)) {
 		sorted[2] = ledA;
 		sorted[3] = ledB;
 	}
@@ -147,7 +147,7 @@ bool PatternAnalysis::firstPhase(vector<LedDescriptor> &descriptors) {
 	sorted[1] = descriptors[minIndex];
 	GenPurpFunc::removeFromVec(minIndex,descriptors);
 
-	if(descriptors[0].cartDist(sorted[1]) < descriptors[0].cartDist(sorted[3])) {
+	if(descriptors[0].euclidDist(sorted[1]) < descriptors[0].euclidDist(sorted[3])) {
 		sorted[0] = descriptors[0];
 		sorted[4] = descriptors[1];
 	}

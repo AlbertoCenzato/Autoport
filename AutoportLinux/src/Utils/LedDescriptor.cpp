@@ -65,7 +65,7 @@ float LedDescriptor::L2Dist(const LedDescriptor &ledDesc) const {
 	return sqrt(sqSum);
 }
 
-float LedDescriptor::cartDist(const LedDescriptor &ledDesc) const {
+float LedDescriptor::euclidDist(const LedDescriptor &ledDesc) const {
 	return sqrt(pow(position.x - ledDesc.position.x, 2) + pow(position.y - ledDesc.position.y, 2));
 }
 
