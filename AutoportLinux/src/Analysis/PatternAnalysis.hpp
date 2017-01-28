@@ -32,7 +32,9 @@ either expressed or implied, of the FreeBSD Project.
 #ifndef PATTERN_ANALYSIS_HPP_
 #define PATTERN_ANALYSIS_HPP_
 
-#include "../Utils/global_includes.hpp"
+//#include "../Utils/global_includes.hpp"
+
+class LedDescriptor;
 
 /*
  * This class decides if a given vector of 2D points represents

@@ -32,13 +32,13 @@ either expressed or implied, of the FreeBSD Project.
 #ifndef IPPANALYSIS_HPP_
 #define IPPANALYSIS_HPP_
 
-#include "../Utils/global_includes.hpp"
-
-#include <fstream>
+#include <opencv2/opencv.hpp>
+#include "../Utils/GenPurpFunc.hpp"
 #include "ImgAnalysis.hpp"
 #include "PatternAnalysis.hpp"
 #include "PositionEstimation.hpp"
 
+class LedDescriptor;
 class ImgLoader;	  // forward declaration
 
 /**
@@ -66,7 +66,7 @@ public:
      * @return: Result enum stating if the evaluation was successful
      * 			see GenPurpFunc.hpp for Result definition
      */
-	Result evaluate(Mat &extrinsicFactors);
+	Result evaluate(cv::Mat &extrinsicFactors);
 
 	/**
 	 * Resets all class members to their default values
@@ -96,7 +96,7 @@ private:
 	 * @descriptors: points to use
 	 * @return: true if "loader" successfully updates its ROI
 	 */
-	bool updateROI	 (const vector<LedDescriptor> &descriptors);
+	bool updateROI	 (const std::vector<LedDescriptor> &descriptors);
 
 	/**
 	 * Sets "loader" resolution according to points size, i.e.:
@@ -107,7 +107,7 @@ private:
 	 * @descriptors: points to use
 	 * @returns: true if "loader" successfully updates its resolution
 	 */
-	bool updateImgRes(const vector<LedDescriptor> &descriptors);
+	bool updateImgRes(const std::vector<LedDescriptor> &descriptors);
 
 	/**
 	 * Sets "imageAnalyzer" color filter interval according to points color.
@@ -117,7 +117,7 @@ private:
 	 * @descriptors: points to use
 	 * @return: always true
 	 */
-	bool updateColor (const vector<LedDescriptor> &descriptors);
+	bool updateColor (const std::vector<LedDescriptor> &descriptors);
 
 	/**
 	 * Sets "loader" resolution and ROI to their default value.
@@ -143,7 +143,7 @@ private:
 	 * @t: translation vector from "loader" RS to camera RS
 	 * @resampleMat: upscaling matrix from "loader" RS to camera RS
 	 */
-	void convertPointsToCamera(vector<LedDescriptor> &points, Point2f &t, Mat &resampleMat);
+	void convertPointsToCamera(std::vector<LedDescriptor> &points, cv::Point2f &t, cv::Mat &resampleMat);
 
 };
 

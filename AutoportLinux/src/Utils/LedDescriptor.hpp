@@ -35,12 +35,16 @@ either expressed or implied, of the FreeBSD Project.
 #include <stdlib.h>
 #include <opencv2/opencv.hpp>
 
+/**
+ * This class is a descriptor for the LEDs detected in an image.
+ * Contains informations about their
+ */
 class LedDescriptor {
 public:
 
 	cv::Point2f position;
 	cv::Scalar 	color;
-	float	size;
+	float		size;
 
 	LedDescriptor();
 	LedDescriptor(cv::Point2f &position, cv::Scalar &color, float size);

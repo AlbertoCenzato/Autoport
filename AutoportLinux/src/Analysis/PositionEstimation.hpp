@@ -32,9 +32,13 @@ either expressed or implied, of the FreeBSD Project.
 #ifndef POSITION_ESTIMATION_HPP_
 #define POSITION_ESTIMATION_HPP_
 
-#include "../Utils/global_includes.hpp"
+#include <stdlib.h>
+#include <iostream>
+#include <opencv2/opencv.hpp>
 
-extern ofstream stream;
+class LedDescriptor;
+
+extern std::ofstream stream;
 
 /**
  * PositionEstimation class computes the rotation matrix R and the translation vector t

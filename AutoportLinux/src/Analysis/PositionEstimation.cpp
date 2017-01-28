@@ -30,7 +30,11 @@ either expressed or implied, of the FreeBSD Project.
 //============================================================================ */
 
 #include "PositionEstimation.hpp"
+#include "../Utils/LedDescriptor.hpp"
+#include "../Utils/Settings.hpp"
 
+using namespace std;
+using namespace cv;
 
 //--- public member functions ---
 

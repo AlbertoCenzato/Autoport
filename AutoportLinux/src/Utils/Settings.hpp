@@ -36,20 +36,18 @@ either expressed or implied, of the FreeBSD Project.
 #include "pugixml.hpp"
 #include "GenPurpFunc.hpp"
 
-using namespace std;
-
 class Settings {
 
 private:
 
-	string workingDir;
+	std::string workingDir;
 	char *filePath = nullptr;	// TODO: this static pointer is a bit dangerous,
 	pugi::xml_document doc;	 	//	     wrap it in a std::auto_ptr or in a manager class
 	bool docOpen = false;
 
 	static Settings *singleton;
 
-	Settings(const string &configFilePath);
+	Settings(const std::string &configFilePath);
 
 public:
 
@@ -74,7 +72,7 @@ public:
 	Position_XYZ_YPR initialPosition = Position_XYZ_YPR(0,0,2000,0,0,0);
 
 	// TODO: change default led positions
-	vector<cv::Point3f> realWorldPoints = {{90, 70,0},
+	std::vector<cv::Point3f> realWorldPoints = {{90, 70,0},
 	                                   	   {90, 30,0},
 										   {90,-90,0},
 										   {50, 70,0},
@@ -90,15 +88,14 @@ public:
 	virtual ~Settings();
 
 	static Settings* getInstance();
-	//static Settings& getInstance(const string& configFilePath);
 
-	bool loadConfiguration(const string &configFilePath);
+	bool loadConfiguration(const std::string &configFilePath);
 
-	bool modifyConfigParam(const string &paramName, const string &attributeName, double value);
+	bool modifyConfigParam(const std::string &paramName, const std::string &attributeName, double value);
 
 	bool saveConfig();
 
-	string toString();
+	std::string toString();
 
 };
 

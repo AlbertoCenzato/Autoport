@@ -32,13 +32,13 @@ either expressed or implied, of the FreeBSD Project.
 #ifndef TEST_HPP_
 #define TEST_HPP_
 
-#include "Utils/global_includes.hpp"
 #include <iostream>
 
 #include "ImgLoader/ImgFileLoader.hpp"
 #include "Analysis/IPPAnalysis.hpp"
 #include "Utils/LedDescriptor.hpp"
 
+using namespace std;
 using namespace cv;
 
 extern string   workingDir;			// -
@@ -59,7 +59,7 @@ namespace Test {
  * 	Every image is evaluated on its own, all feedback controls are suppressed
  * 	as if every image is the first image of the sequence.
  */
-void ippAnalysis(const string& path) {
+void ippAnalysis(const string &path) {
 	ImgLoader *loader;
 	if(path.compare("d") != 0) {
 		loader = new ImgFileLoader(path,false);	// loads from file

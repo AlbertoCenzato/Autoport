@@ -31,6 +31,9 @@ either expressed or implied, of the FreeBSD Project.
 
 #include "ImgFileLoader.hpp"
 
+using namespace std;
+using namespace cv;
+
 ImgFileLoader::ImgFileLoader() : ImgLoader() { }
 
 ImgFileLoader::ImgFileLoader(const string &source, bool resizeDyn, const Size &frameSize) : ImgLoader(source) {

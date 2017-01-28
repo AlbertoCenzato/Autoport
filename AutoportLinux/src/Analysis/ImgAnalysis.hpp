@@ -32,7 +32,11 @@ either expressed or implied, of the FreeBSD Project.
 #ifndef IMGANALYSIS_HPP_
 #define IMGANALYSIS_HPP_
 
-#include "../Utils/global_includes.hpp"
+#include <stdlib.h>
+#include <opencv2/opencv.hpp>
+#include "../Utils/GenPurpFunc.hpp"
+
+class LedDescriptor;
 
 /**
  * ImgAnalysis class extracts coordinates, color and size of
@@ -74,7 +78,7 @@ public:
 	 * @descriptors: descriptors representing LEDs in the image.
 	 * @return: always true.	// TODO: could be used in a better way...
 	 */
-	bool evaluate(cv::Mat &image, vector<LedDescriptor> &descriptors);
+	bool evaluate(cv::Mat &image, std::vector<LedDescriptor> &descriptors);
 
 	// These functions will be used when size "feedback" is ready
 	//
@@ -139,7 +143,7 @@ private:
 	 * @blobParam: parameters to fit.
 	 * @return: a vector of Point2f containing centroids coordinates of detected blobs.
 	 */
-	int findBlobs(const cv::Mat &bwImage, vector<LedDescriptor>& descriptors);
+	int findBlobs(const cv::Mat &bwImage, std::vector<LedDescriptor>& descriptors);
 
 };
 

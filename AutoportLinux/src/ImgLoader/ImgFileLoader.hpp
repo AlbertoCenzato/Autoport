@@ -32,7 +32,6 @@ either expressed or implied, of the FreeBSD Project.
 #ifndef IMGFILELOADER_HPP_
 #define IMGFILELOADER_HPP_
 
-#include "../Utils/global_includes.hpp"
 #include "ImgLoader.hpp"
 
 /**

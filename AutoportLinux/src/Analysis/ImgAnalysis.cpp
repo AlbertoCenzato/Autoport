@@ -29,9 +29,13 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the FreeBSD Project.
 //============================================================================ */
 
-#include "ImgAnalysis.hpp"
 #include <chrono>
+#include "ImgAnalysis.hpp"
+#include "../Utils/Settings.hpp"
+#include "../Utils/LedDescriptor.hpp"
 
+using namespace std;
+using namespace cv;
 
 ImgAnalysis::ImgAnalysis() {
 
