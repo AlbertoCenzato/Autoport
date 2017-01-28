@@ -1,347 +1,147 @@
+/*==============================================================================
+Software for Autoport project
+
+// Copyright   : Copyright (c) 2016, Alberto Cenzato
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+The views and conclusions contained in the software and documentation are those
+of the authors and should not be interpreted as representing official policies,
+either expressed or implied, of the FreeBSD Project.
+//============================================================================ */
+
+#ifndef TEST_HPP_
+#define TEST_HPP_
+
 #include <iostream>
-#include <stdlib.h>
-#include <opencv2/opencv.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/videoio.hpp>
-#include <opencv2/core/core.hpp>
-#include <unistd.h>
 
-#include "IPPAnalysis.hpp"
+#include "ImgLoader/ImgFileLoader.hpp"
+#include "Analysis/IPPAnalysis.hpp"
+#include "Utils/LedDescriptor.hpp"
 
+using namespace std;
 using namespace cv;
 
-extern string   workingDir;
-extern Settings settings;
+extern string   workingDir;			// -
+extern Settings settings;			//	|
+									//  |- shitty global variables, bad practice,
+ofstream ledStream("led.txt");		//  |  should be removed
+ofstream times("times.txt");		// -
 
-//ofstream stream;
-
-ImgAnalysis imgAnalyzer;
-const int MAX_VAL = 255;
-int minHue = 0, maxHue = 255;
-int minSat = 0, maxSat = 255;
-int minVal = 0, maxVal = 255;
-
+/**
+ * This namespace collects a bunch of functions used to test the rest
+ * of the code. Put here all test functions.
+ */
 namespace Test {
 
-	void on_trackbar(int, void*) {
-		Scalar low (minHue, minSat, minVal);
-		Scalar high(maxHue, maxSat, maxVal);
-		Interval<Scalar> colorInterval(low, high);
-		imgAnalyzer.setColorInterval(colorInterval);
+/**
+ * 	Gives in output the [R,t] matrixes computed from a sequence of images.
+ * 	The matrixes are written in "drone.txt" file.
+ * 	Every image is evaluated on its own, all feedback controls are suppressed
+ * 	as if every image is the first image of the sequence.
+ */
+void ippAnalysis(const string &path) {
+	ImgLoader *loader;
+	if(path.compare("d") != 0) {
+		loader = new ImgFileLoader(path,false);	// loads from file
+	}
+	else {
+		// loads from device, once written sould be something like:
+		// loader = new ImgDeviceLoader();
 	}
 
-	void pointCloudRegister() {
-		srand (time(NULL));
-		Scalar white(255,255,255);
-		Scalar red(0,0,255);
-		Scalar green(0,255,0);
-		Scalar blue(125,125,125);
-
-		double meanError = 0;
-		long timeElapsed = 0;
-		int count = 0;
-
-		const int ITERATIONS = 100000;
-		for(int j = 0; j < ITERATIONS; ++j) {
-			cout << j << endl;
-
-			Vec3f points[5];
-			Point2f originalPoints[5];
-			for(int i = 0; i < 5; ++i) {
-				points[i] = Vec3f(rand()%500,rand()%500,1);
-				originalPoints[i] = Point2f(points[i].val[0],points[i].val[1]);
-			}
-
-			Point2f pivot(rand()%250+125,rand()%250+125);
-			double angle = rand()%180;
-			Mat_<float> rot = getRotationMatrix2D(pivot, angle, 1);
-
-			Vec2f rotPoint[5];
-			for(int i = 0; i< 5; ++i) {
-				Mat_<float> result = rot*Mat_<float>(points[i]);
-				rotPoint[i] = Vec2f(result);
-			}
-
-			vector<Point2f> rotPointsVec(5);
-			vector<Point2f> pointsVec(5);
-			for(int i = 0; i < 5; ++i) {
-				rotPointsVec[i] = Point2f(rotPoint[i]);
-				pointsVec[i]	= Point2f(points[i].val[0], points[i].val[1]);
-			}
-			rotPointsVec[rand()%5] = Point2f(rand()%500,rand()%500);
-
-			auto begin = chrono::high_resolution_clock::now();
-			Mat_<float> H = findHomography(rotPointsVec, pointsVec, RANSAC);
-			if(H.empty())
-				cout << "EMPTY!!" << endl;
-			else {
-				++count;
-				auto end = chrono::high_resolution_clock::now();
-				timeElapsed += chrono::duration_cast<chrono::nanoseconds>(end-begin).count();
-
-				Point2f revPoint[5];
-				for(int i = 0; i< 5; ++i) {
-					Vec3f vec(rotPointsVec[i].x, rotPointsVec[i].y, 1);
-					Mat_<float> result = H*Mat_<float>(vec);
-					Vec3f reversedPoint(result);
-					Point2f revPoint[i] = Point2f(reversedPoint.val[0],reversedPoint.val[1]);
-				}
-
-				double meanDistance = 0;
-				for(int i = 0; i < 5; ++i) {
-					meanDistance += GenPurpFunc::distPoint2Point(revPoint[i],originalPoints[i]);
-				}
-				meanError += meanDistance/5;
-			}
-		}
-
-		meanError /= count;
-
-		cout << "Mean time elapsed: " << timeElapsed/1000/ITERATIONS << "us" << endl;
-		cout << "Mean error: " << meanError << endl;
+	if(!loader->isOpen()) {					// if load error, return
+		cerr << "Input not found!" << endl;
+		return;
 	}
-
-	void notteDellaRicerca() {
-
-		Size frameSize(800,600);
-		int fps = 25;
-		cout << "opening image loader" << endl;
-		ImgLoader loader(workingDir+"video.mp4", SourceType::sDEVICE, frameSize, fps);
-		cout << "done" << endl;
-		imgAnalyzer = ImgAnalysis();
-		vector<LedDescriptor> ledPoints(7);
-
-		const string settingsWindow("Settings");
-		const string processedFrame("Processed stream");
-		//namedWindow(originalFrame,  WINDOW_NORMAL);
-		namedWindow(processedFrame, WINDOW_NORMAL);
-
-		Interval<Scalar> colorInterval;
-		imgAnalyzer.getColorInterval(colorInterval);
-
-		Scalar h = colorInterval.max;
-		Scalar l = colorInterval.min;
-
-		maxHue = h[0];
-		maxSat = h[1];
-		maxVal = h[2];
-		minHue = l[0];
-		minSat = l[1];
-		minVal = l[2];
-
-		imshow(settingsWindow, Mat::zeros(1,800,3));
-
-		createTrackbar("Min hue", settingsWindow, &minHue, MAX_VAL, on_trackbar);
-		createTrackbar("Max hue", settingsWindow, &maxHue, MAX_VAL, on_trackbar);
-
-		createTrackbar("Min sat", settingsWindow, &minSat, MAX_VAL, on_trackbar);
-		createTrackbar("Max sat", settingsWindow, &maxSat, MAX_VAL, on_trackbar);
-
-		createTrackbar("Min val", settingsWindow, &minVal, MAX_VAL, on_trackbar);
-		createTrackbar("Max val", settingsWindow, &maxVal, MAX_VAL, on_trackbar);
+	cout << "LOADER OK" << endl;
 
 
-		Mat frame;
-		char c = 64;
-		float downscalingFactor = 1;
-		while(c != 27 && loader.getNextFrame(frame)) {
+	Mat extrinsicFactors = Mat::zeros(3,4,CV_32FC1); // initialize empty [R,t] matrix
+	auto ipp = IPPAnalysis(loader);					 // initialize IPPAnaysis
 
-			bool downScalingNeeded = imgAnalyzer.evaluate(frame, ledPoints, downscalingFactor);
-			if(downScalingNeeded) {
-				loader.setFrameHeight(loader.getFrameHeight()/2);
-				loader.setFrameWidth (loader.getFrameWidth ()/2);
-				downscalingFactor = 0.5;
-			}
-			imshow(processedFrame, frame);
+	ofstream stream("drone.txt");
 
-			c = (char)waitKey(33);
-		}
-
-		//destroyWindow(processedFrame);
-
-		const string hue = "hue";
-		const string sat = "saturation";
-		const string val = "value";
-
-		const string low  = "low";
-		const string high = "high";
-
-		Settings& settings = Settings::getInstance();
-		settings.modifyConfigParam(hue, low,  minHue);
-		settings.modifyConfigParam(sat, low,  minSat);
-		settings.modifyConfigParam(val, low,  minVal);
-		settings.modifyConfigParam(hue, high, maxHue);
-		settings.modifyConfigParam(sat, high, maxSat);
-		settings.modifyConfigParam(val, high, maxVal);
-
-		settings.saveConfig();
-	}
-
-	void cameraCapture() {
-
-		//Size frameSize(800,600);
-		auto loader = ImgLoader("", SourceType::sDEVICE);
-		const string windowName("Video stream");
-		namedWindow(windowName, WINDOW_AUTOSIZE);
-
-		/*
-		const string fileName = workingDir + "output.avi";
-		int frameWidht = loader.getFrameWidth();
-		int frameHeight = loader.getFrameHeight();
-		VideoWriter video(fileName, CV_FOURCC('M','J','P','G'),10, Size(frameWidht,frameHeight), true);
-		*/
-		Mat frame;
-		char c = 64;
-		while(c != 27) {
-			loader.getNextFrame(frame);
-			//video.write(frame);
-			imshow(windowName, frame);
-			c = (char)waitKey(33);
-		}
-
-
-
-	}
-
-	//--- Image analysis and position estimation test ----
-	void taraturaParametriChristian(const string &path) {
-
-		auto posEstimator = PositionEstimation();
-		string imgName;
-		auto ledPoints = vector<LedDescriptor>();
-		ImgLoader loader;
-		if(path.compare("d") == 0)
-			loader = ImgLoader(path, SourceType::sDEVICE);
-		else
-			loader = ImgLoader(path, SourceType::sFILE);
-
-		Interval<Scalar> colorInterval;
-		imgAnalyzer = ImgAnalysis();
-		imgAnalyzer.getColorInterval(colorInterval);
-
-		Scalar h = colorInterval.max;
-		Scalar l = colorInterval.min;
-
-		maxHue = h[0];
-		maxSat = h[1];
-		maxVal = h[2];
-		minHue = l[0];
-		minSat = l[1];
-		minVal = l[2];
-
-		const string settingsWindow("Settings");
-		imshow(settingsWindow, Mat::zeros(1,800,3));
-
-		createTrackbar("Min hue", settingsWindow, &minHue, MAX_VAL, on_trackbar);
-		createTrackbar("Max hue", settingsWindow, &maxHue, MAX_VAL, on_trackbar);
-
-		createTrackbar("Min sat", settingsWindow, &minSat, MAX_VAL, on_trackbar);
-		createTrackbar("Max sat", settingsWindow, &maxSat, MAX_VAL, on_trackbar);
-
-		createTrackbar("Min val", settingsWindow, &minVal, MAX_VAL, on_trackbar);
-		createTrackbar("Max val", settingsWindow, &maxVal, MAX_VAL, on_trackbar);
-
-		Mat image;
-		loader.getNextFrame(image);
-		int downscalingFactor = 1;
-		namedWindow("Original image", WINDOW_NORMAL);
-		char ch = 64;
-		while(ch != 27) {
-
-			cout << "\n\nLoading image " << imgName << endl;
-			if(!loader.getNextFrame(image)) {
-				cout << "Reached video ending" << endl;
-				break;
-			}
-
-			imgAnalyzer.evaluate(image, ledPoints, downscalingFactor);
-			for(uint i = 0; i < ledPoints.size(); ++i)
-				circle(image,ledPoints[i].position,20,Scalar(0,255,0),10);
-
-			imshow("Original image", image);
-			ch = waitKey(0);
-
-			/*
-			cout << "\n\nPunti traslati:";
-			Point2f trasl = Point2f(-1296,972);
-			for(int i = 0; i < 8; i++) {
-				ledPoints.at(i).y = -ledPoints.at(i).y;
-				ledPoints.at(i) = ledPoints.at(i) + trasl;
-				cout << "\nPunto " << i << ": [" << ledPoints.at(i).x << "," << ledPoints.at(i).y << "]";
-			}
-
-			cout << "\n\nEVALUATING POSITION...";
-			auto position = Matrix<double,3,2>();
-			posEstimator.evaluate(ledPoints, position);
-			cout << "\nCurrent position is:\n";
-			GenPurpFunc::printMatrixd(position,3,2);
-			*/
-
-		}
-
-		Settings& settings = Settings::getInstance();
-		settings.modifyConfigParam("hue",	     "low", minHue);
-		settings.modifyConfigParam("hue",	     "high",maxHue);
-		settings.modifyConfigParam("saturation", "low", minSat);
-		settings.modifyConfigParam("saturation", "high",maxSat);
-		settings.modifyConfigParam("value",		 "low", minVal);
-		settings.modifyConfigParam("value",		 "high",maxVal);
-
-		settings.saveConfig();
-
+	if(!stream.is_open()) {					// if output stream error, return
+		cout << "Couldn't open stream!";
 		return;
 	}
 
-	void ippAnalysis(const string& path) {
-		ImgLoader loader;
-		if(path.compare("d") == 0)
-			loader = ImgLoader(path, SourceType::sDEVICE);
-		else
-			loader = ImgLoader(path, SourceType::sFILE);
+	Result success;
 
-		cout << "LOADER OK" << endl;
+	// execute this loop until user press 'ESC'
+	for(char ch = 0; ch != 27; ch = waitKey(0)) {
 
-		Mat extrinsicFactors = Mat::zeros(3,4,CV_32FC1);
-		auto ipp = IPPAnalysis(&loader);
-		int count = 0, maxFramesToSkip = 5;
+		success = ipp.evaluate(extrinsicFactors);	// compute [R,t] matrix on next image
+		if(success == Result::END)	// if last image, break loop
+			break;
 
-		ofstream stream("data.txt");
+		ipp.reset();	// clears
 
-		if(!stream.is_open()) {
-			cout << "Couldn't open stream!";
-			return;
-		}
+		if(success == Result::FAILURE)	// if ipp.evaluate() fails, [R,t] = 0
+			extrinsicFactors = Mat::zeros(3,4,CV_32FC1);
 
-		char ch = 64;
-		Result success;
-
-		while(ch != 27) {
-			success = ipp.evaluate(extrinsicFactors);
-			if(success == Result::END)
-				break;
-			if(success == Result::FAILURE) {
-				++count;
-				if(count > maxFramesToSkip) {
-					ipp.reset();
-					count = 0;
-				}
-				extrinsicFactors = Mat::zeros(3,4,CV_32FC1);
+		// output [R,t] on "drone.txt" file
+		cout << "Position:\n" << extrinsicFactors << endl;
+		for(int i = 0; i < 3; ++i) {
+			for(int j = 0; j < 4; ++j) {
+				stream << extrinsicFactors.at<float>(i,j);
+				stream << " ";
 			}
-			cout << "Position:\n" << extrinsicFactors << endl;
-			for(int i = 0; i < 3; ++i) {
-				for(int j = 0; j < 4; ++j) {
-					stream << extrinsicFactors.at<float>(i,j);
-					stream << " ";
-				}
-				stream << "\n";
-			}
-			ch = waitKey(1);
+			stream << "\n";
 		}
-
-		stream.close();
-		waitKey(0);
-
 	}
+
+	stream.close();
+	waitKey(0);
+
+	delete loader;
 }
 
+/**
+ * Old test function, almost useless
+ */
+void positionSensitivity() {
+	auto positionEstimator = PositionEstimation();
+	Mat extrinsicFactors = Mat::zeros(3,4,CV_32FC1);
+	float f = 0;
+	Point2f p1 = Point2f(1741,1108.42);
+	Point2f p2 = Point2f(1832.81,1110.54);
+	Point2f p3 = Point2f(1831.29,882.216);
+	Point2f p4 = Point2f(0,0);
+	Point2f p5 = Point2f(1684.48,790.512);
+	Scalar color(0,0,0);
+	vector<LedDescriptor> points = {LedDescriptor(p1,color,f),
+									LedDescriptor(p2,color,f),
+									LedDescriptor(p3,color,f),
+									LedDescriptor(p4,color,f),
+									LedDescriptor(p5,color,f)};
+	bool success = positionEstimator.evaluate(points,extrinsicFactors);
+	if(success)
+		cout << extrinsicFactors << endl;
+	else
+		cout << "Fallito" << endl;
+}
+
+} //namespace Test
+
+#endif

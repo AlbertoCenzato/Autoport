@@ -1,8 +1,5 @@
-/*============================================================================
-// Name        : Autoport.cpp
-// Author      : Alberto Cenzato
-// Version     : 2.0
-// Description : Software for Autoport project
+/*==============================================================================
+Software for Autoport project
 
 // Copyright   : Copyright (c) 2016, Alberto Cenzato
 All rights reserved.
@@ -32,32 +29,57 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the FreeBSD Project.
 //============================================================================ */
 
-#include <stdlib.h>
-#include "Utils/GenPurpFunc.hpp"
-#include "Utils/Settings.hpp"
-#include "Test.hpp"
+#include "LedDescriptor.hpp"
 
 using namespace std;
+using namespace cv;
 
-string workingDir;
-const string configFileName = "autoport.config";
-Status status = Status::LOOKING_FOR_TARGET;
-
-int main() {
-
-	cout << "****** AUTOPORT SOFTWARE ******\n" << endl;
-
-	cout << "\n*** Settings ***" << endl;
-	Settings *settings = Settings::getInstance();	// loads settings from autoport.config
-	cout << settings->toString() << "\n\n" << endl;
-
-	cout << "Enter the path of the file to analyze [d for camera capture]" << endl;
-	string path;
-	cin >> path;
-
-	Test::ippAnalysis(path);
-
-	getchar();
-	return 0;
+LedDescriptor::LedDescriptor() {
+	size = 0;
 }
 
+LedDescriptor::LedDescriptor(Point2f &position, Scalar &color, float size) {
+	this->position = Point2f(position);
+	this->color	   = Scalar(color);
+	this->size 	   = size;
+}
+
+LedDescriptor::LedDescriptor(float x, float y, float hue, float saturation, float value, float size) {
+	position   = Point2f(x,y);
+	color 	   = Scalar(hue,saturation,value);
+	this->size = size;
+}
+
+LedDescriptor::~LedDescriptor() {}
+
+//TODO: maybe it would be better to give higher weight in the sum to led position
+//		maybe not
+float LedDescriptor::L2Dist(const LedDescriptor &ledDesc) const {
+	float sqSum = 0;
+	sqSum += pow(position.x - ledDesc.position.x,2);
+	sqSum += pow(position.y - ledDesc.position.y,2);
+	sqSum += pow(color[0]   - ledDesc.color[0],  2);
+	sqSum += pow(color[1]   - ledDesc.color[1],  2);
+	sqSum += pow(color[2]   - ledDesc.color[2],  2);
+	sqSum += pow(size	    - ledDesc.size,  	 2);
+	return sqrt(sqSum);
+}
+
+float LedDescriptor::euclidDist(const LedDescriptor &ledDesc) const {
+	return sqrt(pow(position.x - ledDesc.position.x, 2) + pow(position.y - ledDesc.position.y, 2));
+}
+
+bool LedDescriptor::isEmpty() const {
+	return position.x == 0 || position.y == 0;
+}
+
+Point2f LedDescriptor::centroid(const vector<LedDescriptor> &descriptors) {
+	float x = 0;
+	float y = 0;
+	const int SIZE = descriptors.size();
+	for (int i = 0; i < SIZE; i++) {
+		x += descriptors[i].position.x;
+		y += descriptors[i].position.y;
+	}
+	return Point2f(x/SIZE, y/SIZE);
+}

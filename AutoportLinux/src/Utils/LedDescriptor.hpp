@@ -1,8 +1,5 @@
-/*============================================================================
-// Name        : Autoport.cpp
-// Author      : Alberto Cenzato
-// Version     : 2.0
-// Description : Software for Autoport project
+/*==============================================================================
+Software for Autoport project
 
 // Copyright   : Copyright (c) 2016, Alberto Cenzato
 All rights reserved.
@@ -32,32 +29,42 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the FreeBSD Project.
 //============================================================================ */
 
+#ifndef LEDDESCRIPTOR_HPP_
+#define LEDDESCRIPTOR_HPP_
+
 #include <stdlib.h>
-#include "Utils/GenPurpFunc.hpp"
-#include "Utils/Settings.hpp"
-#include "Test.hpp"
+#include <opencv2/opencv.hpp>
 
-using namespace std;
+/**
+ * This class is a descriptor for the LEDs detected in an image.
+ * Contains informations about their coordinates on the image plane
+ * (in pixels), their color and their size.
+ */
+class LedDescriptor {
+public:
 
-string workingDir;
-const string configFileName = "autoport.config";
-Status status = Status::LOOKING_FOR_TARGET;
+	cv::Point2f position;
+	cv::Scalar 	color;
+	float		size;
 
-int main() {
+	LedDescriptor();
+	LedDescriptor(cv::Point2f &position, cv::Scalar &color, float size);
+	LedDescriptor(float x, float y, float hue, float saturation, float value, float size);
+	virtual ~LedDescriptor();
 
-	cout << "****** AUTOPORT SOFTWARE ******\n" << endl;
+	float L2Dist  (const LedDescriptor &ledDesc) const;
+	float euclidDist(const LedDescriptor &ledDesc) const;
 
-	cout << "\n*** Settings ***" << endl;
-	Settings *settings = Settings::getInstance();	// loads settings from autoport.config
-	cout << settings->toString() << "\n\n" << endl;
+	/**
+	 * returns true if a descriptor is empty. It is empty if
+	 * position.x = 0 or position.y = 0. Every descriptor position is
+	 * computed as the centroid of a blob on the image plane
+	 * and therefore it can't have position.x = 0 or position.y = 0
+	 */
+	bool isEmpty() const;
 
-	cout << "Enter the path of the file to analyze [d for camera capture]" << endl;
-	string path;
-	cin >> path;
+	static cv::Point2f centroid(const std::vector<LedDescriptor> &descriptors);
 
-	Test::ippAnalysis(path);
+};
 
-	getchar();
-	return 0;
-}
-
+#endif /* LEDDESCRIPTOR_HPP_ */

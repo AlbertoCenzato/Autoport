@@ -1,8 +1,5 @@
-/*============================================================================
-// Name        : Autoport.cpp
-// Author      : Alberto Cenzato
-// Version     : 2.0
-// Description : Software for Autoport project
+/*==============================================================================
+Software for Autoport project
 
 // Copyright   : Copyright (c) 2016, Alberto Cenzato
 All rights reserved.
@@ -32,32 +29,33 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the FreeBSD Project.
 //============================================================================ */
 
-#include <stdlib.h>
-#include "Utils/GenPurpFunc.hpp"
-#include "Utils/Settings.hpp"
-#include "Test.hpp"
+#include "ImgLoader.hpp"
 
 using namespace std;
+using namespace cv;
 
-string workingDir;
-const string configFileName = "autoport.config";
-Status status = Status::LOOKING_FOR_TARGET;
-
-int main() {
-
-	cout << "****** AUTOPORT SOFTWARE ******\n" << endl;
-
-	cout << "\n*** Settings ***" << endl;
-	Settings *settings = Settings::getInstance();	// loads settings from autoport.config
-	cout << settings->toString() << "\n\n" << endl;
-
-	cout << "Enter the path of the file to analyze [d for camera capture]" << endl;
-	string path;
-	cin >> path;
-
-	Test::ippAnalysis(path);
-
-	getchar();
-	return 0;
+ImgLoader::ImgLoader() {
+	capture = VideoCapture();
 }
 
+ImgLoader::ImgLoader(const string &source) {
+	capture = VideoCapture(source);
+}
+
+ImgLoader::ImgLoader(int device) {
+	capture = VideoCapture(device);
+}
+
+ImgLoader::~ImgLoader() {}
+
+bool ImgLoader::halveRes() {
+	Rect roi = getROI();
+	return setResolutionHeight(roi.height / 2) && setResolutionWidth(roi.width / 2);
+}
+
+bool ImgLoader::doubleRes() {
+	Rect roi = getROI();
+	return setResolutionHeight(roi.height * 2) && setResolutionWidth(roi.width * 2);
+}
+
+bool ImgLoader::isOpen() { return capture.isOpened(); }
