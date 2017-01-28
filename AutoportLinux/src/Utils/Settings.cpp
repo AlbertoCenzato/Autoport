@@ -51,8 +51,8 @@ const char* Settings::LOW 	 = "low";
 const char* Settings::HIGH 	 = "high";
 
 Settings::Settings(const string &configFilePath) {
-		loadConfiguration(configFilePath);
-	}
+	loadConfiguration(configFilePath);
+}
 
 Settings::~Settings() {
 	delete [] filePath;
@@ -131,11 +131,11 @@ bool Settings::loadConfiguration(const string &configFilePath) {
 
 	node = positionEstimation.child("initial_position");
 	initialPosition = Position_XYZ_YPR(node.attribute("x").as_double(),
-									   node.attribute("y").as_double(),
-									   node.attribute("z").as_double(),
-									   node.attribute("yaw").as_double(),
-									   node.attribute("pitch").as_double(),
-									   node.attribute("roll").as_double());
+			node.attribute("y").as_double(),
+			node.attribute("z").as_double(),
+			node.attribute("yaw").as_double(),
+			node.attribute("pitch").as_double(),
+			node.attribute("roll").as_double());
 
 	realWorldPoints.clear();
 	for (xml_node iterNode = positionEstimation.child("real_world_points").first_child(); iterNode; iterNode = iterNode.next_sibling()) {

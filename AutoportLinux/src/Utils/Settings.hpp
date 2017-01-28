@@ -36,17 +36,33 @@ either expressed or implied, of the FreeBSD Project.
 #include "pugixml.hpp"
 #include "GenPurpFunc.hpp"
 
+/**
+ * This class loads all configurable project settings from an xml file
+ * and stores them in its member variables. It can also save
+ * modified settings to a file. To change permanently the parameters
+ * use Settings::modifyConfigParam(), don't use member variables, changes made
+ * to member variables are not written to file.
+ *
+ * FIXME: it's ambiguous to have public member variables and
+ * 		 Settings::modifyConfigParam() function
+ * FIXME: this class should be split in multiple inner classes
+ * 		  following the hierarchy of the xml configuration file
+ */
 class Settings {
 
 private:
 
 	std::string workingDir;
-	char *filePath = nullptr;	// TODO: this static pointer is a bit dangerous,
-	pugi::xml_document doc;	 	//	     wrap it in a std::auto_ptr or in a manager class
+	char *filePath = nullptr;
+	pugi::xml_document doc;
 	bool docOpen = false;
 
-	static Settings *singleton;
+	static Settings *singleton; // TODO: this static pointer is a bit dangerous,
+                                //	     wrap it in a std::auto_ptr or in a manager class
 
+	/**
+	 * Private class constructor.
+	 */
 	Settings(const std::string &configFilePath);
 
 public:
@@ -87,14 +103,45 @@ public:
 
 	virtual ~Settings();
 
+	/**
+	 * This function is the only way to instantiate an object of this class.
+	 * Projects settings are loaded from file the first time this function is called
+	 * and kept in memory until the execution ends; therefore subsequent calls to
+	 * this function do not open the file again, they simply and quickly return a pointer.
+	 *
+	 * @return: a pointer to the static Settings object.
+	 */
 	static Settings* getInstance();
 
+	/**
+	 * Function called by the constructor to load configuration
+	 * settings from file.
+	 *
+	 * @configFilePath: path to configuration file
+	 * @return: false if errors occur
+	 */
 	bool loadConfiguration(const std::string &configFilePath);
 
+	/**
+	 * Change value to a parameter.
+	 *
+	 * @paramName: name of the parameter to change.
+	 * @attributeName: name of the attribute of the parameter to change.
+	 * @value: new attribute value.
+	 * @return: false if errors occur
+	 */
 	bool modifyConfigParam(const std::string &paramName, const std::string &attributeName, double value);
 
+	/**
+	 * Saves changes done by Settings::modifyConfigParam()
+	 *
+	 * @return: false if errors occur
+	 */
 	bool saveConfig();
 
+	/**
+	 * Returns a string containing parameters values
+	 */
 	std::string toString();
 
 };
