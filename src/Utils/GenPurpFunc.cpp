@@ -5,8 +5,8 @@
  *      Author: alberto
  */
 
-#include "GenPurpFunc.hpp"
-#include "LedDescriptor.hpp"
+#include "Utils/GenPurpFunc.hpp"
+#include "Utils/LedDescriptor.hpp"
 
 using namespace std;
 using namespace cv;

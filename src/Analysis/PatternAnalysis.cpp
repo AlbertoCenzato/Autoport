@@ -30,10 +30,10 @@ either expressed or implied, of the FreeBSD Project.
 //============================================================================ */
 
 #include <opencv2/opencv.hpp>
-#include "PatternAnalysis.hpp"
-#include "../Utils/Settings.hpp"
-#include "../Utils/LedDescriptor.hpp"
-#include "../Utils/GenPurpFunc.hpp"
+#include "Analysis/PatternAnalysis.hpp"
+#include "Utils/Settings.hpp"
+#include "Utils/LedDescriptor.hpp"
+#include "Utils/GenPurpFunc.hpp"
 
 using namespace std;
 using namespace cv;

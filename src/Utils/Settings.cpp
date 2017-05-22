@@ -29,7 +29,7 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the FreeBSD Project.
 //============================================================================ */
 
-#include "Settings.hpp"
+#include "Utils/Settings.hpp"
 
 #include <string.h>
 #include <fstream>

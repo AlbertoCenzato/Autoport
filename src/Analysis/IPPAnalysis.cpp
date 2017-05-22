@@ -33,9 +33,9 @@ either expressed or implied, of the FreeBSD Project.
 
 #include <chrono>
 #include <opencv2/highgui.hpp>
-#include "../Utils/Settings.hpp"
-#include "../Utils/LedDescriptor.hpp"
-#include "../ImgLoader/ImgLoader.hpp"
+#include "Utils/Settings.hpp"
+#include "Utils/LedDescriptor.hpp"
+#include "ImgLoader/ImgLoader.hpp"
 
 using namespace std;
 using namespace cv;
