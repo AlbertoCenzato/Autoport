@@ -33,7 +33,7 @@ either expressed or implied, of the FreeBSD Project.
 #define SETTINGS_HPP_
 
 #include <opencv2/opencv.hpp>
-#include "../../extern_libs/pugixml.hpp"
+#include "pugixml.hpp"
 #include "GenPurpFunc.hpp"
 
 /**
